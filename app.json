@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "HitApp",
-    "slug": "HitApp",
+    "name": "HIT-App",
+    "slug": "HIT-App",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -24,6 +24,9 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "plugins": [
+      "expo-router"
+    ]
   }
 }
