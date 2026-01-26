@@ -2,19 +2,21 @@ import { FlatList, Pressable, View, Text, StyleSheet, Appearance } from "react-n
 import {SafeAreaView} from 'react-native-safe-area-context'
 import { exercises } from "../data/exercises";
 import { routines } from "../data/routines";
+import { useRouter } from "expo-router";
 
-export default function Logs (){
+export default function WorkoutSelectionScreen (){
 
+    const router = useRouter();
     const colorScheme = Appearance.getColorScheme();
     const styles = createStyles(colorScheme);
-    const selectWorkout = (item)=>{
-        console.log(item.exerciseIds)
+    const selectWorkout = (id)=>{
+        router.push(`/workout/${id}`);
     }
     const renderItem = ({item})=>(
             <View style = {styles.rows}>
-                <Text style={[styles.id, styles.workout]}>Workout {item.id} :</Text>
-                <Pressable onPress={()=>selectWorkout(item)}>
-                    <Text style={styles.workout}>{item.name}</Text>
+                <Text style={[styles.id, styles.workoutText]}>Workout {item.id} :</Text>
+                <Pressable onPress={()=>selectWorkout(item.id)}>
+                    <Text style={styles.workoutText}>{item.name}</Text>
                 </Pressable>
             </View>
     )
@@ -58,7 +60,7 @@ function createStyles(colorScheme){
         fontWeight: '400',
         margin: 10,
     },
-    workout:{
+    workoutText:{
         color: 'white',
         fontSize: 17,
     },

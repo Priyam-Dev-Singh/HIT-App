@@ -8,19 +8,19 @@ export const exercises = [
     {
         'id': 'ex_02',
         'name': 'Incline Press',
-        'muscleGroup' : 'Chest',
+        'muscleGroup' : 'Chest (Upper Chest)',
         'description': 'Incline Chest Press either free weights or a machine',
     },
     {
         'id':'ex_03',
         'name':'Straight Arm PullDowns',
-        'muscleGroup':'Back',
+        'muscleGroup':'Back (Lats)',
         'description':'Straight arm Lat Pulldowns on a Lat pulldown machine',
     },
     {
         'id':'ex_04',
         'name':'Palms-up Pulldown',
-        'muscleGroup':'Back',
+        'muscleGroup':'Back and Biceps',
         'description': 'Close grip palms up pulldown on a Lat pulldown machine',
     },
     {
@@ -32,7 +32,7 @@ export const exercises = [
     {
         'id':'ex_06',
         'name':'Leg Extensions',
-        'muscleGroup':'Legs',
+        'muscleGroup':'Quads',
         'description': 'Leg Extensions on a machine',
     },
     {
@@ -44,31 +44,31 @@ export const exercises = [
     {
         'id':'ex_08',
         'name':'Calf Raises',
-        'muscleGroup':'Legs',
+        'muscleGroup':'Calves',
         'description': 'Standing Calf raises preferably on a machine',
     },
     {
         'id':'ex_09',
         'name':'Sit ups',
-        'muscleGroup':'Abs',
+        'muscleGroup':'Abdominals',
         'description': 'Sit ups preferably on a supported machine',
     },
     {
         'id':'ex_10',
         'name':'Lateral Raises',
-        'muscleGroup':'Shoulder',
+        'muscleGroup':'Shoulder (Lateral Delts)',
         'description': 'Shoulder Lateral Raises either free weight or on a machine',
     },
     {
         'id':'ex_11',
         'name':'Rear Delt Fly',
-        'muscleGroup':'Shoulder',
+        'muscleGroup':'Shoulder (Rear Delts)',
         'description': 'Rear Delt flyes preferably on a machine',
     },
     {
         'id':'ex_12',
         'name':'Close Grip Pulldown',
-        'muscleGroup':'Biceps',
+        'muscleGroup':'Biceps and Back',
         'description': 'Close grip palms up pulldown on a Lat pulldown machine',
     },
     {
