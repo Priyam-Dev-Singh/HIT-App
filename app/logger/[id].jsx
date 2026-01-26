@@ -3,6 +3,7 @@ import { Appearance, Button, Image, StyleSheet, Text, TextInput, TouchableOpacit
 import { exercises } from "../../data/exercises";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useState } from "react";
+import { saveSet } from "../../services/storage";
 
 export default function LoggingScreen(){
     const [weight,setWeight]=useState('');
@@ -11,6 +12,18 @@ export default function LoggingScreen(){
     const currentExercise = exercises.find(item=>item.id === id);
     const colorScheme = Appearance.getColorScheme();
     const styles = createStyles(colorScheme);
+    const handleSave = async()=>{
+        if(!weight || !reps){
+            alert("please enter both reps and weight");
+            return;
+        }
+        const success = await saveSet(currentExercise.id, weight, reps);
+        if(success){
+            setReps('');
+            setWeight('');
+            alert('Set saved')
+        }
+    }
     return(
        <SafeAreaView style={styles.container}>
         
@@ -35,7 +48,7 @@ export default function LoggingScreen(){
                 placeholderTextColor={colorScheme==='dark'?'#c0c0c0':'#333'}
                 placeholder="0"
                 keyboardType="numeric"
-                maxLength={3}/>
+                maxLength={6}/>
             </View>
             <View style={styles.logContainers}>
                 <Text style={styles.weightAndReps}>Reps</Text>
@@ -44,13 +57,13 @@ export default function LoggingScreen(){
                 onChangeText={setReps}
                 style={styles.input}
                 placeholder="0"
-                maxLength={2}
+                maxLength={4}
                 keyboardType="numeric"
                 allowFontScaling />
             </View>
         </View>
         <TouchableOpacity style={styles.saveButton}
-        onPress={{}}>
+        onPress={handleSave}>
             <Text style={styles.saveText}>Save Log</Text>
         </TouchableOpacity>
        </SafeAreaView>
