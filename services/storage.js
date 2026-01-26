@@ -34,3 +34,20 @@ export const saveSet = async (exerciseId, weight, reps)=>{
         return false;
     };
 }
+
+export const getLastLog = async (exerciseId) =>{
+    try{
+        const jsonValue = await AsyncStorage.getItem(storageKey);
+
+        const allLogs = jsonValue != null ? JSON.parse(jsonValue):[];
+        //getting the necessary log
+        const lastLog = allLogs.filter(log => log.exerciseId === exerciseId);
+        //sorting so the newest log is first
+        lastLog.sort((a,b)=> new Date(b.date)-new Date(a.date));
+        //if the last log exists then get the first log in the last log array
+        return lastLog.length > 0 ? lastLog[0]: null;
+
+    }catch(e){
+        console.error("Error fetching last log", e);
+    };
+};

@@ -2,12 +2,14 @@ import { useLocalSearchParams } from "expo-router";
 import { Appearance, Button, Image, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { exercises } from "../../data/exercises";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useState } from "react";
-import { saveSet } from "../../services/storage";
+import { useEffect, useState } from "react";
+import { saveSet, getLastLog } from "../../services/storage";
+
 
 export default function LoggingScreen(){
     const [weight,setWeight]=useState('');
     const [reps,setReps]=useState('');
+    const [lastLog, setLastLog] = useState({});
     const {id} = useLocalSearchParams();
     const currentExercise = exercises.find(item=>item.id === id);
     const colorScheme = Appearance.getColorScheme();
@@ -24,6 +26,16 @@ export default function LoggingScreen(){
             alert('Set saved')
         }
     }
+    useEffect(() => {
+      const fetchLastLog = async ()=>{
+        const data = await getLastLog(currentExercise.id);
+        setLastLog(data);
+        //console.log("log loaded",data);
+      }
+      fetchLastLog();
+      
+    }, [currentExercise.id]);
+    
     return(
        <SafeAreaView style={styles.container}>
         
@@ -37,7 +49,14 @@ export default function LoggingScreen(){
         <View>
             <Text style={styles.description}>Description : {currentExercise.description}</Text>
         </View>
-
+        {lastLog != null ? 
+            <View style={styles.lastSet}>
+                <Text style={styles.lastSetContent}>Previous Set</Text>
+                <Text style={styles.lastSetContent}>{lastLog.weight} kgs / {lastLog.reps} reps</Text>
+            </View> : 
+            <View></View>  
+        }
+       
         <View style={{display: 'flex', flexDirection:'row', alignItems:'center', justifyContent:'space-evenly'}}>
             <View style={styles.logContainers}>
                 <Text style={styles.weightAndReps}>Weight (kg)</Text>
@@ -93,7 +112,7 @@ function createStyles (colorScheme){
     },
     description:{
         color: colorScheme === 'light'?'black':'white',
-        fontSize: 15,
+        fontSize: 18,
         padding: 10,
         width:'100%',
         height: 'auto',
@@ -134,12 +153,11 @@ function createStyles (colorScheme){
         width: 'auto',
         height: 'auto',
         alignSelf:'center',
-        margin: 10,
+        margin: 15,
         backgroundColor: 'red',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        margin: 10,
         borderWidth: 1,
         borderColor: 'papayawhip',
         borderRadius: 5,
@@ -151,5 +169,22 @@ function createStyles (colorScheme){
         color: 'white',
         padding: 10,
     },
+    lastSet:{
+        width: 'auto',
+        borderWidth: 1,
+        borderColor:colorScheme==="light"?'black':'papayawhip', 
+        borderRadius: 10,
+        backgroundColor:colorScheme==='light'?'#e1e1e1':'#222',
+        margin: 15,
+        padding: 10,
+        display:'flex',
+        alignItems: 'center',
+        
+    },
+    lastSetContent:{
+        fontSize: 25,
+        color: colorScheme === 'light'?'black':'white',
+    },
+
  })
 }
