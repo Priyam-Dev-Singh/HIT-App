@@ -4,6 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Appearance, FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
 import { useEffect, useState } from 'react';
 import { exercises } from '../../data/exercises';
+import Octicons from '@expo/vector-icons/Octicons';
 
 export default function ExerciseSelectionScreen(){
    
@@ -26,8 +27,8 @@ export default function ExerciseSelectionScreen(){
     );
     return(
         <SafeAreaView style = {styles.container}>
-            <View>
-               <Text>{currentRoutine.name || 'Routine Not Found'}</Text> 
+            <View style={{display:'flex', flexDirection:'row'}}>
+               <Text style={styles.routineName}>{currentRoutine.name || 'Routine Not Found'}</Text>
             </View>
             <FlatList
             data={currentExercises}
@@ -53,16 +54,24 @@ function createStyles (colorScheme){
         display: 'flex',
         flexDirection:'row',
         borderWidth: 1,
-        borderColor: 'papayawhip',
+        borderColor: colorScheme === 'light'?'black':'papayawhip',
         borderRadius: 5,
         gap: 5,
         alignItems:'center',
         margin: 8,
     },
      workoutText:{
-        color: 'white',
+        color: colorScheme === 'light'?'black':'white',
         fontSize: 17,
         margin:10,
+    },
+    routineName:{
+        fontSize: 20,
+        backgroundColor: colorScheme==='light'?'#e1e1e1':'#222',
+        width: '100%',
+        color: colorScheme==='light'?'black':'white',
+        padding: 10,
+
     },
     })
 }

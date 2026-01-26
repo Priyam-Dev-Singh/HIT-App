@@ -50,7 +50,7 @@ function createStyles(colorScheme){
         display: 'flex',
         flexDirection:'row',
         borderWidth: 1,
-        borderColor: 'papayawhip',
+        borderColor: colorScheme==='dark'?'papayawhip':'black',
         borderRadius: 5,
         gap: 5,
         alignItems:'center',
@@ -61,7 +61,7 @@ function createStyles(colorScheme){
         margin: 10,
     },
     workoutText:{
-        color: 'white',
+        color: colorScheme==='dark'?'white':'black',
         fontSize: 17,
     },
     
