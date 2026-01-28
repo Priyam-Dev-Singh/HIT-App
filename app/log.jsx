@@ -3,28 +3,38 @@ import {SafeAreaView} from 'react-native-safe-area-context'
 import { exercises } from "../data/exercises";
 import { routines } from "../data/routines";
 import { useRouter } from "expo-router";
+import { useContext } from "react";
+import { ThemeContext } from "../src/context/ThemeContext";
+import Octicons from '@expo/vector-icons/Octicons';
 
 export default function WorkoutSelectionScreen (){
 
     const router = useRouter();
-    const colorScheme = Appearance.getColorScheme();
+    const {colorScheme, toggleTheme} = useContext(ThemeContext);
     const styles = createStyles(colorScheme);
     const selectWorkout = (id)=>{
         router.push(`/workout/${id}`);
     }
     const renderItem = ({item})=>(
+        <Pressable onPress={()=>selectWorkout(item.id)}>
             <View style = {styles.rows}>
                 <Text style={[styles.id, styles.workoutText]}>Workout {item.id} :</Text>
-                <Pressable onPress={()=>selectWorkout(item.id)}>
                     <Text style={styles.workoutText}>{item.name}</Text>
-                </Pressable>
+               
             </View>
+        </Pressable>
     )
    
     return(
        <SafeAreaView style={styles.container}>
-        <View style={{height: '10%', backgroundColor:'gray'
-        }}></View>
+        <View style={{height: '7%', backgroundColor:colorScheme==='dark'?'grey':'#dddddd', display: 'flex', flexDirection:'row', justifyContent:"space-between", alignItems:'center'
+        }}>
+            <Text style = {styles.headerText}>Select a Workout</Text>
+            <Pressable onPress={toggleTheme}>
+                {colorScheme==='dark'?
+                <Octicons name="moon" size={36} color='white' selectable={undefined} style={{width: 36, marginHorizontal: 10,}}/>:<Octicons name="sun" size={36} color='black' selectable={undefined} style={{width: 36, marginHorizontal: 10,}}/>}
+            </Pressable>
+        </View>
         <FlatList
         data = {routines}
         keyExtractor={item => item.id}
@@ -54,7 +64,7 @@ function createStyles(colorScheme){
         borderRadius: 5,
         gap: 5,
         alignItems:'center',
-        margin: 8,
+        margin: 10,
     },
     id:{
         fontWeight: '400',
@@ -64,5 +74,11 @@ function createStyles(colorScheme){
         color: colorScheme==='dark'?'white':'black',
         fontSize: 17,
     },
+    headerText:{
+        color: colorScheme==='dark'?'white':'black',
+        padding: 10,
+        fontSize: 22,
+        fontWeight: '600'
+    }
     
 })}

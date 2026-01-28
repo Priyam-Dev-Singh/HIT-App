@@ -2,13 +2,14 @@ import {useLocalSearchParams, useRouter} from 'expo-router';
 import { routines } from '../../data/routines';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Appearance, FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { exercises } from '../../data/exercises';
 import Octicons from '@expo/vector-icons/Octicons';
+import { ThemeContext } from '../../src/context/ThemeContext';
 
 export default function ExerciseSelectionScreen(){
    
-    const colorScheme = Appearance.getColorScheme();
+    const{colorScheme, toggleTheme} = useContext(ThemeContext);
     const styles = createStyles(colorScheme);
     const {id} = useLocalSearchParams();
     const router = useRouter();
@@ -27,9 +28,14 @@ export default function ExerciseSelectionScreen(){
     );
     return(
         <SafeAreaView style = {styles.container}>
-            <View style={{display:'flex', flexDirection:'row'}}>
-               <Text style={styles.routineName}>{currentRoutine.name || 'Routine Not Found'}</Text>
-            </View>
+           <View style={{height: '7%', backgroundColor:colorScheme==='dark'?'grey':'#dddddd', display: 'flex', flexDirection:'row', justifyContent:"space-between", alignItems:'center'
+                   }}>
+                       <Text style = {styles.headerText}>{currentRoutine.name}</Text>
+                       <Pressable onPress={toggleTheme}>
+                           {colorScheme==='dark'?
+                           <Octicons name="moon" size={36} color='white' selectable={undefined} style={{width: 36, marginHorizontal: 10,}}/>:<Octicons name="sun" size={36} color='black' selectable={undefined} style={{width: 36, marginHorizontal: 10,}}/>}
+                       </Pressable>
+                   </View>
             <FlatList
             data={currentExercises}
             keyExtractor={item=>item.id}
@@ -59,6 +65,7 @@ function createStyles (colorScheme){
         gap: 5,
         alignItems:'center',
         margin: 8,
+        pointerEvents:'auto',
     },
      workoutText:{
         color: colorScheme === 'light'?'black':'white',
@@ -70,8 +77,14 @@ function createStyles (colorScheme){
         backgroundColor: colorScheme==='light'?'#e1e1e1':'#222',
         width: '100%',
         color: colorScheme==='light'?'black':'white',
-        padding: 10,
+        padding: 15,
 
     },
+    headerText:{
+        color: colorScheme==='dark'?'white':'black',
+        padding: 10,
+        fontSize: 22,
+        fontWeight: '600',
+    }
     })
 }

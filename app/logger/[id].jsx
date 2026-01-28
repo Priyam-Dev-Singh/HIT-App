@@ -3,7 +3,7 @@ import { Appearance, Button, Image, StyleSheet, Text, TextInput, TouchableOpacit
 import { exercises } from "../../data/exercises";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useEffect, useState } from "react";
-import { saveSet, getLastLog } from "../../services/storage";
+import { saveSet, getLastLog } from "../../src/storage";
 
 
 export default function LoggingScreen(){
