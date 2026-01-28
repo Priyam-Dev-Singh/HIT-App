@@ -1,7 +1,8 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import uuid from 'react-native-uuid';
 
-const storageKey = '@workoutLogs';
+const workoutStorageKey = '@workoutLogs';
+const macrosStorageKey = '@macrosLogs';
 
 export const saveSet = async (exerciseId, weight, reps)=>{
     try{
@@ -14,7 +15,7 @@ export const saveSet = async (exerciseId, weight, reps)=>{
             reps: parseFloat(reps)
         };
         //reading current Logs
-        const jsonValue = await AsyncStorage.getItem(storageKey);
+        const jsonValue = await AsyncStorage.getItem(workoutStorageKey);
         const currentLogs = jsonValue != null ? JSON.parse(jsonValue) : [];
 
         //updating
@@ -22,7 +23,7 @@ export const saveSet = async (exerciseId, weight, reps)=>{
         //console.log(JSON.stringify(updatedLogs));
 
         //saving to storage
-        await AsyncStorage.setItem(storageKey,JSON.stringify(updatedLogs));
+        await AsyncStorage.setItem(workoutStorageKey,JSON.stringify(updatedLogs));
         
 
         console.log("DataBase updated");
@@ -37,7 +38,7 @@ export const saveSet = async (exerciseId, weight, reps)=>{
 
 export const getLastLog = async (exerciseId) =>{
     try{
-        const jsonValue = await AsyncStorage.getItem(storageKey);
+        const jsonValue = await AsyncStorage.getItem(workoutStorageKey);
 
         const allLogs = jsonValue != null ? JSON.parse(jsonValue):[];
         //getting the necessary log
@@ -51,3 +52,34 @@ export const getLastLog = async (exerciseId) =>{
         console.error("Error fetching last log", e);
     };
 };
+
+export const saveMacros = async (protein, carbs, fats, water) => {
+    try{
+        const newLog = {
+          date : new Date().toISOString(),
+          protein : parseFloat(protein),
+          carbs : parseFloat(carbs),
+          fats : parseFloat(fats),
+          water: parseFloat(water),
+        };
+
+        //getting the current logs
+        const jsonValue = await AsyncStorage.getItem(macrosStorageKey);
+
+        const currentLogs = jsonValue != null ? JSON.parse(jsonValue):[];
+
+        //updating the current log
+        const updatedLogs = [...currentLogs, newLog];
+        //saving the updated log
+        await AsyncStorage.setItem(macrosStorageKey, JSON.stringify(updatedLogs));
+
+        console.log("Database Updated");
+        return true;
+
+
+    }catch(e){
+        console.error("Error saving Log", e);
+        return false;
+    };
+
+}
