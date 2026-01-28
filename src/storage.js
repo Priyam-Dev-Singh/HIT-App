@@ -53,6 +53,30 @@ export const getLastLog = async (exerciseId) =>{
     };
 };
 
+export const deleteLastLog = async (exerciseId) => {
+   try{
+     const jsonValue = await AsyncStorage.getItem(workoutStorageKey);
+    const allLogs = jsonValue != null ? JSON.parse(jsonValue) : [];
+
+    const exerciseLogs = allLogs.filter(log => log.exerciseId === exerciseId);
+    if(exerciseId.length === 0){console.log("No logs are present");
+        return false;
+    }
+    exerciseLogs.sort((a,b)=> new Date(b.date)- new Date(a.date));
+    const lastLog = exerciseLogs[0];
+    const updatedLogs = allLogs.filter(log=> log.id !== lastLog.id);
+    
+    await AsyncStorage.setItem(workoutStorageKey, JSON.stringify(updatedLogs));
+
+    console.log("Last log deleted with log id: ",lastLog.id);
+    return true;
+
+   }catch(e){console.error("Error deleting the last log");
+            return false;
+   }
+
+};
+
 export const saveMacros = async (protein, carbs, fats, water) => {
     try{
         const newLog = {

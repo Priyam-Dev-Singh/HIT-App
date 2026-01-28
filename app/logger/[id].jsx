@@ -1,10 +1,11 @@
 import { useLocalSearchParams } from "expo-router";
-import { Appearance, Button, Image, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { Alert, Appearance, Button, Image, Platform, Pressable, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { exercises } from "../../data/exercises";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useEffect, useState } from "react";
-import { saveSet, getLastLog } from "../../src/storage";
-
+import { useContext, useEffect, useState } from "react";
+import { saveSet, getLastLog, deleteLastLog } from "../../src/storage";
+import Octicons from '@expo/vector-icons/Octicons';
+import { ThemeContext } from "../../src/context/ThemeContext";
 
 export default function LoggingScreen(){
     const [weight,setWeight]=useState('');
@@ -12,7 +13,7 @@ export default function LoggingScreen(){
     const [lastLog, setLastLog] = useState({});
     const {id} = useLocalSearchParams();
     const currentExercise = exercises.find(item=>item.id === id);
-    const colorScheme = Appearance.getColorScheme();
+    const {colorScheme, toggleTheme} = useContext(ThemeContext); 
     const styles = createStyles(colorScheme);
     const handleSave = async()=>{
         if(!weight || !reps){
@@ -25,13 +26,46 @@ export default function LoggingScreen(){
             setWeight('');
             alert('Set saved')
         }
-    }
-    useEffect(() => {
-      const fetchLastLog = async ()=>{
+    };
+
+    const fetchLastLog = async ()=>{
         const data = await getLastLog(currentExercise.id);
         setLastLog(data);
         //console.log("log loaded",data);
+      };
+
+      const performDelete = async ()=>{
+        const success =  await deleteLastLog(currentExercise.id);
+        if(success){
+            fetchLastLog();
+           if(Platform.OS==='web'){
+            window.alert("Last set was deleted!");
+           }
+           else{
+            Alert.alert("Last set was deleted!")
+           } 
+            }
+        else{alert("Failed to delete last set!");}
+                
       }
+
+    const handleDelete = ()=>{
+        if(Platform.OS==='web'){
+            const userConfirmed = window.confirm("Delete last set?");
+            if(userConfirmed){performDelete();
+            }
+        }
+        else{Alert.alert('Delete Last Set?','This cant be undone',[
+            {text:'cancel', style:'cancel'},
+            {text: 'Delete', style:'destructive',
+                onPress: performDelete
+            }
+        ])  
+    }
+}
+
+    useEffect(() => {
+
       fetchLastLog();
       
     }, [currentExercise.id]);
@@ -39,9 +73,15 @@ export default function LoggingScreen(){
     return(
        <SafeAreaView style={styles.container}>
         
-        <View>
-            <Text style={styles.name}>{currentExercise.name}</Text>
-        </View>
+        <View style={{height: '7%', backgroundColor:colorScheme==='dark'?'black':'#dddddd', display: 'flex', flexDirection:'row', justifyContent:"space-between", alignItems:'center'
+                           }}>
+            <Text style = {styles.headerText}>{currentExercise.name}</Text>
+                <Pressable onPress={toggleTheme}>
+                     {colorScheme==='dark'?
+                <Octicons name="moon" size={33} color='white' selectable={undefined} style={{width: 36, marginHorizontal: 10,}}/>:
+                <Octicons name="sun" size={33} color='black' selectable={undefined} style={{width: 36, marginHorizontal: 10,}}/>}
+            </Pressable>
+                           </View>
         <View style={styles.header}></View>
         <View>
             <Text style={styles.muscleGroup}>Muscle Group: {currentExercise.muscleGroup}</Text>
@@ -50,10 +90,18 @@ export default function LoggingScreen(){
             <Text style={styles.description}>Description : {currentExercise.description}</Text>
         </View>
         {lastLog != null ? 
-            <View style={styles.lastSet}>
+           <View style={styles.lastSet}>
+             <View style={{ alignItems:"center", marginLeft: 60,}}>
                 <Text style={styles.lastSetContent}>Previous Set</Text>
                 <Text style={styles.lastSetContent}>{lastLog.weight} kgs / {lastLog.reps} reps</Text>
-            </View> : 
+                
+            </View>
+            <Pressable onPress={()=>{handleDelete();
+                console.log("Delete pressed");
+            }}>
+                <Octicons name='trash' size = {33} color="red" selectable={undefined} style={{width:36,}} />
+            </Pressable>
+           </View> : 
             <View></View>  
         }
        
@@ -75,6 +123,7 @@ export default function LoggingScreen(){
                 value={reps}
                 onChangeText={setReps}
                 style={styles.input}
+                placeholderTextColor={colorScheme==='dark'?'#c0c0c0':'#333'}
                 placeholder="0"
                 maxLength={4}
                 keyboardType="numeric"
@@ -95,24 +144,17 @@ function createStyles (colorScheme){
         flex: 1,
         backgroundColor: colorScheme === 'light'?'white':'black',
     },
-    name:{
-        fontSize: 30,
-        width: '100%',
-        height: 'auto',
-        padding: 15,
-        color: colorScheme === 'light'?'black':'white',
-        backgroundColor: colorScheme ==='light'?'#f1f1f1':'#222',
-    },
+
     muscleGroup:{
         color: colorScheme === 'light'?'black':'white',
-        fontSize: 20,
+        fontSize: 18,
         padding: 10,
         width: '100%',
         height: 'auto',
     },
     description:{
         color: colorScheme === 'light'?'black':'white',
-        fontSize: 18,
+        fontSize: 16,
         padding: 10,
         width:'100%',
         height: 'auto',
@@ -132,7 +174,7 @@ function createStyles (colorScheme){
     },
     weightAndReps:{
         color: colorScheme === 'light'?'black':'white',
-        fontSize: 20,
+        fontSize: 18,
         padding: 5,
         marginBottom: 5,
 
@@ -145,7 +187,7 @@ function createStyles (colorScheme){
         width: 50,
         backgroundColor:colorScheme==='light'?'#e1e1e1':'#222',
         color: colorScheme === 'light'?'black':'white',
-        fontSize: 20,
+        fontSize: 18,
         textAlign: 'center',
         
     },
@@ -165,7 +207,7 @@ function createStyles (colorScheme){
     
     },
     saveText:{
-        fontSize: 20,
+        fontSize: 15,
         color: 'white',
         padding: 10,
     },
@@ -179,11 +221,19 @@ function createStyles (colorScheme){
         padding: 10,
         display:'flex',
         alignItems: 'center',
+        flexDirection:'row',
+        justifyContent:"space-around",
         
     },
     lastSetContent:{
-        fontSize: 25,
+        fontSize: 18,
         color: colorScheme === 'light'?'black':'white',
+    },
+     headerText:{
+        color: colorScheme==='dark'?'white':'black',
+        padding: 10,
+        fontSize: 20,
+        fontWeight: '600',
     },
 
  })
