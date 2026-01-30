@@ -3,14 +3,16 @@ import { Alert, Appearance, Button, Image, Platform, Pressable, StyleSheet, Text
 import { exercises } from "../../data/exercises";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useContext, useEffect, useState } from "react";
-import { saveSet, getLastLog, deleteLastLog } from "../../src/storage";
+import { saveSet, getLastLog, deleteLastLog, getProgressData } from "../../src/storage";
 import Octicons from '@expo/vector-icons/Octicons';
 import { ThemeContext } from "../../src/context/ThemeContext";
+import { LineChart } from "react-native-gifted-charts";
 
 export default function LoggingScreen(){
     const [weight,setWeight]=useState('');
     const [reps,setReps]=useState('');
     const [lastLog, setLastLog] = useState({});
+    const [chartData, setChartData] = useState([]);
     const {id} = useLocalSearchParams();
     const currentExercise = exercises.find(item=>item.id === id);
     const {colorScheme, toggleTheme} = useContext(ThemeContext); 
@@ -64,11 +66,21 @@ export default function LoggingScreen(){
     }
 }
 
+    const fetchChartData = async()=>{
+        const data = await getProgressData(currentExercise.id, currentExercise.type);
+        setChartData(data);
+       // console.log("This is data",data);
+      //console.log("This is chart Data",chartData);
+    }
+
     useEffect(() => {
 
       fetchLastLog();
+      fetchChartData();
+         
       
     }, [currentExercise.id]);
+     console.log("This is chart Data",chartData);
     
     return(
        <SafeAreaView style={styles.container}>

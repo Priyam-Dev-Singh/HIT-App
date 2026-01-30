@@ -12,7 +12,7 @@ export const saveSet = async (exerciseId, weight, reps)=>{
             exerciseId: exerciseId,
             date: new Date().toISOString(),
             weight: parseFloat(weight),
-            reps: parseFloat(reps)
+            reps: parseFloat(reps),
         };
         //reading current Logs
         const jsonValue = await AsyncStorage.getItem(workoutStorageKey);
@@ -106,4 +106,56 @@ export const saveMacros = async (protein, carbs, fats, water) => {
         return false;
     };
 
-}
+};
+
+function calculate1RM(type, weight, reps ){
+    const R = parseFloat(reps);
+    const W = parseFloat(weight);
+    if(R===1){
+        return W;
+    }
+    if(type === 'compound'){
+        if(R<=5){
+            return W/(1-0.035*(R-1));
+        }
+        else if(R<=15){
+            return W/(0.86-0.02*(R-5));
+        }
+        else if(R<=50){
+            return W/(0.66-0.009*(R-15));
+        }
+    }
+    else{
+         if(R<=5){
+            return W/(1-0.025*(R-1));
+        }
+        else if(R<=15){
+            return W/(0.90-0.026*(R-5));
+        }
+        else if(R<=50){
+            return W/(0.64-0.011*(R-15));
+        }
+    };
+};
+export const getProgressData = async (exerciseId, exerciseType)=>{
+    try{
+
+        const jsonValue = await AsyncStorage.getItem(workoutStorageKey);
+        const allLogs = jsonValue != null ? JSON.parse(jsonValue):[];
+        //console.log("Total Logs in DB:", allLogs.length);
+        //console.log("Looking for ID:", exerciseId);
+        let exerciseLogs = allLogs.filter(log => log.exerciseId === exerciseId);
+        //console.log("Logs found for this exercise:", exerciseLogs.length);
+        exerciseLogs.sort((a,b)=> new Date(a.date)-new Date(b.date));
+        exerciseLogs = exerciseLogs.slice(0,10);
+        const oneRepMaxes = exerciseLogs.map(log=>(
+            {
+            value : calculate1RM(exerciseType,log.weight,log.reps),
+            label : `${new Date(log.date).getDate()}/${new Date(log.date).getMonth()+1}`
+        }));
+
+        return oneRepMaxes;
+
+    }catch(e){console.error("error getting progress data", e);}
+
+};
