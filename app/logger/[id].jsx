@@ -1,5 +1,5 @@
-import { useLocalSearchParams } from "expo-router";
-import { Alert, Appearance, Button, Image, Platform, Pressable, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { router, useLocalSearchParams, useRouter } from "expo-router";
+import { Alert, Appearance, Button, Image, KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { exercises } from "../../data/exercises";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useContext, useEffect, useState } from "react";
@@ -9,6 +9,7 @@ import { ThemeContext } from "../../src/context/ThemeContext";
 import { LineChart } from "react-native-gifted-charts";
 
 export default function LoggingScreen(){
+    const router = useRouter();
     const [weight,setWeight]=useState('');
     const [reps,setReps]=useState('');
     const [lastLog, setLastLog] = useState({});
@@ -80,13 +81,22 @@ export default function LoggingScreen(){
          
       
     }, [currentExercise.id]);
-     console.log("This is chart Data",chartData);
+     //console.log("This is chart Data",chartData);
     
     return(
        <SafeAreaView style={styles.container}>
-        
-        <View style={{height: '7%', backgroundColor:colorScheme==='dark'?'black':'#dddddd', display: 'flex', flexDirection:'row', justifyContent:"space-between", alignItems:'center'
+        <KeyboardAvoidingView
+            style={{flex:1}}
+            behavior = {Platform.OS==='ios'?'padding':'height'}
+            keyboardVerticalOffset={Platform.OS==='ios'?10:0}
+        >
+            <ScrollView contentContainerStyle={{ flexGrow: 1, paddingBottom: 20 }} 
+                keyboardShouldPersistTaps="handled">
+                <View style={{height: '7%', backgroundColor:colorScheme==='dark'?'black':'#dddddd', display: 'flex', flexDirection:'row', justifyContent:"space-between", alignItems:'center'
                            }}>
+            <Pressable onPress={()=>{router.push("/")}}>
+                <Octicons name="home" size={33} color={colorScheme==='dark'?'white':'black'} selectable={undefined} style={{width: 36, marginHorizontal: 10,}}/>
+            </Pressable>
             <Text style = {styles.headerText}>{currentExercise.name}</Text>
                 <Pressable onPress={toggleTheme}>
                      {colorScheme==='dark'?
@@ -101,6 +111,35 @@ export default function LoggingScreen(){
         <View>
             <Text style={styles.description}>Description : {currentExercise.description}</Text>
         </View>
+        { chartData.length != 0 ?
+            (<View>
+                <Text style = {styles.chartHeader}>Strength Curve</Text>
+                <LineChart
+                    data={chartData}
+                    color="#FF0000"
+                    thickness={3}
+                    dataPointsColor="#FF0000"
+
+                    xAxisColor={colorScheme==='dark'?'white':'black'}
+                    yAxisColor={colorScheme==='dark'?'gray':'black'}
+                    yAxisTextStyle={{color:colorScheme==='dark'?'lightgray':'gray'}}
+                    xAxisLabelTextStyle={{color:colorScheme==='dark'?'lightgray':'gray'}}
+                    rulesColor={colorScheme === 'dark' ? '#333' : '#eee'}
+                    textColor={colorScheme === 'dark' ? 'white' : 'black'}
+
+                    height={200}
+                    width={300}
+                    initialSpacing={20}
+                    hideRules
+                    hideYAxisText={false}
+                    yAxisTextNumberOfLines={1}
+                    textShiftY={-10}
+                    textShiftX={-5}
+                    textFontSize={12}
+                />
+            </View> ):
+           null
+        }
         {lastLog != null ? 
            <View style={styles.lastSet}>
              <View style={{ alignItems:"center", marginLeft: 60,}}>
@@ -146,6 +185,8 @@ export default function LoggingScreen(){
         onPress={handleSave}>
             <Text style={styles.saveText}>Save Log</Text>
         </TouchableOpacity>
+            </ScrollView>
+        </KeyboardAvoidingView>
        </SafeAreaView>
     );
 }
@@ -247,6 +288,13 @@ function createStyles (colorScheme){
         fontSize: 20,
         fontWeight: '600',
     },
+    chartHeader:{
+        fontSize:17,
+        color: colorScheme==='dark'?'white':'black',
+        padding: 10,
+        alignSelf:'center',
+        pointerEvents:'auto',
+    }
 
  })
 }

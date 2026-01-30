@@ -1,13 +1,15 @@
 import { useContext, useState } from "react";
-import {Text, TextInput, TouchableOpacity, View, Pressable } from "react-native";
+import {Text, TextInput, TouchableOpacity, View, Pressable, KeyboardAvoidingView, ScrollView, Platform } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { saveMacros } from "../../src/storage";
 import { ThemeContext } from "../../src/context/ThemeContext";
 import Octicons from '@expo/vector-icons/Octicons';
+import { useRouter } from "expo-router";
 
 
 
 export default function macrosLoggingScreen(){
+    const router = useRouter();
     const {colorScheme, toggleTheme} = useContext(ThemeContext);
     const [protein, setProtein] = useState('');
     const [carbs, setCarbs] = useState('');
@@ -31,13 +33,23 @@ export default function macrosLoggingScreen(){
     }
     return(
        <SafeAreaView style={{flex: 1, backgroundColor: colorScheme ==="dark"?'black':'white',}}>
-       <View style={{height: '7%', backgroundColor:colorScheme==='dark'?'grey':'#dddddd', display: 'flex', flexDirection:'row', justifyContent:"space-between", alignItems:'center'
-               }}>
-                   <Text style = {{color: colorScheme==='dark'?'white':'black', padding: 10, fontSize: 22,fontWeight: '600'}}>Save your Macros</Text>
-                   <Pressable onPress={toggleTheme}>
+        <KeyboardAvoidingView
+            style={{flex:1}}
+            behavior = {Platform.OS==='ios'?'padding':'height'}
+            keyboardVerticalOffset={Platform.OS==='ios'?10:0}>
+            <ScrollView
+                contentContainerStyle={{ flexGrow: 1, paddingBottom: 20 }} 
+                keyboardShouldPersistTaps="handled">
+                 <View style={{height: '7%', backgroundColor:colorScheme==='dark'?'grey':'#dddddd', display: 'flex', flexDirection:'row', justifyContent:"space-between", alignItems:'center', marginBottom:'15'
+               }}> 
+               <Pressable onPress={()=>{router.push("/")}}>
+                    <Octicons name="home" size={33} color={colorScheme==='dark'?'white':'black'} selectable={undefined} style={{width: 36, marginHorizontal: 10,}}/>
+                </Pressable>
+                <Text style = {{color: colorScheme==='dark'?'white':'black', padding: 10, fontSize: 22,fontWeight: '600'}}>Save your Macros</Text>
+                <Pressable onPress={toggleTheme}>
                        {colorScheme==='dark'?
-                       <Octicons name="moon" size={36} color='white' selectable={undefined} style={{width: 36, marginHorizontal: 10,}}/>:<Octicons name="sun" size={36} color='black' selectable={undefined} style={{width: 36, marginHorizontal: 10,}}/>}
-                   </Pressable>
+                    <Octicons name="moon" size={36} color='white' selectable={undefined} style={{width: 36, marginHorizontal: 10,}}/>:<Octicons name="sun" size={36} color='black' selectable={undefined} style={{width: 36, marginHorizontal: 10,}}/>}
+                </Pressable>
                </View>
         <View style = {{display: 'flex', flexDirection: 'row', flexWrap: "wrap", justifyContent: 'space-evenly'}}>
         <View style={{height:'auto', width:'auto', backgroundColor: colorScheme==='dark'?'#222':'#dddddd', display: 'flex', alignItems: 'center', gap: 10, margin: 10,padding: 10, borderWidth: 1, borderColor: colorScheme==='dark'?'papayawhip':'gray', borderRadius: 10,}}>
@@ -94,6 +106,9 @@ export default function macrosLoggingScreen(){
         onPress={handleSave}>
         <Text style={{color: 'white', fontSize: 15, padding: 10,}}>Save Macros</Text>
         </TouchableOpacity>
+      
+            </ScrollView>
+        </KeyboardAvoidingView>
        </SafeAreaView>
     )
 

@@ -1,8 +1,9 @@
-import {View, Text, StyleSheet, Button} from 'react-native';
+import {View, Text, StyleSheet, Button, Appearance} from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { StatusBar } from 'expo-status-bar';
 export default function HomeScreen(){
-    
+    const colorScheme = Appearance.getColorScheme();
     const router = useRouter();
     return(
         <SafeAreaView style={{flex: 1, backgroundColor: 'black', alignItems:'center', display: 'flex', flexDirection: 'column', gap:10,}}>
@@ -21,6 +22,7 @@ export default function HomeScreen(){
             style={{margin: 20,}}
             />
           </View>
+          <StatusBar style="inverted" />
         </SafeAreaView>
     );
 }

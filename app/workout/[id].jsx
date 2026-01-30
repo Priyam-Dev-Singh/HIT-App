@@ -29,7 +29,10 @@ export default function ExerciseSelectionScreen(){
     return(
         <SafeAreaView style = {styles.container}>
            <View style={{height: '7%', backgroundColor:colorScheme==='dark'?'grey':'#dddddd', display: 'flex', flexDirection:'row', justifyContent:"space-between", alignItems:'center'
-                   }}>
+                   }}>  
+                   <Pressable onPress={()=>{router.push("/")}}>
+                        <Octicons name="home" size={33} color={colorScheme==='dark'?'white':'black'} selectable={undefined} style={{width: 36, marginHorizontal: 10,}}/>
+                    </Pressable>
                        <Text style = {styles.headerText}>{currentRoutine.name}</Text>
                        <Pressable onPress={toggleTheme}>
                            {colorScheme==='dark'?
