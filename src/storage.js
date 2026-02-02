@@ -5,6 +5,7 @@ import { HitRoutine } from '../data/routines';
 const workoutStorageKey = '@workoutLogs';
 const macrosStorageKey = '@macrosLogs';
 const routineIndexKey = '@HITroutine';
+const historyKey = '@workoutHistory';
 
 export const saveSet = async (exerciseId, weight, reps)=>{
     try{
@@ -192,3 +193,45 @@ export const saveNextRoutineIndex = async (newIndex)=>{
    }
 };
 
+const getTodayString = ()=>{
+    return new Date().toISOString().split('T')[0];
+}
+
+export const getWorkoutHistory = async()=>{
+    try{
+        const jsonValue = await AsyncStorage.getItem(historyKey);
+        return jsonValue!=null?JSON.parse(jsonValue):{};
+
+    }catch(e){console.error("error retreiving history",e);
+        return {};
+    }
+}
+
+export const markDayCompleted = async()=>{
+    try{
+        const currentHistory = await getWorkoutHistory();
+        const today = getTodayString();
+        const fullHistory={
+            ...currentHistory,
+            [today]:{
+                selected:true,
+                selectedColor: '#D32F2F',
+                marked:true
+            }
+        };
+        const allDates = Object.keys(fullHistory).sort();
+        let finalHistory = fullHistory;
+        
+        if(allDates.length>31){
+            const recentDates = allDates.slice(-31);
+            finalHistory={};
+            recentDates.forEach(date=>{
+                finalHistory[date] = fullHistory[date];
+            });
+        }
+        await AsyncStorage.setItem(historyKey, JSON.stringify(finalHistory));
+        return true;
+    }catch(e){console.error("error marking day completed", e);
+        return false;
+    }
+};

@@ -6,7 +6,7 @@ import { useContext, useEffect, useState } from 'react';
 import { exercises } from '../../data/exercises';
 import Octicons from '@expo/vector-icons/Octicons';
 import { ThemeContext } from '../../src/context/ThemeContext';
-import { getCurrentRoutine, saveNextRoutineIndex } from '../../src/storage';
+import { getCurrentRoutine, markDayCompleted, saveNextRoutineIndex } from '../../src/storage';
 
 export default function ExerciseSelectionScreen(){
    
@@ -20,11 +20,16 @@ export default function ExerciseSelectionScreen(){
     const openLogger = (id)=>{
         router.push(`/logger/${id}`);
     }
-    const renderItem = ({item})=>(
-        <Pressable onPress={()=>openLogger(item.id)}>
-            <View style={styles.rows}>
-            <Text style = {styles.workoutText}>{item.name}</Text>
+    const renderItem = ({item, index})=>(
+        <Pressable onPress={()=>openLogger(item.id)} style={({pressed})=>[styles.exerciseCard, pressed&&{opacity:0.7}]}>
+           <View style={styles.numberBox}>
+            <Text style={styles.numberText}>{index+1}</Text>
+           </View>
+            <View style={styles.textContainer}>
+            <Text style = {styles.exerciseName}>{item.name}</Text>
             </View>
+           <Octicons name='chevron-right' size={24} color={colorScheme === 'dark' ? '#555' : '#CCC'}/>
+           
         </Pressable>
     );
 
@@ -35,14 +40,14 @@ export default function ExerciseSelectionScreen(){
         //console.log("next routine index: ", currentIndex);
         //console.log("previous routine index: ", currentIndex);
         await saveNextRoutineIndex(currentIndex);
+        await markDayCompleted();
         router.replace("/");
 
     }catch(e){console.error("error handling the completed session", e);}
 };
     return(
         <SafeAreaView style = {styles.container}>
-           <View style={{height: '7%', backgroundColor:colorScheme==='dark'?'grey':'#dddddd', display: 'flex', flexDirection:'row', justifyContent:"space-between", alignItems:'center'
-                   }}>  
+           <View style={styles.header}>  
                    <Pressable onPress={()=>{router.push("/")}}>
                         <Octicons name="home" size={33} color={colorScheme==='dark'?'white':'black'} selectable={undefined} style={{width: 36, marginHorizontal: 10,}}/>
                     </Pressable>
@@ -57,10 +62,13 @@ export default function ExerciseSelectionScreen(){
             keyExtractor={item=>item.id}
             renderItem={renderItem}
             style = {styles.list}
-            />
-            <TouchableOpacity style = {styles.markCompleted} onPress={handleCompletedSession}>
-                <Text style ={styles.buttonText} >Workout Completed</Text>
+            ListFooterComponent={
+                <TouchableOpacity style = {styles.markCompleted} onPress={handleCompletedSession}>
+                <Text style ={styles.buttonText} >Mark Completed</Text>
             </TouchableOpacity>
+            }
+            />
+            
         </SafeAreaView>
     )
 }
@@ -69,65 +77,89 @@ function createStyles (colorScheme){
     return StyleSheet.create({
     container:{
         flex: 1,
-        backgroundColor: colorScheme === 'light'?'white':'black',
         display:'flex',
         flexDirection:'column',
+        backgroundColor: colorScheme === 'dark' ? '#000000' : '#F2F2F7',
         justifyContent:'center',
         
+    },
+    header:{
+        height: '7%', 
+        borderBottomWidth:1,
+        backgroundColor: colorScheme === 'dark' ? '#111111' : '#FFFFFF',
+        borderBottomColor: colorScheme === 'dark' ? '#333' : '#E5E5EA',
+        display: 'flex', 
+        flexDirection:'row', 
+        justifyContent:"space-between", 
+        alignItems:'center'
     },
      list:{
         marginTop: 10,
     },
-    rows:{
-        display: 'flex',
-        flexDirection:'row',
+    exerciseCard:{
+        backgroundColor: colorScheme === 'dark' ? '#1C1C1E' : '#FFFFFF',
+        borderRadius: 16,
+        marginHorizontal: 16, // Space from left/right screen edges
+        marginTop: 12,        // Space between cards
+        padding: 16,          // Space inside the card
+        flexDirection: 'row', // Aligns items horizontally
+        alignItems: 'center', // Centers items vertically
+    
+    // Shadows
+        boxShadow: '0px 2px 5px rgba(0,0,0,0.1)', // Modern shadow
+        elevation: 3,
+    },
+    numberBox:{
+        width: 40,
+        height: 40,
+        borderRadius: 8,
+        backgroundColor: colorScheme === 'dark' ? '#330000' : '#FFEBEE', // Dark Red vs Light Red
+        alignItems: 'center',
+        justifyContent: 'center',
         borderWidth: 1,
-        borderColor: colorScheme === 'light'?'black':'papayawhip',
-        borderRadius: 5,
-        gap: 5,
-        alignItems:'center',
-        margin: 8,
-        pointerEvents:'auto',
+        borderColor: colorScheme === 'dark' ? '#D32F2F' : 'transparent',
     },
-     workoutText:{
-        color: colorScheme === 'light'?'black':'white',
+    numberText: {
+        color: '#D32F2F', // Hero Red
+        fontSize: 18,
+        fontWeight: 'bold',
+    },
+    textContainer: {
+        flex: 1,       // Forces it to take up all middle space
+        marginLeft: 15, // Gap between Number and Text
+    },
+     exerciseName:{
+        color: colorScheme === 'dark' ? '#FFFFFF' : '#000000',
         fontSize: 17,
-        margin:10,
-    },
-    routineName:{
-        fontSize: 20,
-        backgroundColor: colorScheme==='light'?'#e1e1e1':'#222',
-        width: '100%',
-        color: colorScheme==='light'?'black':'white',
-        padding: 15,
-
-    },
-    headerText:{
-        color: colorScheme==='dark'?'white':'black',
-        padding: 10,
-        fontSize: 22,
         fontWeight: '600',
     },
+    headerText:{
+        color: colorScheme === 'dark' ? '#FFFFFF' : '#000000',
+        padding: 10,
+        fontSize: 22,
+        fontWeight: '700',
+        letterSpacing: 0.5,
+    },
     markCompleted:{
-      backgroundColor:colorScheme==='dark'?'#1A1A1A':'#FFFFFF',
-      marginTop:10,
-      marginBottom:400,
-      borderWidth:1,
-      width:'50%',
-      borderColor:colorScheme==='light'?'#D32F2F':'#FF5252',
-      padding:10,
-      paddingTop:15,
-      borderRadius: 20,
-      display: 'flex',
-      alignItems:'center',
-      justifyContent:'center',
-      alignSelf:'center',
+      backgroundColor: '#D32F2F', // Solid Hero Red
+      margin: 20,
+      marginTop: 30, // Extra space from last item
+      marginBottom:60,
+      paddingVertical: 18,
+      borderRadius: 16,
+      alignItems: 'center',
+      justifyContent: 'center',
+    
+    // Red Glow
+      boxShadow: '0px 4px 15px rgba(211, 47, 47, 0.5)',
+      elevation: 6
     },
     buttonText:{
-      fontSize:17,
-      color:colorScheme==='dark'?'#FFFFFF':'#000000',
-      margin:5,
-      fontWeight:'600',
+      color: '#FFFFFF',
+      fontSize: 18,
+      fontWeight: '800', // Extra Bold
+      letterSpacing: 1.5, // Spaced out for "Military" look
+      textTransform: 'uppercase',
     }
     })
 }

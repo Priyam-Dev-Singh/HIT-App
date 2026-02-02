@@ -93,8 +93,7 @@ export default function LoggingScreen(){
         >
             <ScrollView contentContainerStyle={{ flexGrow: 1, paddingBottom: 20 }} 
                 keyboardShouldPersistTaps="handled">
-                <View style={{height: '7%', backgroundColor:colorScheme==='dark'?'black':'#dddddd', display: 'flex', flexDirection:'row', justifyContent:"space-between", alignItems:'center'
-                           }}>
+                <View style={styles.header}>
             <Pressable onPress={()=>{router.push("/")}}>
                 <Octicons name="home" size={33} color={colorScheme==='dark'?'white':'black'} selectable={undefined} style={{width: 36, marginHorizontal: 10,}}/>
             </Pressable>
@@ -105,7 +104,7 @@ export default function LoggingScreen(){
                 <Octicons name="sun" size={33} color='black' selectable={undefined} style={{width: 36, marginHorizontal: 10,}}/>}
             </Pressable>
                            </View>
-        <View style={styles.header}></View>
+        <View></View>
         <View>
             <Text style={styles.muscleGroup}>Muscle Group: {currentExercise.muscleGroup}</Text>
         </View>
@@ -117,33 +116,50 @@ export default function LoggingScreen(){
                 <Text style = {styles.chartHeader}>Strength Curve</Text>
                 <LineChart
                     data={chartData}
-                    color="#FF0000"
+                    color="#D32F2F"
                     thickness={3}
-                    dataPointsColor="#FF0000"
+                    curved
+                    isAnimated
+                    dataPointsColor="#D32F2F"
 
-                    xAxisColor={colorScheme==='dark'?'white':'black'}
-                    yAxisColor={colorScheme==='dark'?'gray':'black'}
-                    yAxisTextStyle={{color:colorScheme==='dark'?'lightgray':'gray'}}
-                    xAxisLabelTextStyle={{color:colorScheme==='dark'?'lightgray':'gray'}}
-                    rulesColor={colorScheme === 'dark' ? '#333' : '#eee'}
-                    textColor={colorScheme === 'dark' ? 'white' : 'black'}
+                    areaChart
+                    startFillColor="#D32F2F"
+                    startOpacity={0.2}
+                    endFillColor="#D32F2F"
+                    endOpacity={0.0}
 
-                    height={200}
-                    width={300}
+                    xAxisColor={colorScheme === 'dark' ? '#333' : '#E5E5EA'}
+                    yAxisColor="transparent"
+                    yAxisTextStyle={{color:colorScheme === 'dark' ? '#666' : '#999', fontSize: 10,}}
+                    xAxisLabelTextStyle={{color:colorScheme === 'dark' ? '#666' : '#999', fontSize: 10,}}
+                    rulesColor={colorScheme === 'dark' ? '#222' : '#F0F0F0'}
+
+                    height={220}
+                    width={'100%'-60}
                     initialSpacing={20}
+                    endSpacing={20}
+
                     hideRules
                     hideYAxisText={false}
                     yAxisTextNumberOfLines={1}
-                    textShiftY={-10}
-                    textShiftX={-5}
-                    textFontSize={12}
+                    pointerConfig={{             // Adds a touch interaction
+                        pointerStripHeight: 160,
+                        pointerStripColor: colorScheme === 'dark' ? '#555' : 'lightgray',
+                        pointerStripWidth: 2,
+                        pointerColor: colorScheme === 'dark' ? 'white' : 'black',
+                        radius: 6,
+                        pointerLabelWidth: 100,
+                        pointerLabelHeight: 90,
+                        activatePointersOnLongPress: true,
+                        autoAdjustPointerLabelPosition: false,
+    }}
                 />
             </View> ):
            null
         }
         {lastLog != null ? 
            <View style={styles.lastSet}>
-             <View style={{ alignItems:"center", marginLeft: 60,}}>
+             <View style={{ alignItems:"center", flexDirection:'row', }}>
                 <Text style={styles.lastSetContent}>Previous Set</Text>
                 <Text style={styles.lastSetContent}>{lastLog.weight} kgs / {lastLog.reps} reps</Text>
                 
@@ -196,105 +212,144 @@ function createStyles (colorScheme){
     return StyleSheet.create({
         container:{
         flex: 1,
-        backgroundColor: colorScheme === 'light'?'white':'black',
+        backgroundColor: colorScheme === 'dark' ? '#000000' : '#F2F2F7',
     },
-
+    header:{
+        paddingVertical: 15,
+        paddingHorizontal: 10,
+        borderBottomWidth: 1,
+        backgroundColor: colorScheme === 'dark' ? '#111111' : '#FFFFFF',
+        borderBottomColor: colorScheme === 'dark' ? '#333' : '#E5E5EA',
+        flexDirection: 'row',
+        justifyContent: "space-between",
+        alignItems: 'center'
+    },
     muscleGroup:{
-        color: colorScheme === 'light'?'black':'white',
-        fontSize: 18,
-        padding: 10,
-        width: '100%',
-        height: 'auto',
+        backgroundColor: colorScheme === 'dark' ? '#333' : '#E0E0E0',
+        color: colorScheme === 'dark' ? '#FFF' : '#000',
+        fontSize: 14,
+        fontWeight: 'bold',
+        textTransform: 'uppercase',
+        letterSpacing: 1,
+    
+    // Badge shaping
+        paddingVertical: 6,
+        paddingHorizontal: 12,
+        borderRadius: 8,
+        overflow: 'hidden', // Needed for borderRadius on Text
+        alignSelf: 'flex-start', // Don't stretch full width
+        marginLeft: 20,
+        marginTop: 20,
+        marginBottom: 5,
+        width: 'auto',
     },
     description:{
-        color: colorScheme === 'light'?'black':'white',
-        fontSize: 16,
-        padding: 10,
-        width:'100%',
-        height: 'auto',
+        color: colorScheme === 'dark' ? '#AAAAAA' : '#666666',
+        fontSize: 15,
+        lineHeight: 20,
+        paddingHorizontal: 20,
+        marginBottom: 20,
+        width: '100%',
 
     },
     logContainers:{
-        display:'flex', 
-        flexDirection: 'column',
-        padding: 10, 
-        margin:10, 
-        width:'40%',
-        alignItems:'center',
-        borderWidth:1, 
-        borderColor: colorScheme==='dark'?'papayawhip':'black', 
-        borderRadius: 10,
-        backgroundColor:colorScheme==='light'?'#f1f1f1':'#111',
+        width: '45%',        // Slightly less than half width
+        height: 120,         // TALL card
+        margin: 10,
+        alignItems: 'center',
+        justifyContent: 'center', // Center content vertically
+        borderRadius: 16,    // Modern rounded corners
+        backgroundColor: colorScheme === 'dark' ? '#1C1C1E' : '#FFFFFF',
+    
+    // Remove old border logic, use specific border for dark mode definition
+        borderWidth: 1,
+        borderColor: colorScheme === 'dark' ? '#333' : 'transparent',
+    
+    // Add Shadow/Glow
+        boxShadow: '0px 4px 10px rgba(0,0,0,0.1)', 
+        elevation: 4,
     },
     weightAndReps:{
-        color: colorScheme === 'light'?'black':'white',
-        fontSize: 18,
-        padding: 5,
-        marginBottom: 5,
+        color: '#D32F2F',    // RED Label
+        fontSize: 12,
+        fontWeight: 'bold',
+        marginBottom: 5,     // Space between label and number
+        textTransform: 'uppercase',
+        letterSpacing: 1,
 
     },
     input:{
-        borderWidth: 1,
-        borderColor:colorScheme==="light"?'black':'papayawhip',
-        borderRadius: 10,
-        height: 50,
-        width: 50,
-        backgroundColor:colorScheme==='light'?'#e1e1e1':'#222',
-        color: colorScheme === 'light'?'black':'white',
-        fontSize: 18,
+        borderWidth: 0,
+        backgroundColor: 'transparent',
+    
+    // Make text HUGE
+        fontSize: 40,
+        fontWeight: 'bold',
+        color: colorScheme === 'dark' ? '#FFF' : '#000',
         textAlign: 'center',
+        width: '100%',
+        height: 60,
         
     },
     saveButton:{
-        width: 'auto',
-        height: 'auto',
-        alignSelf:'center',
-        margin: 15,
-        backgroundColor: 'red',
-        display: 'flex',
+        backgroundColor: '#D32F2F', // Hero Red
+        width: '90%',               // standardized width
+        paddingVertical: 18,
+        borderRadius: 16,
+        alignSelf: 'center',
         alignItems: 'center',
         justifyContent: 'center',
-        borderWidth: 1,
-        borderColor: 'papayawhip',
-        borderRadius: 5,
-
+        marginTop: 20,
     
+    // Remove old borders
+        borderWidth: 0,
+    
+    // Red Glow
+        boxShadow: '0px 4px 15px rgba(211, 47, 47, 0.4)',
+        elevation: 6,
     },
     saveText:{
-        fontSize: 15,
+        fontSize: 18,
         color: 'white',
-        padding: 10,
+        fontWeight: '800', // Extra bold
+        letterSpacing: 1,
+        textTransform: 'uppercase',
     },
     lastSet:{
-        width: 'auto',
-        borderWidth: 1,
-        borderColor:colorScheme==="light"?'black':'papayawhip', 
-        borderRadius: 10,
-        backgroundColor:colorScheme==='light'?'#e1e1e1':'#222',
-        margin: 15,
-        padding: 10,
-        display:'flex',
+        flexDirection: 'row',
+        justifyContent: 'space-between', // Push text left, trash right
         alignItems: 'center',
-        flexDirection:'row',
-        justifyContent:"space-around",
-        
+        backgroundColor: colorScheme === 'dark' ? '#1C1C1E' : '#FFFFFF',
+        marginHorizontal: 20,
+        marginVertical: 10,
+        padding: 15,
+        borderRadius: 12,
+    
+        // Shadow
+        boxShadow: '0px 2px 5px rgba(0,0,0,0.1)',
+        elevation: 2,
     },
     lastSetContent:{
-        fontSize: 18,
-        color: colorScheme === 'light'?'black':'white',
+        fontSize: 16,
+        fontWeight: '600',
+        color: colorScheme === 'dark' ? 'white' : 'black',
+        marginHorizontal: 15,
     },
      headerText:{
         color: colorScheme==='dark'?'white':'black',
-        padding: 10,
         fontSize: 20,
-        fontWeight: '600',
+        fontWeight: '700',
+        letterSpacing:0.5,
     },
     chartHeader:{
-        fontSize:17,
-        color: colorScheme==='dark'?'white':'black',
-        padding: 10,
-        alignSelf:'center',
-        pointerEvents:'auto',
+        fontSize: 14,
+        fontWeight: 'bold',
+        color: colorScheme === 'dark' ? '#888' : '#555',
+        paddingLeft: 20,
+        marginBottom: 10,
+        textTransform: 'uppercase',
+        letterSpacing: 1,
+        alignSelf: 'flex-start',
     }
 
  })

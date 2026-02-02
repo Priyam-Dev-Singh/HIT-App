@@ -1,35 +1,44 @@
 import {View, Text, StyleSheet, Button, Pressable, TouchableOpacity} from 'react-native';
-import { useRouter } from 'expo-router';
+import { useFocusEffect, useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
-import { useContext, useEffect, useState } from 'react';
+import { useCallback, useContext, useEffect, useState } from 'react';
 import { ThemeContext } from '../src/context/ThemeContext';
-import { fetchLastGlobalWorkout, getCurrentRoutine } from '../src/storage';
+import { fetchLastGlobalWorkout, getCurrentRoutine, getWorkoutHistory } from '../src/storage';
 import { HitRoutine, routines } from '../data/routines';
 import Octicons from '@expo/vector-icons/Octicons';
 import { MaterialCommunityIcons, FontAwesome5 } from '@expo/vector-icons';
+import Feather from '@expo/vector-icons/Feather';
+import { Calendar } from 'react-native-calendars';
 
 
 export default function HomeScreen(){
+    const [markedDates, setMarkedDates] = useState({});
+    const[isReady, setIsReady] = useState(true);
     const [routine, setRoutine] = useState({});
     const [lastLog, setLastLog] = useState({});
     const {colorScheme, toggleTheme} = useContext(ThemeContext);
     const styles = createStyles(colorScheme);
     const router = useRouter();
-    useEffect(()=>{
-      getLastLogData();
-      const loadRoutine = async ()=>{
-      const currentRoutine = await findCurrentRoutine();
-      setRoutine(currentRoutine);
+   
+      useEffect(()=>{
+
+      const initializeDashboard = async ()=>{
+        const data = await fetchLastGlobalWorkout();
+        setLastLog(data);
+      //console.log(data);
+        if(data && data.date){
+          const ready = hoursAgo(data.date);
+          setIsReady(ready);
+        }
+        const currentRoutine = await findCurrentRoutine();
+        const history = await getWorkoutHistory();
+        setMarkedDates(history);
+        setRoutine(currentRoutine);
       };
-      loadRoutine();
+      initializeDashboard();
     },[]);
 
-    const getLastLogData = async ()=>{
-      const data = await fetchLastGlobalWorkout();
-      setLastLog(data);
-      //console.log(data);
-    }
     const getRoutine = ()=>{
      if(routines[0].exerciseIds.includes(lastLog.exerciseId)){
       return routines[0].name;
@@ -49,6 +58,15 @@ export default function HomeScreen(){
       return `${diffDays} days ago`
     }
     
+    const hoursAgo =(dateString)=>{
+      const past = new Date (dateString);
+      const now = new Date();
+      const diffTime = Math.abs(now-past);
+      const diffHrs = Math.floor(diffTime/(1000*60*60));
+      if(diffHrs>48){return true;}
+      else {return false;}
+    }
+
     const findCurrentRoutine = async ()=>{
       const index = await getCurrentRoutine();
       const currentIndex = index+1 < HitRoutine.length ? index+1 : 0; 
@@ -61,6 +79,7 @@ export default function HomeScreen(){
 
     }
     //console.log(routine);
+    //console.log(isReady);
     return(
         <SafeAreaView style={styles.container}>
            <View style={{display:'flex', flexDirection:'row', alignItems:'center', justifyContent:'space-between'}}>
@@ -76,23 +95,49 @@ export default function HomeScreen(){
             <Text style={styles.headerText} >Last Workout : {getRoutine()}</Text>
             <Text style={styles.lastWorkout}>{daysAgo(lastLog.date)}</Text>
             </View>}
-            <TouchableOpacity style={styles.newWorkout} onPress={()=> router.push(`/workout/${routine.id}`)}>
+            <View style={{width:'92%', marginTop:15, borderRadius:15, overflow:'hidden'}}>
+              <Calendar
+              markedDates={markedDates}
+              theme={{
+                backgroundColor: colorScheme === 'dark' ? '#1A1A1A' : '#ffffff',
+                calendarBackground: colorScheme === 'dark' ? '#1A1A1A' : '#ffffff',
+                textSectionTitleColor: '#b6c1cd',
+                selectedDayBackgroundColor: '#D32F2F', // Red Circle
+                selectedDayTextColor: '#ffffff',
+                todayTextColor: '#D32F2F',
+                dayTextColor: colorScheme === 'dark' ? '#ffffff' : '#2d4150',
+                textDisabledColor: '#d9e1e8',
+                monthTextColor: colorScheme === 'dark' ? '#ffffff' : 'black',
+                arrowColor: '#D32F2F',
+                textDayFontWeight: '300',
+                textMonthFontWeight: 'bold',
+                textDayHeaderFontWeight: '300',
+                textDayFontSize: 16,
+                textMonthFontSize: 16,
+                textDayHeaderFontSize: 14
+              }}/>
+            </View>
+            {isReady===true?
+              <TouchableOpacity style={styles.newWorkout} onPress={()=> router.push(`/workout/${routine.id}`)}>
                 <Text style = {styles.mission}>Mission: </Text>
                 <Text style = {styles.nextWorkout}>{routine?.name||"Loading..."}</Text>
+                <FontAwesome5 name="dumbbell" size={28} color={colorScheme==='light'?'white':'black'} style={{marginLeft:70}} />
             </TouchableOpacity>
-          <View style={{width: 180, margin: 20, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10}}>
-            <View style={styles.buttonSelector}>
-             <TouchableOpacity onPress={()=>router.push(`/log`)} style={styles.logButton}>
-              <FontAwesome5 name="dumbbell" size={32} color={colorScheme==='light'?'#D32F2F':'#FF5252'} />
-              <Text style={styles.buttonText}>Log Workout</Text>
-             </TouchableOpacity>
-           <TouchableOpacity onPress={()=>router.push('/diet/macros')} style={[styles.logButton,{borderColor:colorScheme==='dark'?'#4CAF50':'#388E3C'}]}>
-            <FontAwesome5 name="leaf" size={32} color={colorScheme==='dark'?'#4CAF50':'#388E3C'} />
-            <Text style={styles.buttonText}>Save Macros</Text>
-           </TouchableOpacity>
-            </View>
+            :
+           <View style = {styles.recoveryCard}>
+            <Text style= {styles.recoveryText}>Recovery Mode</Text>
+            <Feather name="battery-charging" size={35} color="white" />
+           </View>
+            }
         
-          </View>
+            
+           <TouchableOpacity onPress={()=>router.push('/diet/macros')} style={styles.macrosButton}>
+            <Text style={styles.buttonText}>Save Macros</Text>
+            <FontAwesome5 name="leaf" size={32} color={colorScheme==='dark'?'white':'#B9F6CA'} />
+           </TouchableOpacity>
+         
+        
+          
           <StatusBar style="inverted" />
         </SafeAreaView>
     );
@@ -140,54 +185,72 @@ function createStyles (colorScheme){
       alignItems:'center',
       justifyContent:'center',
     },
-    logButton:{
-      backgroundColor:colorScheme==='dark'?'#1A1A1A':'#FFFFFF',
-      marginTop:10,
-      marginBottom:10,
-      borderWidth:1,
-      borderColor:colorScheme==='light'?'#D32F2F':'#FF5252',
-      padding:10,
-      paddingTop:15,
+    macrosButton:{
+      backgroundColor: '#2E7D32', // SOLID GREEN
+      width: '92%',
+      height: 100,                // Slightly shorter than Hero to show hierarchy? 
+                                // Or keep 110 for consistency. I used 100 here.
       borderRadius: 20,
-      display:'flex',
-      flexDirection:'column',
-      alignItems:'center',
-      justifyContent:'center',
-      gap:10,
+      marginTop: 15,              // Space between Red and Green cards
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      paddingHorizontal: 20,
+    
+    // Green Glow/Shadow
+      boxShadow: '0px 4px 8px rgba(46, 125, 50, 0.4)',
+      elevation: 8,
 
     },
     buttonText:{
-      fontSize:17,
-      color:colorScheme==='dark'?'#FFFFFF':'#000000',
-      margin: 5,
-      fontWeight:'600',
+      color: 'white',
+      fontSize: 22,
+      fontWeight: 'bold',
     },
     newWorkout:{
-      borderWidth: 1,
-      borderColor: colorScheme==='dark'?'papayawhip':'gray',
-      borderRadius: 10,
-      height:'9%',
-      width:'92%',
-      marginTop:15,
-      gap:10,
-      backgroundColor:colorScheme==='dark'?'#1A1A1A':'#FFFFFF',
-      display: 'flex',
-      alignItems:'center',
-      justifyContent:'center',
-      flexDirection:'row',
-      padding:10,
+      backgroundColor: '#D32F2F',
+      width: '92%',
+      height: 100,               
+      borderRadius: 20,
+      marginTop: 20,
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      paddingHorizontal: 20,
+      boxShadow: '0px 4px 8px rgba(211, 47, 47, 0.4)', 
+      elevation: 8,
     },
     nextWorkout:{
-      color:colorScheme==='dark'?'#FFFFFF':'#000000',
-      fontSize: 20,
-      fontWeight:'600',
+      color: 'white',                 // Pure White
+      fontSize: 23,
+      fontWeight: 'bold',
+      
     },
     mission:{
-      color:colorScheme==='dark'?'#AAAAAA':'#666666',
-      fontSize:19,
-      fontWeight:'500',
+      color: 'rgba(255,255,255,0.8)', // White, slightly transparent
+      fontSize: 12,
+      fontWeight: 'bold',
+      letterSpacing: 1,
+      textTransform: 'uppercase',
+    },
+    recoveryCard:{
+      backgroundColor: '#1976D2',
+      width: '92%',
+      height: 100,               
+      borderRadius: 20,
+      marginTop: 20,
+      flexDirection:'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      paddingHorizontal: 20,
+      boxShadow: '0px 4px 8px rgba(25, 118, 210, 0.4)',
+      elevation: 8,
+    },
+    recoveryText:{
+      color: 'white',                 // Pure White
+      fontSize: 24,
+      fontWeight: 'bold',
     }
-    
 
   })
 }
