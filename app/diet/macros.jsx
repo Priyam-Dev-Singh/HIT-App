@@ -52,10 +52,10 @@ export default function macrosLoggingScreen(){
                 </Pressable>
                </View>
         <View style = {{display: 'flex', flexDirection: 'row', flexWrap: "wrap", justifyContent: 'space-evenly'}}>
-        <View style={{height:'auto', width:'auto', backgroundColor: colorScheme==='dark'?'#222':'#dddddd', display: 'flex', alignItems: 'center', gap: 10, margin: 10,padding: 10, borderWidth: 1, borderColor: colorScheme==='dark'?'papayawhip':'gray', borderRadius: 10,}}>
+        <View style={{height:'auto', width:'auto', backgroundColor: colorScheme==='dark'?'#222':'#f1f1f1', display: 'flex', alignItems: 'center', gap: 10, margin: 10,padding: 10, borderWidth: 1, borderColor: colorScheme==='dark'?'papayawhip':'black', borderRadius: 10,}}>
             <Text style={{fontSize:20,color: colorScheme==='dark'?'white':'black', padding: 10, }}>Protein (gm)</Text>
             <TextInput
-            style={{ width:100, color: colorScheme === "dark"?"white":"black",fontSize: 19, textAlign: 'center',padding: 10, borderWidth: 1, borderColor: colorScheme==='dark'?'papayawhip':'gray'}}
+            style={{ width:100, color: colorScheme === "dark"?"white":"black",fontSize: 19, textAlign: 'center',padding: 10, borderWidth: 1, borderColor: colorScheme==='dark'?'papayawhip':'black'}}
             placeholder="0"
             value={protein}
             onChangeText={setProtein}
@@ -64,10 +64,10 @@ export default function macrosLoggingScreen(){
             placeholderTextColor='#999'
             />
         </View>
-        <View style={{height:'auto', width:'auto', backgroundColor: colorScheme==='dark'?'#222':'#dddddd', display: 'flex', alignItems: 'center', gap: 10, margin: 10,padding:10, borderWidth: 1,  borderColor: colorScheme==='dark'?'papayawhip':'gray', borderRadius: 10,}}>
+        <View style={{height:'auto', width:'auto', backgroundColor: colorScheme==='dark'?'#222':'#f1f1f1', display: 'flex', alignItems: 'center', gap: 10, margin: 10,padding:10, borderWidth: 1,  borderColor: colorScheme==='dark'?'papayawhip':'black', borderRadius: 10,}}>
             <Text style={{fontSize:20,color: colorScheme==='dark'?'white':'black', padding: 10, marginHorizontal: 5,}}>Carbs (gm)</Text>
             <TextInput
-            style={{ width:100, color: colorScheme === "dark"?"white":"black", fontSize: 19, textAlign: 'center',padding: 10, borderWidth: 1,  borderColor: colorScheme==='dark'?'papayawhip':'gray'}}
+            style={{ width:100, color: colorScheme === "dark"?"white":"black", fontSize: 19, textAlign: 'center',padding: 10, borderWidth: 1,  borderColor: colorScheme==='dark'?'papayawhip':'black'}}
             placeholder="0"
             value={carbs}
             onChangeText={setCarbs}
@@ -76,10 +76,10 @@ export default function macrosLoggingScreen(){
             placeholderTextColor='#999'
             />
         </View>
-        <View style={{height:'auto', width:'auto', backgroundColor: colorScheme==='dark'?'#222':'#dddddd', display: 'flex', alignItems: 'center', gap: 10, margin: 10,padding: 10, borderWidth: 1,  borderColor: colorScheme==='dark'?'papayawhip':'gray', borderRadius: 10,}}>
+        <View style={{height:'auto', width:'auto', backgroundColor: colorScheme==='dark'?'#222':'#f1f1f1', display: 'flex', alignItems: 'center', gap: 10, margin: 10,padding: 10, borderWidth: 1,  borderColor: colorScheme==='dark'?'papayawhip':'black', borderRadius: 10,}}>
             <Text style={{fontSize:20,color: colorScheme==='dark'?'white':'black', padding: 10, marginHorizontal: 12, }}>Fats (gm)</Text>
             <TextInput
-            style={{ width:100, color: colorScheme === "dark"?"white":"black", fontSize: 19, textAlign: 'center',padding: 10, borderWidth: 1, borderColor: colorScheme==='dark'?'papayawhip':'gray'}}
+            style={{ width:100, color: colorScheme === "dark"?"white":"black", fontSize: 19, textAlign: 'center',padding: 10, borderWidth: 1, borderColor: colorScheme==='dark'?'papayawhip':'black'}}
             placeholder="0"
             value={fats}
             onChangeText={setFats}
@@ -88,10 +88,10 @@ export default function macrosLoggingScreen(){
             placeholderTextColor='#999'
             />
         </View>
-        <View style={{height:'auto', width:'auto', backgroundColor: colorScheme==='dark'?'#222':'#dddddd', display: 'flex', alignItems: 'center', gap: 10, margin: 10, padding: 10, borderWidth: 1,  borderColor: colorScheme==='dark'?'papayawhip':'gray', borderRadius: 10,}}>
+        <View style={{height:'auto', width:'auto', backgroundColor: colorScheme==='dark'?'#222':'#f1f1f1', display: 'flex', alignItems: 'center', gap: 10, margin: 10, padding: 10, borderWidth: 1,  borderColor: colorScheme==='dark'?'papayawhip':'black', borderRadius: 10,}}>
             <Text style={{fontSize:20,color: colorScheme==='dark'?'white':'black', padding: 10,  marginHorizontal: 12,}}>Water (L)</Text>
             <TextInput
-            style={{ width:100, color: colorScheme === "dark"?"white":"black", fontSize: 19, textAlign: 'center',padding: 10, borderWidth: 1, borderColor: colorScheme==='dark'?'papayawhip':'gray'}}
+            style={{ width:100, color: colorScheme === "dark"?"white":"black", fontSize: 19, textAlign: 'center',padding: 10, borderWidth: 1, borderColor: colorScheme==='dark'?'papayawhip':'black'}}
             placeholder="0"
             value={water}
             onChangeText={setWater}

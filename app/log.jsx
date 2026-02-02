@@ -13,6 +13,7 @@ export default function WorkoutSelectionScreen (){
     const {colorScheme, toggleTheme} = useContext(ThemeContext);
     const styles = createStyles(colorScheme);
     const selectWorkout = (id)=>{
+        console.log(id);
         router.push(`/workout/${id}`);
     }
     const renderItem = ({item})=>(

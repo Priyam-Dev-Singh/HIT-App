@@ -1,11 +1,12 @@
 import {useLocalSearchParams, useRouter} from 'expo-router';
-import { routines } from '../../data/routines';
+import { HitRoutine, routines } from '../../data/routines';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Appearance, FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Appearance, FlatList, Pressable, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useContext, useEffect, useState } from 'react';
 import { exercises } from '../../data/exercises';
 import Octicons from '@expo/vector-icons/Octicons';
 import { ThemeContext } from '../../src/context/ThemeContext';
+import { getCurrentRoutine, saveNextRoutineIndex } from '../../src/storage';
 
 export default function ExerciseSelectionScreen(){
    
@@ -26,6 +27,18 @@ export default function ExerciseSelectionScreen(){
             </View>
         </Pressable>
     );
+
+    const handleCompletedSession = async ()=>{
+    try{
+        const index = await getCurrentRoutine();
+        const currentIndex = index+1 < HitRoutine.length ? index+1 : 0;
+        //console.log("next routine index: ", currentIndex);
+        //console.log("previous routine index: ", currentIndex);
+        await saveNextRoutineIndex(currentIndex);
+        router.replace("/");
+
+    }catch(e){console.error("error handling the completed session", e);}
+};
     return(
         <SafeAreaView style = {styles.container}>
            <View style={{height: '7%', backgroundColor:colorScheme==='dark'?'grey':'#dddddd', display: 'flex', flexDirection:'row', justifyContent:"space-between", alignItems:'center'
@@ -45,6 +58,9 @@ export default function ExerciseSelectionScreen(){
             renderItem={renderItem}
             style = {styles.list}
             />
+            <TouchableOpacity style = {styles.markCompleted} onPress={handleCompletedSession}>
+                <Text style ={styles.buttonText} >Workout Completed</Text>
+            </TouchableOpacity>
         </SafeAreaView>
     )
 }
@@ -54,9 +70,12 @@ function createStyles (colorScheme){
     container:{
         flex: 1,
         backgroundColor: colorScheme === 'light'?'white':'black',
+        display:'flex',
+        flexDirection:'column',
+        justifyContent:'center',
+        
     },
      list:{
-        flex: 1,
         marginTop: 10,
     },
     rows:{
@@ -88,6 +107,27 @@ function createStyles (colorScheme){
         padding: 10,
         fontSize: 22,
         fontWeight: '600',
+    },
+    markCompleted:{
+      backgroundColor:colorScheme==='dark'?'#1A1A1A':'#FFFFFF',
+      marginTop:10,
+      marginBottom:400,
+      borderWidth:1,
+      width:'50%',
+      borderColor:colorScheme==='light'?'#D32F2F':'#FF5252',
+      padding:10,
+      paddingTop:15,
+      borderRadius: 20,
+      display: 'flex',
+      alignItems:'center',
+      justifyContent:'center',
+      alignSelf:'center',
+    },
+    buttonText:{
+      fontSize:17,
+      color:colorScheme==='dark'?'#FFFFFF':'#000000',
+      margin:5,
+      fontWeight:'600',
     }
     })
 }

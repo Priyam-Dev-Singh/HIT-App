@@ -28,6 +28,7 @@ export default function LoggingScreen(){
             setReps('');
             setWeight('');
             alert('Set saved')
+            router.back();
         }
     };
 

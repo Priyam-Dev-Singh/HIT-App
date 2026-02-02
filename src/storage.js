@@ -1,8 +1,10 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import uuid from 'react-native-uuid';
+import { HitRoutine } from '../data/routines';
 
 const workoutStorageKey = '@workoutLogs';
 const macrosStorageKey = '@macrosLogs';
+const routineIndexKey = '@HITroutine';
 
 export const saveSet = async (exerciseId, weight, reps)=>{
     try{
@@ -159,3 +161,34 @@ export const getProgressData = async (exerciseId, exerciseType)=>{
     }catch(e){console.error("error getting progress data", e);}
 
 };
+
+export const fetchLastGlobalWorkout = async () => {
+    try{
+     const jsonValue = await AsyncStorage.getItem(workoutStorageKey);
+     const allLogs = jsonValue != null ? JSON.parse(jsonValue):[];
+     if (allLogs.length === 0){ return null;}
+     allLogs.sort((a,b)=> new Date(b.date)- new Date(a.date));
+     
+     return allLogs[0];
+    }catch(e){console.error("error fetching last global log", e);}
+};
+
+export const getCurrentRoutine = async ()=>{
+    try{
+        const jsonValue = await AsyncStorage.getItem(routineIndexKey);
+        const index = jsonValue != null ? JSON.parse(jsonValue):-1;
+        return index;
+        
+
+        }catch(e){console.error("Error getting routine", e)}
+};
+
+export const saveNextRoutineIndex = async (newIndex)=>{
+   try{
+    await AsyncStorage.setItem(routineIndexKey, JSON.stringify(newIndex));
+    return true;
+   }catch(e){console.error("error saving next routine index", e);
+    return false;
+   }
+};
+

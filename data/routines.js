@@ -15,4 +15,6 @@ export const routines = [
         'exerciseIds':['ex_10', 'ex_11', "ex_12", 'ex_13', 'ex_14'],
     }
 
-]
+];
+
+export const HitRoutine = ['2','1','3','1'];
