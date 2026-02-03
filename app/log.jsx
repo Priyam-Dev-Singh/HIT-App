@@ -16,20 +16,27 @@ export default function WorkoutSelectionScreen (){
         console.log(id);
         router.push(`/workout/${id}`);
     }
-    const renderItem = ({item})=>(
-        <Pressable onPress={()=>selectWorkout(item.id)}>
-            <View style = {styles.rows}>
-                <Text style={[styles.id, styles.workoutText]}>Workout {item.id} :</Text>
-                    <Text style={styles.workoutText}>{item.name}</Text>
-               
+    const renderItem = ({item, index})=>(
+        <Pressable onPress={()=>selectWorkout(item.id)}
+        style={({pressed})=>[styles.card, pressed && {opacity: 0.7}]}>
+            <View style={styles.numberBox}>
+                <Text style={styles.numberText}>{index + 1}</Text>
             </View>
+            <View style = {styles.textContainer}>
+                <Text style={styles.workoutSubtext}>Routine {item.id} :</Text>
+                <Text style={styles.workoutText}>{item.name}</Text>   
+            </View>
+            <Octicons 
+                name="chevron-right" 
+                size={24} 
+                color={colorScheme === 'dark' ? '#555' : '#CCC'} 
+            />
         </Pressable>
     )
    
     return(
        <SafeAreaView style={styles.container}>
-        <View style={{height: '7%', backgroundColor:colorScheme==='dark'?'grey':'#dddddd', display: 'flex', flexDirection:'row', justifyContent:"space-between", alignItems:'center'
-        }}> 
+        <View style={styles.header}> 
             <Pressable onPress={()=>{router.push("/")}}>
                 <Octicons name="home" size={33} color={colorScheme==='dark'?'white':'black'} selectable={undefined} style={{width: 36, marginHorizontal: 10,}}/>
             </Pressable>
@@ -54,35 +61,75 @@ function createStyles(colorScheme){
     return StyleSheet.create({
     container:{
         flex: 1,
-        backgroundColor: colorScheme === 'light'?'white':'black',
+        backgroundColor: colorScheme === 'dark' ? '#000000' : '#F2F2F7',
+    },
+    header:{
+        paddingVertical: 15,
+        paddingHorizontal: 20,
+        borderBottomWidth: 1,
+        backgroundColor: colorScheme === 'dark' ? '#111111' : '#FFFFFF',
+        flexDirection: 'row',
+        justifyContent: "space-between",
+        alignItems: 'center',
+        borderBottomColor: colorScheme === 'dark' ? '#333' : '#E5E5EA',
     },
     list:{
         flex: 1,
         marginTop: 10,
     },
-    rows:{
-        display: 'flex',
-        flexDirection:'row',
-        borderWidth: 1,
-        borderColor: colorScheme==='dark'?'papayawhip':'black',
-        borderRadius: 5,
-        gap: 5,
-        alignItems:'center',
-        margin: 10,
+    textContainer:{
+        flex: 1,
+        marginLeft: 15,
     },
     id:{
         fontWeight: '400',
         margin: 10,
     },
     workoutText:{
-        color: colorScheme==='dark'?'white':'black',
-        fontSize: 17,
-    },
+        color: colorScheme === 'dark' ? '#FFFFFF' : '#000000',
+            fontSize: 17,
+            fontWeight: '600',
+            marginBottom: 2,
+        },
+    workoutSubtext: {
+            color: colorScheme === 'dark' ? '#888' : '#666',
+            fontSize: 12,
+            textTransform: 'uppercase',
+            letterSpacing: 1,
+        },
     headerText:{
-        color: colorScheme==='dark'?'white':'black',
-        padding: 10,
-        fontSize: 22,
-        fontWeight: '600'
-    }
+        color: colorScheme === 'dark' ? '#FFFFFF' : '#000000',
+        fontSize: 20,
+        fontWeight: '700',
+        letterSpacing: 0.5,
+    },
+    numberBox: {
+        width: 40,
+        height: 40,
+        borderRadius: 8,
+        backgroundColor: colorScheme === 'dark' ? '#330000' : '#FFEBEE',
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderWidth: 1,
+        borderColor: colorScheme === 'dark' ? '#D32F2F' : 'transparent',
+        },
+    numberText: {
+        color: '#D32F2F', // Hero Red
+        fontSize: 18,
+        fontWeight: 'bold',
+    },
+    card: {
+            backgroundColor: colorScheme === 'dark' ? '#1C1C1E' : '#FFFFFF',
+            borderRadius: 16,
+            marginHorizontal: 16,
+            marginTop: 12,
+            padding: 16,
+            flexDirection: 'row',
+            alignItems: 'center',
+            
+            // Shadows
+            boxShadow: '0px 2px 5px rgba(0,0,0,0.1)',
+            elevation: 3,
+        },
     
 })}

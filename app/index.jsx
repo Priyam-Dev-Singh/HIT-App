@@ -10,9 +10,12 @@ import Octicons from '@expo/vector-icons/Octicons';
 import { MaterialCommunityIcons, FontAwesome5 } from '@expo/vector-icons';
 import Feather from '@expo/vector-icons/Feather';
 import { Calendar } from 'react-native-calendars';
+import { WorkoutContext } from '../src/context/WorkoutContext';
+import AntDesign from '@expo/vector-icons/AntDesign';
 
 
 export default function HomeScreen(){
+    const {isWorkoutActive, routineId, startWorkout, setIsChecking} = useContext(WorkoutContext);
     const [markedDates, setMarkedDates] = useState({});
     const[isReady, setIsReady] = useState(true);
     const [routine, setRoutine] = useState({});
@@ -21,9 +24,9 @@ export default function HomeScreen(){
     const styles = createStyles(colorScheme);
     const router = useRouter();
    
-      useEffect(()=>{
-
-      const initializeDashboard = async ()=>{
+     useFocusEffect(
+       useCallback(()=>{
+        const initializeDashboard = async ()=>{
         const data = await fetchLastGlobalWorkout();
         setLastLog(data);
       //console.log(data);
@@ -37,7 +40,8 @@ export default function HomeScreen(){
         setRoutine(currentRoutine);
       };
       initializeDashboard();
-    },[]);
+    },[])
+     );
 
     const getRoutine = ()=>{
      if(routines[0].exerciseIds.includes(lastLog.exerciseId)){
@@ -117,23 +121,40 @@ export default function HomeScreen(){
                 textDayHeaderFontSize: 14
               }}/>
             </View>
-            {isReady===true?
-              <TouchableOpacity style={styles.newWorkout} onPress={()=> router.push(`/workout/${routine.id}`)}>
+           {isWorkoutActive?
+           <TouchableOpacity style={[styles.newWorkout, {gap: 5}]} onPress={()=>{
+                router.push(`/workout/${routine.id}`);
+              }}>
+                <Text style = {styles.mission}>MISSION IN PROGRESS </Text>
+                <Text style = {styles.nextWorkout}>RESUME</Text>
+                <FontAwesome5 name="play" size={24} color={colorScheme==='light'?'white':'black'} style={{marginLeft:70}} />
+            </TouchableOpacity>
+          :
+           (isReady ?
+              <TouchableOpacity style={styles.newWorkout} onPress={()=>{ 
+                setIsChecking(false);
+                startWorkout(routine.id);
+                router.push(`/workout/${routine.id}`);
+              }}>
                 <Text style = {styles.mission}>Mission: </Text>
                 <Text style = {styles.nextWorkout}>{routine?.name||"Loading..."}</Text>
-                <FontAwesome5 name="dumbbell" size={28} color={colorScheme==='light'?'white':'black'} style={{marginLeft:70}} />
+                <FontAwesome5 name="dumbbell" size={28} color='rgba(255, 255, 255, 0.8)' style={{marginLeft:60}} />
             </TouchableOpacity>
             :
            <View style = {styles.recoveryCard}>
             <Text style= {styles.recoveryText}>Recovery Mode</Text>
             <Feather name="battery-charging" size={35} color="white" />
            </View>
-            }
+            )}
         
             
            <TouchableOpacity onPress={()=>router.push('/diet/macros')} style={styles.macrosButton}>
             <Text style={styles.buttonText}>Save Macros</Text>
             <FontAwesome5 name="leaf" size={32} color={colorScheme==='dark'?'white':'#B9F6CA'} />
+           </TouchableOpacity>
+           <TouchableOpacity onPress={()=>{router.push('/log'); setIsChecking(true)}} style={styles.progressButton}>
+            <Text style={styles.progressText}>View Progress</Text>
+            <AntDesign name="line-chart" size={32} color="white" />
            </TouchableOpacity>
          
         
@@ -209,6 +230,7 @@ function createStyles (colorScheme){
     },
     newWorkout:{
       backgroundColor: '#D32F2F',
+      
       width: '92%',
       height: 100,               
       borderRadius: 20,
@@ -250,7 +272,27 @@ function createStyles (colorScheme){
       color: 'white',                 // Pure White
       fontSize: 24,
       fontWeight: 'bold',
-    }
+    },
+    progressButton:{
+      backgroundColor: '#EF6C00', // Industrial Orange (High contrast, serious)
+      width: '92%',
+      height: 80, 
+      borderRadius: 20,
+      marginTop: 15,
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      paddingHorizontal: 20,
 
+    // Orange Glow
+      boxShadow: '0px 4px 8px rgba(239, 108, 0, 0.4)',
+      elevation: 6,
+    },
+    progressText:{
+      color: 'white',
+      fontSize: 22,
+      fontWeight: 'bold',
+      letterSpacing: 0.5,
+    },
   })
 }

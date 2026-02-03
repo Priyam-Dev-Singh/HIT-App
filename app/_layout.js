@@ -1,12 +1,14 @@
 import { Stack } from "expo-router";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { ThemeProvider } from "../src/context/ThemeContext";
+import { WorkoutProvider } from "../src/context/WorkoutContext";
 
 export default function Layout (){
 
     return(
         <ThemeProvider>
-            <SafeAreaProvider>
+            <WorkoutProvider>
+                <SafeAreaProvider>
                 <Stack>
                     <Stack.Screen name='index' options = {{headerShown:false}} />
                     <Stack.Screen name='log' options = {{headerShown:false}}/>
@@ -15,6 +17,7 @@ export default function Layout (){
                     <Stack.Screen name = 'diet/macros' options = {{headerShown:false}}/>
                 </Stack>
             </SafeAreaProvider>
+            </WorkoutProvider>
         </ThemeProvider>
     )
 

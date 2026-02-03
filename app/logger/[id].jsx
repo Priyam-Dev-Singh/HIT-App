@@ -7,8 +7,10 @@ import { saveSet, getLastLog, deleteLastLog, getProgressData } from "../../src/s
 import Octicons from '@expo/vector-icons/Octicons';
 import { ThemeContext } from "../../src/context/ThemeContext";
 import { LineChart } from "react-native-gifted-charts";
+import { WorkoutContext } from "../../src/context/WorkoutContext";
 
 export default function LoggingScreen(){
+    const {isChecking} = useContext(WorkoutContext);
     const router = useRouter();
     const [weight,setWeight]=useState('');
     const [reps,setReps]=useState('');
@@ -172,7 +174,8 @@ export default function LoggingScreen(){
            </View> : 
             <View></View>  
         }
-       
+        {!isChecking ? 
+        <>
         <View style={{display: 'flex', flexDirection:'row', alignItems:'center', justifyContent:'space-evenly'}}>
             <View style={styles.logContainers}>
                 <Text style={styles.weightAndReps}>Weight (kg)</Text>
@@ -201,7 +204,8 @@ export default function LoggingScreen(){
         <TouchableOpacity style={styles.saveButton}
         onPress={handleSave}>
             <Text style={styles.saveText}>Save Log</Text>
-        </TouchableOpacity>
+        </TouchableOpacity> </>: null}
+        
             </ScrollView>
         </KeyboardAvoidingView>
        </SafeAreaView>

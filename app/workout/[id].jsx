@@ -1,15 +1,16 @@
 import {useLocalSearchParams, useRouter} from 'expo-router';
 import { HitRoutine, routines } from '../../data/routines';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Appearance, FlatList, Pressable, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Alert, Appearance, FlatList, Pressable, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useContext, useEffect, useState } from 'react';
 import { exercises } from '../../data/exercises';
 import Octicons from '@expo/vector-icons/Octicons';
 import { ThemeContext } from '../../src/context/ThemeContext';
 import { getCurrentRoutine, markDayCompleted, saveNextRoutineIndex } from '../../src/storage';
+import { WorkoutContext } from '../../src/context/WorkoutContext';
 
 export default function ExerciseSelectionScreen(){
-   
+    const {endWorkout, isChecking} = useContext(WorkoutContext);
     const{colorScheme, toggleTheme} = useContext(ThemeContext);
     const styles = createStyles(colorScheme);
     const {id} = useLocalSearchParams();
@@ -40,9 +41,12 @@ export default function ExerciseSelectionScreen(){
         //console.log("next routine index: ", currentIndex);
         //console.log("previous routine index: ", currentIndex);
         await saveNextRoutineIndex(currentIndex);
-        await markDayCompleted();
-        router.replace("/");
-
+        const success = await markDayCompleted();
+        if(success){
+            endWorkout();
+            router.replace("/");
+        }
+        else{Alert.alert("Error marking workout completed");}
     }catch(e){console.error("error handling the completed session", e);}
 };
     return(
@@ -62,10 +66,10 @@ export default function ExerciseSelectionScreen(){
             keyExtractor={item=>item.id}
             renderItem={renderItem}
             style = {styles.list}
-            ListFooterComponent={
-                <TouchableOpacity style = {styles.markCompleted} onPress={handleCompletedSession}>
+            ListFooterComponent={ !isChecking?
+                  <TouchableOpacity style = {styles.markCompleted} onPress={handleCompletedSession}>
                 <Text style ={styles.buttonText} >Mark Completed</Text>
-            </TouchableOpacity>
+            </TouchableOpacity>:null  
             }
             />
             
