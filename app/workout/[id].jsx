@@ -58,7 +58,7 @@ export default function ExerciseSelectionScreen(){
                        <Text style = {styles.headerText}>{currentRoutine.name}</Text>
                        <Pressable onPress={toggleTheme}>
                            {colorScheme==='dark'?
-                           <Octicons name="moon" size={36} color='white' selectable={undefined} style={{width: 36, marginHorizontal: 10,}}/>:<Octicons name="sun" size={36} color='black' selectable={undefined} style={{width: 36, marginHorizontal: 10,}}/>}
+                           <Octicons name="moon" size={30} color='white' selectable={undefined} style={{width: 30, marginHorizontal: 10,}}/>:<Octicons name="sun" size={30} color='black' selectable={undefined} style={{width: 30, marginHorizontal: 10,}}/>}
                        </Pressable>
                    </View>
             <FlatList

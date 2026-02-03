@@ -1,4 +1,4 @@
-import {View, Text, StyleSheet, Button, Pressable, TouchableOpacity} from 'react-native';
+import {View, Text, StyleSheet, Button, Pressable, TouchableOpacity, ScrollView} from 'react-native';
 import { useFocusEffect, useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
@@ -85,13 +85,14 @@ export default function HomeScreen(){
     //console.log(routine);
     //console.log(isReady);
     return(
-        <SafeAreaView style={styles.container}>
-           <View style={{display:'flex', flexDirection:'row', alignItems:'center', justifyContent:'space-between'}}>
-             <Text style={{color:colorScheme==='dark'?'papayawhip':'black', margin: 15, fontSize: 30}}>Hello, HIT App</Text>
-            <Pressable onPress={toggleTheme}>
+        <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false}>
+          <SafeAreaView style={styles.container}>
+           <View style={styles.masterHeader}>
+             <Text style={styles.masterHeaderText}>INTENSITY</Text>
+            <Pressable onPress={toggleTheme} style={{padding:8}}>
               {colorScheme==='dark'?
-                <Octicons name="moon" size={33} color='white' selectable={undefined} style={{width: 36, marginHorizontal: 10,}}/>:
-                <Octicons name="sun" size={33} color='black' selectable={undefined} style={{width: 36, marginHorizontal: 10,}}/>}
+                <Octicons name="moon" size={30} color='white' selectable={undefined} style={{width: 36, marginHorizontal: 10,}}/>:
+                <Octicons name="sun" size={30} color='black' selectable={undefined} style={{width: 36, marginHorizontal: 10, }}/>}
             </Pressable>
            </View>
             {lastLog==null?<View></View>:
@@ -102,6 +103,7 @@ export default function HomeScreen(){
             <View style={{width:'92%', marginTop:15, borderRadius:15, overflow:'hidden'}}>
               <Calendar
               markedDates={markedDates}
+              key={colorScheme}
               theme={{
                 backgroundColor: colorScheme === 'dark' ? '#1A1A1A' : '#ffffff',
                 calendarBackground: colorScheme === 'dark' ? '#1A1A1A' : '#ffffff',
@@ -127,7 +129,7 @@ export default function HomeScreen(){
               }}>
                 <Text style = {styles.mission}>MISSION IN PROGRESS </Text>
                 <Text style = {styles.nextWorkout}>RESUME</Text>
-                <FontAwesome5 name="play" size={24} color={colorScheme==='light'?'white':'black'} style={{marginLeft:70}} />
+                <FontAwesome5 name="play" size={24} color={colorScheme==='dark'?'white':'black'} />
             </TouchableOpacity>
           :
            (isReady ?
@@ -138,19 +140,19 @@ export default function HomeScreen(){
               }}>
                 <Text style = {styles.mission}>Mission: </Text>
                 <Text style = {styles.nextWorkout}>{routine?.name||"Loading..."}</Text>
-                <FontAwesome5 name="dumbbell" size={28} color='rgba(255, 255, 255, 0.8)' style={{marginLeft:60}} />
+                <FontAwesome5 name="dumbbell" size={26} color='rgba(255, 255, 255, 0.8)' />
             </TouchableOpacity>
             :
            <View style = {styles.recoveryCard}>
             <Text style= {styles.recoveryText}>Recovery Mode</Text>
-            <Feather name="battery-charging" size={35} color="white" />
+            <Feather name="battery-charging" size={30} color="white" />
            </View>
             )}
         
             
            <TouchableOpacity onPress={()=>router.push('/diet/macros')} style={styles.macrosButton}>
             <Text style={styles.buttonText}>Save Macros</Text>
-            <FontAwesome5 name="leaf" size={32} color={colorScheme==='dark'?'white':'#B9F6CA'} />
+            <FontAwesome5 name="leaf" size={26} color={colorScheme==='dark'?'white':'#B9F6CA'} />
            </TouchableOpacity>
            <TouchableOpacity onPress={()=>{router.push('/log'); setIsChecking(true)}} style={styles.progressButton}>
             <Text style={styles.progressText}>View Progress</Text>
@@ -161,6 +163,7 @@ export default function HomeScreen(){
           
           <StatusBar style="inverted" />
         </SafeAreaView>
+        </ScrollView>
     );
 }
 
@@ -173,6 +176,23 @@ function createStyles (colorScheme){
       display: 'flex',
       flexDirection: 'column',
       gap:10,
+      paddingBottom: 100,
+    },
+    masterHeader:{
+      width: '100%',             // <--- THE FIX
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      paddingHorizontal: 20,     // Proper side spacing
+      paddingVertical: 15,       // Breathing room top/bottom
+      backgroundColor: 'transparent',
+    },
+    masterHeaderText:{
+      fontSize: 24,              // 30 is a bit loud, 24 is cleaner
+      color: colorScheme === 'dark' ? '#FFFFFF' : '#000000',
+      letterSpacing: 1,          // Makes it look like a brand
+      textTransform: 'uppercase',
+      fontWeight: '800',         // Extra Bold (Logo feel)
     },
     header:{
       borderWidth: 1,
@@ -191,12 +211,12 @@ function createStyles (colorScheme){
     },
     headerText:{
       color:colorScheme==='dark'?'#FFFFFF':'#000000',
-      fontSize:17,
+      fontSize:14,
       fontWeight:'500',
     },
     lastWorkout:{
       color:colorScheme==='dark'?'#AAAAAA':'#666666',
-      fontSize:16,
+      fontSize:14,
       fontWeight:'500',
     },
     buttonSelector:{
@@ -225,7 +245,7 @@ function createStyles (colorScheme){
     },
     buttonText:{
       color: 'white',
-      fontSize: 22,
+      fontSize: 20,
       fontWeight: 'bold',
     },
     newWorkout:{
@@ -244,13 +264,13 @@ function createStyles (colorScheme){
     },
     nextWorkout:{
       color: 'white',                 // Pure White
-      fontSize: 23,
+      fontSize: 18,
       fontWeight: 'bold',
       
     },
     mission:{
       color: 'rgba(255,255,255,0.8)', // White, slightly transparent
-      fontSize: 12,
+      fontSize: 10,
       fontWeight: 'bold',
       letterSpacing: 1,
       textTransform: 'uppercase',
@@ -270,7 +290,7 @@ function createStyles (colorScheme){
     },
     recoveryText:{
       color: 'white',                 // Pure White
-      fontSize: 24,
+      fontSize: 20,
       fontWeight: 'bold',
     },
     progressButton:{
@@ -290,7 +310,7 @@ function createStyles (colorScheme){
     },
     progressText:{
       color: 'white',
-      fontSize: 22,
+      fontSize: 20,
       fontWeight: 'bold',
       letterSpacing: 0.5,
     },

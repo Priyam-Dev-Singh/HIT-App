@@ -1,6 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import uuid from 'react-native-uuid';
-import { HitRoutine } from '../data/routines';
+import {Text} from 'react-native';
+import React from 'react';
 
 const workoutStorageKey = '@workoutLogs';
 const macrosStorageKey = '@macrosLogs';
@@ -235,3 +236,73 @@ export const markDayCompleted = async()=>{
         return false;
     }
 };
+const calculateTotalClaories = (protein, carbs, fats)=>{
+    const P = parseFloat(protein)||0;
+    const C = parseFloat(carbs) || 0;
+    const F = parseFloat(fats)||0;
+    return (P*4)+(C*4)+(F*9)
+};
+
+export const getWeeklyCalories = async()=>{
+    try{
+
+        const jsonValue = await AsyncStorage.getItem(macrosStorageKey);
+        let allLogs = jsonValue != null? JSON.parse(jsonValue):[];
+        allLogs.sort((a,b)=> new Date(a.date) - new Date(b.date));
+        allLogs = allLogs.slice(-7);
+        const dailyCaloricIntake = allLogs.map(log=>(
+            {
+                value: calculateTotalClaories(log.protein, log.carbs, log.fats),
+                label: `${new Date(log.date).getDate()}/${new Date(log.date).getMonth()+1}`,
+                frontColor: '#2E7D32',
+                topLabelComponent:()=>(
+                    <Text
+                        style={{
+                        color: '#00E676', // Match bar color
+                        fontSize: 10,
+                        fontWeight: 'bold',
+                        marginBottom: 6,  // Push it up slightly
+                        textAlign: 'center',
+                        width: 30}}>{calculateTotalClaories(log.protein, log.carbs, log.fats)}</Text>
+                )
+            }
+        ));
+        //console.log(dailyCaloricIntake);
+        return dailyCaloricIntake;
+    }catch(e){console.error("Error fetching calories", e);
+        return [];
+    }
+};
+
+export const getWeeklyWater= async ()=>{
+    try{
+        const jsonValue = await AsyncStorage.getItem(macrosStorageKey);
+        let allLogs = jsonValue != null ? JSON.parse(jsonValue):[];
+        allLogs.sort((a,b)=>new Date(a.date) - new Date(b.date));
+        allLogs.slice(-7);
+
+        const dailyWaterIntake = allLogs.map(log => (
+            {
+                value: parseFloat(log.water||0),
+                label: `${new Date(log.date).getDate()}/${new Date(log.date).getMonth()+1}`,
+                frontColor: '#1976D2',
+                topLabelComponent: ()=>(
+                    <Text style={{
+                        color: '#40C4FF', // Brighter Cyan for text visibility
+                        fontSize: 10,
+                        fontWeight: 'bold',
+                        marginBottom: 6,
+                        textAlign: 'center',
+                        width: 30
+                    }}>
+                        {log.water}
+                    </Text>
+                )
+
+            }
+        ));
+        //console.log(dailyWaterIntake);
+        return dailyWaterIntake;
+    }catch(e){console.error("Error fetching water", e);
+        return [];}
+}

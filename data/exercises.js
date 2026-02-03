@@ -66,14 +66,14 @@ export const exercises = [
         'id':'ex_10',
         'name':'Lateral Raises',
         'type' : 'isolation',
-        'muscleGroup':'Shoulder (Lateral Delts)',
+        'muscleGroup':'Lateral Delts',
         'description': 'Shoulder Lateral Raises either free weight or on a machine',
     },
     {
         'id':'ex_11',
         'name':'Rear Delt Fly',
         'type' : 'isolation',
-        'muscleGroup':'Shoulder (Rear Delts)',
+        'muscleGroup':'Rear Delts',
         'description': 'Rear Delt flyes preferably on a machine',
     },
     {
