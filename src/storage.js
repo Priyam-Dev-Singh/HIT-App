@@ -112,6 +112,25 @@ export const saveMacros = async (protein, carbs, fats, water) => {
 
 };
 
+export const deleteLastMacros = async()=>{
+    try{
+        const jsonValue = await AsyncStorage.getItem(macrosStorageKey);
+        let allLogs = jsonValue != null ? JSON.parse(jsonValue):[];
+        if(allLogs.length==0){
+            console.log("no macro logs present to delete");
+            return false;
+        }
+        allLogs.sort((a,b)=> new Date(b.date) - new Date(a.date));
+        allLogs.shift();
+        await AsyncStorage.setItem(macrosStorageKey, JSON.stringify(allLogs));
+        console.log("Last macros log was deleted");
+        return true;
+
+    }catch(e){console.error("Error deleting last macros log", e);
+        return false;
+    }
+};
+
 function calculate1RM(type, weight, reps ){
     const R = parseFloat(reps);
     const W = parseFloat(weight);

@@ -176,7 +176,7 @@ function createStyles (colorScheme){
       display: 'flex',
       flexDirection: 'column',
       gap:10,
-      paddingBottom: 100,
+      paddingBottom: 70,
     },
     masterHeader:{
       width: '100%',             // <--- THE FIX

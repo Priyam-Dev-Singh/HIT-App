@@ -177,7 +177,7 @@ export default function LoggingScreen() {
                         />
                     </View>
 
-                    {/* Previous Log */}
+                   
                     {lastLog && lastLog.weight ? (
                         <View style={styles.lastSet}>
                             <View style={{ alignItems: "center", flexDirection: 'row' }}>

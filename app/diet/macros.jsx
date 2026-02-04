@@ -1,7 +1,7 @@
 import { useContext, useEffect, useRef, useState } from "react";
-import { Text, TextInput, TouchableOpacity, View, Pressable, KeyboardAvoidingView, ScrollView, Platform, StyleSheet, Dimensions, Keyboard } from "react-native";
+import { Text, TextInput, TouchableOpacity, View, Pressable, KeyboardAvoidingView, ScrollView, Platform, StyleSheet, Dimensions, Keyboard, Alert } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { getWeeklyCalories, getWeeklyWater, saveMacros } from "../../src/storage";
+import { deleteLastMacros, getWeeklyCalories, getWeeklyWater, saveMacros } from "../../src/storage";
 import { ThemeContext } from "../../src/context/ThemeContext";
 import Octicons from '@expo/vector-icons/Octicons';
 import { FontAwesome5, MaterialCommunityIcons } from '@expo/vector-icons';
@@ -61,6 +61,28 @@ export default function MacrosLoggingScreen() {
             router.back();
         }
     };
+    const performDelete = async()=>{
+        const success = await deleteLastMacros();
+        if(success){
+            Alert.alert("Last set was deleted");
+        }
+        else{
+            alert("Log your macros first");
+        }
+    };
+    const handleDelete = ()=>{
+        if(Platform.OS==='web'){
+            if(window.confirm("Delete last Macros Log?")){performDelete();}
+        }
+        else{
+            Alert.alert("Delete Last Macros Log?", 'This cant be undone',[
+                {text:'cancel', style:'cancel'},
+                {text:'Delete', style:'destructive', onPress: performDelete}
+            ]
+            )
+        };
+    };
+
     //console.log(dailyCalories);
     //console.log(dailyWater);
     return (
@@ -212,10 +234,15 @@ export default function MacrosLoggingScreen() {
                     </View>
 
                    
-                    <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
+                    <View style={{display:'flex', flexDirection:'row', alignItems:'baseline', justifyContent:'center'}}>
+                        <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
                         <Text style={styles.saveText}>SAVE YOUR MACROS</Text>
                         <FontAwesome5 name="check" size={18} color="white" style={{marginLeft: 10}}/>
                     </TouchableOpacity>
+                    <TouchableOpacity onPress={handleDelete}>
+                        <Octicons name='trash' size={28} color='red' style={{padding:20,}}/>
+                    </TouchableOpacity>
+                    </View>
 
                 </ScrollView>
             </KeyboardAvoidingView>
@@ -236,6 +263,7 @@ function createStyles(colorScheme) {
         container: {
             flex: 1,
             backgroundColor: bg,
+            paddingBottom: 70,
         },
         scrollContent: {
             paddingBottom: 40,
@@ -343,6 +371,8 @@ function createStyles(colorScheme) {
         saveButton: {
             backgroundColor: greenHero,
             marginHorizontal: 20,
+            paddingHorizontal: 20,
+            padding: 10,
             marginTop: 30,
             height: 56,
             borderRadius: 12,
@@ -356,7 +386,7 @@ function createStyles(colorScheme) {
         },
         saveText: {
             color: 'white',
-            fontSize: 18,
+            fontSize: 17,
             fontWeight: '800',
             letterSpacing: 1,
             textTransform: 'uppercase',
