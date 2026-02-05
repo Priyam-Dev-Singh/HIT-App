@@ -234,13 +234,13 @@ export default function MacrosLoggingScreen() {
                     </View>
 
                    
-                    <View style={{display:'flex', flexDirection:'row', alignItems:'baseline', justifyContent:'center'}}>
+                    <View style={{display:'flex', flexDirection:'row', alignItems:'center', justifyContent:'center'}}>
                         <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
                         <Text style={styles.saveText}>SAVE YOUR MACROS</Text>
                         <FontAwesome5 name="check" size={18} color="white" style={{marginLeft: 10}}/>
                     </TouchableOpacity>
                     <TouchableOpacity onPress={handleDelete}>
-                        <Octicons name='trash' size={28} color='red' style={{padding:20,}}/>
+                        <Octicons name='trash' size={28} color='red' style={{marginTop:30}}/>
                     </TouchableOpacity>
                     </View>
 
@@ -263,10 +263,10 @@ function createStyles(colorScheme) {
         container: {
             flex: 1,
             backgroundColor: bg,
-            paddingBottom: 70,
+            
         },
         scrollContent: {
-            paddingBottom: 40,
+            paddingBottom: 20,
         },
         
         header: {
