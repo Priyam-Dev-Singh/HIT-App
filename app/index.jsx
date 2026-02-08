@@ -85,7 +85,8 @@ export default function HomeScreen(){
     //console.log(routine);
     //console.log(isReady);
     return(
-        <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false}>
+        <ScrollView style={{ flex: 1, backgroundColor:colorScheme==='dark'?'black':'white',
+         }} showsVerticalScrollIndicator={false}>
           <SafeAreaView style={styles.container}>
            <View style={styles.masterHeader}>
              <Text style={styles.masterHeaderText}>INTENSITY</Text>

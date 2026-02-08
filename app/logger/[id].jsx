@@ -131,7 +131,7 @@ export default function LoggingScreen() {
                             color="#D32F2F"
                             thickness={3}
                             curved
-                            isAnimated
+                            
                             dataPointsColor="#D32F2F"
                             areaChart
                             startFillColor="#D32F2F"
@@ -141,7 +141,7 @@ export default function LoggingScreen() {
                             xAxisColor="transparent"
                             yAxisColor="transparent"
                             yAxisTextStyle={{ color: colorScheme === 'dark' ? '#666' : '#999', fontSize: 10 }}
-                            xAxisLabelTextStyle={{ color: colorScheme === 'dark' ? '#666' : '#999', fontSize: 10 }}
+                            xAxisLabelTextStyle={{ color:  colorScheme === 'dark' ? '#666' : '#999', fontSize: 10 }}
                             rulesColor={colorScheme === 'dark' ? '#222' : '#F0F0F0'}
                             height={220}
                             

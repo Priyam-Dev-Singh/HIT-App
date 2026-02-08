@@ -163,7 +163,7 @@ export default function MacrosLoggingScreen() {
                             width={screenWidth - 70}
                             isAnimated
                             yAxisTextStyle={{ color: colorScheme === 'dark' ? '#CCCCCC' : '#333333' }}
-                            xAxisLabelTextStyle={{color: colorScheme === 'dark' ? '#CCCCCC' : '#333333', // Dynamic color
+                            xAxisLabelTextStyle={{color: 'transparent', // Dynamic color
                             fontSize: 12}}
                         />
                     </View>
@@ -266,7 +266,7 @@ function createStyles(colorScheme) {
             
         },
         scrollContent: {
-            paddingBottom: 20,
+            paddingBottom: 50,
         },
         
         header: {
