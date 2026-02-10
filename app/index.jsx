@@ -4,7 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import { useCallback, useContext, useEffect, useState } from 'react';
 import { ThemeContext } from '../src/context/ThemeContext';
-import { fetchLastGlobalWorkout, getCurrentRoutine, getWorkoutHistory } from '../src/storage';
+import { fetchLastGlobalWorkout, getCurrentRoutine, getWorkoutHistory, logOut } from '../src/storage';
 import { HitRoutine, routines } from '../data/routines';
 import Octicons from '@expo/vector-icons/Octicons';
 import { MaterialCommunityIcons, FontAwesome5 } from '@expo/vector-icons';
@@ -106,8 +106,8 @@ export default function HomeScreen(){
               markedDates={markedDates}
               key={colorScheme}
               theme={{
-                backgroundColor: colorScheme === 'dark' ? '#1A1A1A' : '#ffffff',
-                calendarBackground: colorScheme === 'dark' ? '#1A1A1A' : '#ffffff',
+                backgroundColor: colorScheme === 'dark' ? '#1A1A1A' : '#f2f2f2',
+                calendarBackground: colorScheme === 'dark' ? '#1A1A1A' : '#f2f2f2',
                 textSectionTitleColor: '#b6c1cd',
                 selectedDayBackgroundColor: '#D32F2F', // Red Circle
                 selectedDayTextColor: '#ffffff',
@@ -160,8 +160,9 @@ export default function HomeScreen(){
             <AntDesign name="line-chart" size={32} color="white" />
            </TouchableOpacity>
          
-        
-          
+           <View style={{flexDirection:'row', gap:20}}>
+            <Button title='Signout' onPress={logOut}  />
+           </View>
           <StatusBar style="inverted" />
         </SafeAreaView>
         </ScrollView>

@@ -1,7 +1,8 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import uuid from 'react-native-uuid';
-import {Text} from 'react-native';
+import {Alert, Text} from 'react-native';
 import React from 'react';
+import { supabase } from './lib/supabase';
 
 const workoutStorageKey = '@workoutLogs';
 const macrosStorageKey = '@macrosLogs';
@@ -324,4 +325,12 @@ export const getWeeklyWater= async ()=>{
         return dailyWaterIntake;
     }catch(e){console.error("Error fetching water", e);
         return [];}
+}
+
+export const logOut = async ()=>{
+    const {error} = await supabase.auth.signOut();
+    if(error){
+        Alert.alert("Error signing out");
+        console.log(error);
+    }
 }
