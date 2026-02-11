@@ -3,7 +3,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { supabase } from "../../src/lib/supabase";
 import { Alert, Button, TextInput, View, Text } from "react-native";
 import { useRouter } from "expo-router";
-import { syncData } from "../../src/lib/sync";
+import { syncAllUserData } from "../../src/lib/sync";
 
 
 export default function LoginPage(){
@@ -22,7 +22,7 @@ export default function LoginPage(){
             Alert.alert(error.message);
         }
         else{
-            await syncData();
+            await syncAllUserData();
             router.replace('/');
         }
          setLoading(false);

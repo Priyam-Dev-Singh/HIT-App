@@ -112,8 +112,9 @@ export const deleteLastLog = async (exerciseId) => {
 
 export const saveMacros = async (protein, carbs, fats, water) => {
     try{
+        const timeStamp = new Date().toISOString();
         const newLog = {
-          date : new Date().toISOString(),
+          date : timeStamp,
           protein : parseFloat(protein),
           carbs : parseFloat(carbs),
           fats : parseFloat(fats),
@@ -130,10 +131,30 @@ export const saveMacros = async (protein, carbs, fats, water) => {
         //saving the updated log
         await AsyncStorage.setItem(macrosStorageKey, JSON.stringify(updatedLogs));
 
-        console.log("Database Updated");
+        console.log("Local Database Updated");
+        //supabase sync
+        try{
+            const {data:{user}} = await supabase.auth.getUser();
+            if(!user){
+                console.warn("User doesnt exists");
+                return;
+            }
+            const {error} = await supabase.from('macrosLogs').insert([
+                {
+                    logged_at: timeStamp,
+                    protein:protein,
+                    carbs: carbs,
+                    fats: fats,
+                    water: water,
+                }
+            ]);
+            if(error){console.log("supabase macros cloud sync error");}
+            else{console.log("Macros table updated successfully");}
+    
+        }catch(e){
+            console.error("Error saving macros to cloud", e);
+        }
         return true;
-
-
     }catch(e){
         console.error("Error saving Log", e);
         return false;
@@ -236,6 +257,9 @@ export const getCurrentRoutine = async ()=>{
 export const saveNextRoutineIndex = async (newIndex)=>{
    try{
     await AsyncStorage.setItem(routineIndexKey, JSON.stringify(newIndex));
+    
+    insertRoutineInDB(newIndex).catch(e=> console.error(e));
+       
     return true;
    }catch(e){console.error("error saving next routine index", e);
     return false;
@@ -268,7 +292,7 @@ export const markDayCompleted = async()=>{
                 marked:true
             }
         };
-        const allDates = Object.keys(fullHistory).sort();
+       /* const allDates = Object.keys(fullHistory).sort();
         let finalHistory = fullHistory;
         
         if(allDates.length>31){
@@ -277,8 +301,20 @@ export const markDayCompleted = async()=>{
             recentDates.forEach(date=>{
                 finalHistory[date] = fullHistory[date];
             });
+        }*/
+        await AsyncStorage.setItem(historyKey, JSON.stringify(fullHistory));
+
+        const{data:{user}} = await supabase.auth.getUser();
+        if(user){
+            const{error} = supabase.from('profiles').upsert(({
+                user_id : user.id,
+                created_at: new Date.toISOString(),
+                calendar_data: fullHistory,
+            }));
+
+            if(error){console.log("Error putting calendar data in DB");}
+            else{console.log("calendar data synced to DB");}
         }
-        await AsyncStorage.setItem(historyKey, JSON.stringify(finalHistory));
         return true;
     }catch(e){console.error("error marking day completed", e);
         return false;
@@ -360,5 +396,28 @@ export const logOut = async ()=>{
     if(error){
         Alert.alert("Error signing out");
         console.log(error);
+    }
+};
+
+export const insertRoutineInDB = async (newIndex)=>{
+
+    try{
+        const {data:{user}} = await supabase.auth.getUser();
+        if(!user){
+            console.log("This is a new user");
+            return;
+        }
+        const {error} = await supabase.from('profiles').upsert({
+            id: user.id,
+            created_at: new Date().toISOString,
+            HIT_routine: newIndex,
+        });
+
+        if(error){console.log("Error inserting routine", e);}
+        else{
+            console.log("Hit routine inserted to the DB");
+        }
+    }catch(e){
+        console.log("Error syncing routine to database");
     }
 }
