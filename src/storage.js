@@ -3,6 +3,7 @@ import uuid from 'react-native-uuid';
 import {Alert, Text} from 'react-native';
 import React from 'react';
 import { supabase } from './lib/supabase';
+import { counterEvent } from 'react-native/Libraries/Performance/Systrace';
 
 const workoutStorageKey = '@workoutLogs';
 const macrosStorageKey = '@macrosLogs';
@@ -12,10 +13,11 @@ const historyKey = '@workoutHistory';
 export const saveSet = async (exerciseId, weight, reps)=>{
     try{
         const newId = uuid.v4();
+        const timeStamp = new Date().toISOString();
         const newLog ={
             id: newId,
             exerciseId: exerciseId,
-            date: new Date().toISOString(),
+            date: timeStamp,
             weight: parseFloat(weight),
             reps: parseFloat(reps),
         };
@@ -25,15 +27,41 @@ export const saveSet = async (exerciseId, weight, reps)=>{
 
         //updating
         const updatedLogs = [...currentLogs,newLog];
-        //console.log(JSON.stringify(updatedLogs));
+        console.log(JSON.stringify(updatedLogs));
 
         //saving to storage
         await AsyncStorage.setItem(workoutStorageKey,JSON.stringify(updatedLogs));
         
 
-        console.log("DataBase updated");
-        return true;
+        console.log("Local DataBase updated");
+        
 
+        //supabase sync
+        try{
+            const {data:{user}} = await supabase.auth.getUser();
+            if(!user){console.warn("No user logged in. Skipping cloud save");
+                return;
+            }
+
+            const {error} = await supabase.from('workoutLogs').insert([
+                {   
+                    id: newId,
+                    user_id : user.id,
+                    exercise_id : exerciseId,
+                    logged_at: timeStamp,
+                    weight: parseFloat(weight),
+                    reps : parseInt(reps),
+                }
+            ]);
+            if(error){
+                console.log("Supabase insert error", error);
+            }
+            else{
+                console.log("Cloud sync successful");
+            }
+
+            return true;
+        }catch(cloudError){console.error("Error updating cloud database", cloudError);}
 
     }catch(e){
         console.error("failed to log", e);
