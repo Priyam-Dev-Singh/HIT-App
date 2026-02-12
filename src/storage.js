@@ -121,8 +121,10 @@ export const deleteLastLog = async (exerciseId) => {
 
 export const saveMacros = async (protein, carbs, fats, water) => {
     try{
+        const newId = uuid.v4();
         const timeStamp = new Date().toISOString();
         const newLog = {
+          id: newId,
           date : timeStamp,
           protein : parseFloat(protein),
           carbs : parseFloat(carbs),
@@ -149,7 +151,8 @@ export const saveMacros = async (protein, carbs, fats, water) => {
                 return;
             }
             const {error} = await supabase.from('macrosLogs').insert([
-                {
+                {   
+                    id: newId,
                     logged_at: timeStamp,
                     protein:protein,
                     carbs: carbs,
@@ -180,9 +183,21 @@ export const deleteLastMacros = async()=>{
             return false;
         }
         allLogs.sort((a,b)=> new Date(b.date) - new Date(a.date));
+        const recentLog = allLogs[0];
         allLogs.shift();
         await AsyncStorage.setItem(macrosStorageKey, JSON.stringify(allLogs));
-        console.log("Last macros log was deleted");
+
+        // supabase deletion 
+        try{
+            const {error} = await supabase.from('macrosLogs').delete().eq('id', recentLog.id);
+            if(error){console.log("error in performing delete macros command", error);
+                return false;
+            }
+            console.log("Last macro log deleted from cloud");
+        }catch(e){console.log("Error deleting macros form cloud", e);}
+
+        console.log("Last macros log was deleted from");
+
         return true;
 
     }catch(e){console.error("Error deleting last macros log", e);
@@ -402,10 +417,19 @@ export const getWeeklyWater= async ()=>{
 
 export const logOut = async ()=>{
     const {error} = await supabase.auth.signOut();
+
     if(error){
         Alert.alert("Error signing out");
         console.log(error);
     }
+    const keys = [
+        '@workoutLogs',
+        '@macrosLogs',      
+        '@HITroutine',
+        '@workoutHistory'
+    ];
+    await AsyncStorage.multiRemove(keys);
+    console.log("Logged out and data cleared"); 
 };
 
 export const insertRoutineInDB = async (newIndex)=>{

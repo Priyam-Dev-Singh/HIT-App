@@ -154,8 +154,8 @@ export default function MacrosLoggingScreen() {
                             frontColor="#1976D2"
                             yAxisThickness={0}
                             xAxisThickness={0}
-                            maxValue={4}
-                            noOfSections={4}
+                            maxValue={6}
+                            noOfSections={6}
                             yAxisExtraHeight={20}
                             hideRules
                             hideYAxisText
@@ -239,7 +239,7 @@ export default function MacrosLoggingScreen() {
                         <Text style={styles.saveText}>SAVE YOUR MACROS</Text>
                         <FontAwesome5 name="check" size={18} color="white" style={{marginLeft: 10}}/>
                     </TouchableOpacity>
-                    <TouchableOpacity onPress={handleDelete}>
+                    <TouchableOpacity onPress={()=>{handleDelete(); router.back();}}>
                         <Octicons name='trash' size={28} color='red' style={{marginTop:30}}/>
                     </TouchableOpacity>
                     </View>
