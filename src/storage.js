@@ -88,11 +88,11 @@ export const getLastLog = async (exerciseId) =>{
 
 export const deleteLastLog = async (exerciseId) => {
    try{
-     const jsonValue = await AsyncStorage.getItem(workoutStorageKey);
+    const jsonValue = await AsyncStorage.getItem(workoutStorageKey);
     const allLogs = jsonValue != null ? JSON.parse(jsonValue) : [];
 
     const exerciseLogs = allLogs.filter(log => log.exerciseId === exerciseId);
-    if(exerciseId.length === 0){console.log("No logs are present");
+    if(exerciseLogs.length === 0){console.log("No logs are present");
         return false;
     }
     exerciseLogs.sort((a,b)=> new Date(b.date)- new Date(a.date));
@@ -101,13 +101,22 @@ export const deleteLastLog = async (exerciseId) => {
     
     await AsyncStorage.setItem(workoutStorageKey, JSON.stringify(updatedLogs));
 
+    //deleting from the supabase cloud
+    try{
+        const {error} = await supabase.from('workoutLogs').delete().eq('id', lastLog.id);
+        if(error){console.error("Error deleting from cloud", error);
+            return false;
+        }
+        console.log('Last set was deleted');
+
+    }catch(error){console.error("Error deleting workout from DB", error)}
+
     console.log("Last log deleted with log id: ",lastLog.id);
     return true;
 
-   }catch(e){console.error("Error deleting the last log");
+   }catch(e){console.error("Error deleting the last log",e);
             return false;
    }
-
 };
 
 export const saveMacros = async (protein, carbs, fats, water) => {
@@ -306,11 +315,11 @@ export const markDayCompleted = async()=>{
 
         const{data:{user}} = await supabase.auth.getUser();
         if(user){
-            const{error} = supabase.from('profiles').upsert(({
+            const{error} =  await supabase.from('profiles').upsert({
                 user_id : user.id,
-                created_at: new Date.toISOString(),
+                created_at: new Date().toISOString(),
                 calendar_data: fullHistory,
-            }));
+            },{onConflict:'user_id'});
 
             if(error){console.log("Error putting calendar data in DB");}
             else{console.log("calendar data synced to DB");}
@@ -408,10 +417,10 @@ export const insertRoutineInDB = async (newIndex)=>{
             return;
         }
         const {error} = await supabase.from('profiles').upsert({
-            id: user.id,
-            created_at: new Date().toISOString,
+            user_id: user.id,
+            created_at: new Date().toISOString(),
             HIT_routine: newIndex,
-        });
+        },{onConflict:'user_id'});
 
         if(error){console.log("Error inserting routine", e);}
         else{

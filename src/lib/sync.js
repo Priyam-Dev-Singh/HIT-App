@@ -77,8 +77,8 @@ export const syncHITRoutine = async ()=>{
             console.log("user doesnt exists");
             return;
         }
-        const {data, error} = await supabase.from('profiles').select('HIT_routine').eq('user_id' = user.id).single();
-        if(!data || data.length===0){
+        const {data, error} = await supabase.from('profiles').select('HIT_routine').eq('user_id', user.id).maybeSingle();
+        if(!data){
             console.log("No routine index found");
         }
         if(error){
@@ -99,16 +99,16 @@ export const syncCalendarData = async()=>{
         const {data:{user}} = await supabase.auth.getUser();
         if(!user)return;
         
-        const {data, error} = await supabase.from('profiles').select('calendar_data').eq('user_id', user.id).single();
-        if(error)throw error;
+        const {data, error} = await supabase.from('profiles').select('calendar_data').eq('user_id', user.id).maybeSingle();
+        if(error && error.code !== 'PGRST116')throw error;
 
         if(data && data.calendar_data){
             await AsyncStorage.setItem(historyKey, JSON.stringify(data.calendar_data));
-            console.log("calendar Data restored");;
+            console.log("calendar Data restored");
         }
 
 
-    }catch(clouderror){console.error("Error syncing to cloud", e);
+    }catch(clouderror){console.error("Error syncing to cloud", clouderror);
         return false;
     }
 }
