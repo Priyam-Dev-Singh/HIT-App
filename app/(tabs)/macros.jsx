@@ -86,7 +86,7 @@ export default function MacrosLoggingScreen() {
     //console.log(dailyCalories);
     //console.log(dailyWater);
     return (
-        <SafeAreaView style={styles.container}>
+        <View style={styles.container}>
             <KeyboardAvoidingView
                 style={{ flex: 1 }}
                 behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -246,7 +246,7 @@ export default function MacrosLoggingScreen() {
 
                 </ScrollView>
             </KeyboardAvoidingView>
-        </SafeAreaView>
+        </View>
     );
 }
 
@@ -266,7 +266,7 @@ function createStyles(colorScheme) {
             
         },
         scrollContent: {
-            paddingBottom: 50,
+            paddingBottom: 40,
         },
         
         header: {

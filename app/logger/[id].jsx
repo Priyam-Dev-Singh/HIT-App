@@ -1,5 +1,5 @@
 import { useRouter, useLocalSearchParams } from "expo-router";
-import { Alert, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View, Dimensions, KeyboardAvoidingView, Keyboard } from "react-native";
+import { Alert, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View, Dimensions, KeyboardAvoidingView, Keyboard, ActivityIndicator } from "react-native";
 import { exercises } from "../../data/exercises";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useContext, useEffect, useState, useRef } from "react";
@@ -11,6 +11,7 @@ import { WorkoutContext } from "../../src/context/WorkoutContext";
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 export default function LoggingScreen() {
+    const [isLoading, setIsLoading] = useState(false);
     const { isChecking } = useContext(WorkoutContext);
     const router = useRouter();
     const [weight, setWeight] = useState('');
@@ -44,10 +45,12 @@ export default function LoggingScreen() {
             alert("please enter both reps and weight");
             return;
         }
+        setIsLoading(true);
         const success = await saveSet(currentExercise.id, weight, reps);
         if (success) {
             setReps('');
             setWeight('');
+            setIsLoading(false);
             alert('Set saved');
             router.back();
         }
@@ -226,7 +229,7 @@ export default function LoggingScreen() {
                                 </View>
                             </View>
                             <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
-                                <Text style={styles.saveText}>Save Log</Text>
+                                {isLoading?<ActivityIndicator color='#fff'/>:<Text style={styles.saveText}>Save Log</Text>}
                             </TouchableOpacity>
                         </>
                     ) : null}

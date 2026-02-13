@@ -1,17 +1,18 @@
-import {View, Text, StyleSheet, Button, Pressable, TouchableOpacity, ScrollView} from 'react-native';
+import {View, Text, StyleSheet, Button, Pressable, TouchableOpacity, ScrollView, ActivityIndicator} from 'react-native';
 import { useFocusEffect, useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import { useCallback, useContext, useEffect, useState } from 'react';
-import { ThemeContext } from '../src/context/ThemeContext';
-import { fetchLastGlobalWorkout, getCurrentRoutine, getWorkoutHistory, logOut } from '../src/storage';
-import { HitRoutine, routines } from '../data/routines';
+import { ThemeContext } from '../../src/context/ThemeContext';
+import { fetchLastGlobalWorkout, getCurrentRoutine, getWorkoutHistory, logOut } from '../../src/storage';
+import { HitRoutine, routines } from '../../data/routines';
 import Octicons from '@expo/vector-icons/Octicons';
 import { MaterialCommunityIcons, FontAwesome5 } from '@expo/vector-icons';
 import Feather from '@expo/vector-icons/Feather';
 import { Calendar } from 'react-native-calendars';
-import { WorkoutContext } from '../src/context/WorkoutContext';
+import { WorkoutContext } from '../../src/context/WorkoutContext';
 import AntDesign from '@expo/vector-icons/AntDesign';
+import { supabase } from '../../src/lib/supabase';
 
 
 export default function HomeScreen(){
@@ -23,10 +24,13 @@ export default function HomeScreen(){
     const {colorScheme, toggleTheme} = useContext(ThemeContext);
     const styles = createStyles(colorScheme);
     const router = useRouter();
+    const [loading, setLoading] = useState(true);
    
      useFocusEffect(
-       useCallback(()=>{
+       useCallback( ()=>{
         const initializeDashboard = async ()=>{
+          setLoading(true);
+          
         const data = await fetchLastGlobalWorkout();
         setLastLog(data);
       //console.log(data);
@@ -38,8 +42,12 @@ export default function HomeScreen(){
         const history = await getWorkoutHistory();
         setMarkedDates(history);
         setRoutine(currentRoutine);
+        setLoading(false);
       };
-      initializeDashboard();
+      supabase.auth.getSession().then(({data:{session}})=>{
+        if(session)  initializeDashboard();
+      })
+     
     },[])
      );
 
@@ -84,11 +92,19 @@ export default function HomeScreen(){
     }
     //console.log(routine);
     //console.log(isReady);
+
+    if(loading){
+      return(
+        <View style={{ flex: 1, backgroundColor: colorScheme==='dark' ? '#121212' : '#F5F5F5', justifyContent: 'center', alignItems: 'center' }}>
+            <ActivityIndicator size={60} color="#D32F2F" />
+        </View>
+      )
+    }
     return(
         <ScrollView style={{ flex: 1, backgroundColor:colorScheme==='dark'?'black':'white',
          }} showsVerticalScrollIndicator={false}>
           <SafeAreaView style={styles.container}>
-           <View style={styles.masterHeader}>
+             <View style={styles.masterHeader}>
              <Text style={styles.masterHeaderText}>INTENSITY</Text>
             <Pressable onPress={toggleTheme} style={{padding:8}}>
               {colorScheme==='dark'?
@@ -151,18 +167,15 @@ export default function HomeScreen(){
             )}
         
             
-           <TouchableOpacity onPress={()=>router.push('/diet/macros')} style={styles.macrosButton}>
+          {/* <TouchableOpacity onPress={()=>router.push('/macros')} style={styles.macrosButton}>
             <Text style={styles.buttonText}>Save Macros</Text>
             <FontAwesome5 name="leaf" size={26} color={colorScheme==='dark'?'white':'#B9F6CA'} />
-           </TouchableOpacity>
+           </TouchableOpacity>*/}
            <TouchableOpacity onPress={()=>{router.push('/log'); setIsChecking(true)}} style={styles.progressButton}>
             <Text style={styles.progressText}>View Progress</Text>
             <AntDesign name="line-chart" size={32} color="white" />
            </TouchableOpacity>
          
-           <View style={{flexDirection:'row', gap:20}}>
-            <Button title='Signout' onPress={logOut}  />
-           </View>
           <StatusBar style="inverted" />
         </SafeAreaView>
         </ScrollView>

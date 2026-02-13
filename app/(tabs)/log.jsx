@@ -1,10 +1,10 @@
 import { FlatList, Pressable, View, Text, StyleSheet, Appearance } from "react-native";
 import {SafeAreaView} from 'react-native-safe-area-context'
-import { exercises } from "../data/exercises";
-import { routines } from "../data/routines";
+import { exercises } from "../../data/exercises";
+import { routines } from "../../data/routines";
 import { useRouter } from "expo-router";
 import { useContext } from "react";
-import { ThemeContext } from "../src/context/ThemeContext";
+import { ThemeContext } from "../../src/context/ThemeContext";
 import Octicons from '@expo/vector-icons/Octicons';
 
 export default function WorkoutSelectionScreen (){

@@ -1,7 +1,7 @@
 import {useLocalSearchParams, useRouter} from 'expo-router';
 import { HitRoutine, routines } from '../../data/routines';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Alert, Appearance, FlatList, Pressable, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Alert, Appearance, FlatList, Pressable, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useContext, useEffect, useState } from 'react';
 import { exercises } from '../../data/exercises';
 import Octicons from '@expo/vector-icons/Octicons';
@@ -10,6 +10,7 @@ import { getCurrentRoutine, markDayCompleted, saveNextRoutineIndex } from '../..
 import { WorkoutContext } from '../../src/context/WorkoutContext';
 
 export default function ExerciseSelectionScreen(){
+    const [isLoading, setIsLoading] = useState(false);
     const {endWorkout, isChecking} = useContext(WorkoutContext);
     const{colorScheme, toggleTheme} = useContext(ThemeContext);
     const styles = createStyles(colorScheme);
@@ -36,6 +37,7 @@ export default function ExerciseSelectionScreen(){
 
     const handleCompletedSession = async ()=>{
     try{
+        setIsLoading(true);
         const index = await getCurrentRoutine();
         const currentIndex = index+1 < HitRoutine.length ? index+1 : 0;
         //console.log("next routine index: ", currentIndex);
@@ -44,6 +46,7 @@ export default function ExerciseSelectionScreen(){
         const success = await markDayCompleted();
         if(success){
             endWorkout();
+            setIsLoading(false);
             router.replace("/");
         }
         else{Alert.alert("Error marking workout completed");}
@@ -68,7 +71,7 @@ export default function ExerciseSelectionScreen(){
             style = {styles.list}
             ListFooterComponent={ !isChecking?
                   <TouchableOpacity style = {styles.markCompleted} onPress={handleCompletedSession}>
-                <Text style ={styles.buttonText} >Mark Completed</Text>
+                {isLoading? <ActivityIndicator color='#fff' />: <Text style ={styles.buttonText} >Mark Completed</Text>}
             </TouchableOpacity>:null  
             }
             />

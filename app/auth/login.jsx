@@ -5,6 +5,10 @@ import { Alert, TextInput, View, Text, KeyboardAvoidingView, Platform, StyleShee
 import { useRouter } from "expo-router";
 import AntDesign from '@expo/vector-icons/AntDesign';
 import { syncAllUserData } from "../../src/lib/sync";
+import * as WebBrowser from 'expo-web-browser';
+import {makeRedirectUri} from 'expo-auth-session';
+
+WebBrowser.maybeCompleteAuthSession();
 
 
 export default function LoginPage(){
@@ -53,7 +57,59 @@ export default function LoginPage(){
     }
 
     async function handleGoogleSignIn(){
-        Alert.alert("Google Sign In button");
+        //Alert.alert("Google Sign In button");
+        try{
+            setLoading(true);
+            const redirectUrl = makeRedirectUri({
+                scheme:'intensity',
+                path:'auth/callback'
+            });
+            console.log("My redirect url is ", redirectUrl);
+            const {data, error} = await supabase.auth.signInWithOAuth({
+                provider:'google',
+                options:{
+                    redirectTo: redirectUrl,
+                    skipBrowserRedirect: true,
+                }
+            });
+            if(error)throw error;
+
+            const result = await WebBrowser.openAuthSessionAsync(data.url, redirectUrl);
+            if(result.type==='success'){
+                const url = result.url;
+
+                const getTokens = (url)=>{
+                    let params = {};
+                    const queryString = url.split('#')[1] || url.split('?')[1];
+                    if(queryString){
+                        queryString.split('&').forEach(param => {
+                            const [key, value] = param.split("=");
+                            params[key] = value;
+                        });
+                    }
+                    return params;
+                };
+
+                const {access_token, refresh_token} = getTokens(url);
+
+                if(access_token && refresh_token){
+                    const {error: sessionError}=await supabase.auth.setSession({
+                        access_token,
+                        refresh_token
+                    });
+                    if(sessionError){
+                        console.error("Error setting session", sessionError);
+                    }else{
+                        console.log("Session set the router should take over now");
+                    }
+                }
+                console.log("Google sign in successful");
+            }
+
+        }catch(e){console.error("Erorr while signing through google", e);}
+        finally{
+            setLoading(false);
+        }
     }
     return(
            <KeyboardAvoidingView behavior={Platform.OS === 'ios'?'height':'padding'} style={styles.container}>

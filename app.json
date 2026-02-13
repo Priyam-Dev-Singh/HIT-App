@@ -2,7 +2,7 @@
   "expo": {
     "name": "Intensity",
     "slug": "Intensity",
-    "scheme": "hit-app",
+    "scheme": "intensity",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/myIcon.png",
@@ -28,7 +28,8 @@
       "favicon": "./assets/myIcon.png"
     },
     "plugins": [
-      "expo-router"
+      "expo-router",
+      "expo-web-browser"
     ],
     "extra": {
       "router": {},
