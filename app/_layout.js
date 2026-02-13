@@ -27,6 +27,7 @@ export default function Layout (){
             <WorkoutProvider>
                 <SafeAreaProvider>
                 <Stack>
+                    <Stack.Screen name="auth/login" options={{headerShown:false}}/>
                     <Stack.Screen name='index' options = {{headerShown:false}} />
                     <Stack.Screen name='log' options = {{headerShown:false}}/>
                     <Stack.Screen name = 'logger/[id]' options = {{headerShown:false}}/>
