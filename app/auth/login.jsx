@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { supabase } from "../../src/lib/supabase";
 import { Alert, TextInput, View, Text, KeyboardAvoidingView, Platform, StyleSheet, TouchableOpacity, ActivityIndicator, StatusBar } from "react-native";
@@ -7,11 +7,13 @@ import AntDesign from '@expo/vector-icons/AntDesign';
 import { syncAllUserData } from "../../src/lib/sync";
 import * as WebBrowser from 'expo-web-browser';
 import {makeRedirectUri} from 'expo-auth-session';
+import { WorkoutContext } from "../../src/context/WorkoutContext";
 
 WebBrowser.maybeCompleteAuthSession();
 
 
 export default function LoginPage(){
+    const {fromLogin, setFromLogin} = useContext(WorkoutContext);
     const router = useRouter();
     const [email, setEmail]= useState('');
     const [password, setPassword] = useState('');
@@ -21,6 +23,7 @@ export default function LoginPage(){
     const styles = createStyles();
 
     const signInWithEmail = async ()=>{
+        setFromLogin(true);
         setLoading(true);
         const {error} = await supabase.auth.signInWithPassword({
             email: email,
@@ -30,13 +33,14 @@ export default function LoginPage(){
             Alert.alert(error.message);
         }
         else{
-            await syncAllUserData();
-            router.replace('/');
+           router.replace('/');
+           
         }
          setLoading(false);
     }
 
     const signUpWithEmail = async ()=>{
+        setFromLogin(false);
         setLoading(true);
         const{
             data:{session},
@@ -59,6 +63,7 @@ export default function LoginPage(){
     async function handleGoogleSignIn(){
         //Alert.alert("Google Sign In button");
         try{
+            setFromLogin(true);
             setLoading(true);
             const redirectUrl = makeRedirectUri({
                 scheme:'intensity',

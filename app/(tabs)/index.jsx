@@ -13,10 +13,11 @@ import { Calendar } from 'react-native-calendars';
 import { WorkoutContext } from '../../src/context/WorkoutContext';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import { supabase } from '../../src/lib/supabase';
+import { syncAllUserData } from '../../src/lib/sync';
 
 
 export default function HomeScreen(){
-    const {isWorkoutActive, routineId, startWorkout, setIsChecking} = useContext(WorkoutContext);
+    const {isWorkoutActive, routineId, startWorkout, setIsChecking, fromLogin, setFromLogin} = useContext(WorkoutContext);
     const [markedDates, setMarkedDates] = useState({});
     const[isReady, setIsReady] = useState(true);
     const [routine, setRoutine] = useState({});
@@ -30,10 +31,13 @@ export default function HomeScreen(){
        useCallback( ()=>{
         const initializeDashboard = async ()=>{
           setLoading(true);
-          
+       if(fromLogin){
+         await syncAllUserData();
+         setFromLogin(false);
+       }
         const data = await fetchLastGlobalWorkout();
         setLastLog(data);
-      //console.log(data);
+        //console.log(data);
         if(data && data.date){
           const ready = hoursAgo(data.date);
           setIsReady(ready);
@@ -43,10 +47,11 @@ export default function HomeScreen(){
         setMarkedDates(history);
         setRoutine(currentRoutine);
         setLoading(false);
+       
       };
-      supabase.auth.getSession().then(({data:{session}})=>{
-        if(session)  initializeDashboard();
-      })
+      
+     initializeDashboard();
+      
      
     },[])
      );

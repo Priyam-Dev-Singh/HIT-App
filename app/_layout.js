@@ -5,6 +5,7 @@ import { WorkoutProvider } from "../src/context/WorkoutContext";
 import { supabase } from "../src/lib/supabase";
 import { useEffect, useState } from "react";
 import { ActivityIndicator, View } from "react-native";
+import { syncAllUserData } from "../src/lib/sync";
 
     //console.log("Supabase client active", supabase);
 export default function Layout (){
@@ -19,9 +20,12 @@ export default function Layout (){
            
             
         })*/
+       
          const {data :{subscription}} = supabase.auth.onAuthStateChange((_event, session)=>{
-            //setSession(session);
-           if(session){router.replace('/');
+            setSession(session);
+           if(session){
+                
+                router.replace('/');
                 setIsInitialised(true);
             }
             else { router.replace('/auth/login');}
