@@ -30,12 +30,12 @@ export default function Layout (){
     useEffect(()=>{
         if(!isInitialized)return;
 
-        const inAuthGroup = segments[0]==='(tabs)';
+        const currentGroup= segments[0];
 
-        if(session && inAuthGroup){
-            router.replace('/(tabs)');
-        } else if(!session && segments[0]!=='auth'){
+        if(!session && currentGroup !=='auth'){
             router.replace('/auth/login');
+        } else if(session && currentGroup==='auth'){
+            router.replace('/(tabs)');
         }
 
     },[session, isInitialized, segments])
