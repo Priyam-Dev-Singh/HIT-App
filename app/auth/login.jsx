@@ -65,10 +65,7 @@ export default function LoginPage(){
         try{
             setFromLogin(true);
             setLoading(true);
-            const redirectUrl = makeRedirectUri({
-                scheme:'intensity',
-                path:'auth/callback'
-            });
+            const redirectUrl = makeRedirectUri();
             console.log("My redirect url is ", redirectUrl);
             const {data, error} = await supabase.auth.signInWithOAuth({
                 provider:'google',

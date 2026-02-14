@@ -25,16 +25,20 @@ export default function HomeScreen(){
     const {colorScheme, toggleTheme} = useContext(ThemeContext);
     const styles = createStyles(colorScheme);
     const router = useRouter();
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(false);
    
      useFocusEffect(
        useCallback( ()=>{
         const initializeDashboard = async ()=>{
           setLoading(true);
+          
        if(fromLogin){
          await syncAllUserData();
-         setFromLogin(false);
+          setFromLogin(false);
+        
+         
        }
+      
         const data = await fetchLastGlobalWorkout();
         setLastLog(data);
         //console.log(data);
@@ -53,8 +57,9 @@ export default function HomeScreen(){
      initializeDashboard();
       
      
-    },[])
+    },[fromLogin])
      );
+      
 
     const getRoutine = ()=>{
      if(routines[0].exerciseIds.includes(lastLog.exerciseId)){
@@ -157,6 +162,7 @@ export default function HomeScreen(){
            (isReady ?
               <TouchableOpacity style={styles.newWorkout} onPress={()=>{ 
                 setIsChecking(false);
+                console.log("routine id is ", routine.id);
                 startWorkout(routine.id);
                 router.push(`/workout/${routine.id}`);
               }}>

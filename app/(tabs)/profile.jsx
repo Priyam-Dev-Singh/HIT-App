@@ -1,15 +1,18 @@
 import { useContext, useEffect, useState } from "react";
-import { ActivityIndicator, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { ThemeContext } from "../../src/context/ThemeContext";
 import { supabase } from "../../src/lib/supabase";
 import { logOut } from "../../src/storage";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from '@expo/vector-icons';
+import { WorkoutContext } from "../../src/context/WorkoutContext";
 
 export default function ProfileScreen(){
+    const {endWorkout} = useContext(WorkoutContext);
     const {colorScheme} = useContext(ThemeContext);
     const isDark = colorScheme === 'dark';
     const [email, setEmail] = useState('loading...');
+    const[avatarUrl, setAvatarUrl] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
 
     const styles = createStyles(isDark);
@@ -17,12 +20,17 @@ export default function ProfileScreen(){
     useEffect(()=>{
         const getUser =async()=>{
             const{data:{user}} = await supabase.auth.getUser();
-            if(user){setEmail(user.email);}; 
+            if(user){setEmail(user.email);
+                 if(user.user_metadata?.avatar_url){
+                setAvatarUrl(user.user_metadata.avatar_url);
+                 }
+            }; 
         }
         getUser();
     },[])
     const handleLogOut = async ()=>{
         setIsLoading(true);
+        endWorkout();
         await logOut();
         setIsLoading(false);
     }
@@ -30,7 +38,7 @@ export default function ProfileScreen(){
     return(
         <SafeAreaView style={styles.container}>
             <View style={styles.avatarContainer}>
-                <Ionicons name="person" size={50} color={isDark ? '#FFF' : '#000'} />
+               {avatarUrl?(<Image source={{uri:avatarUrl}} style={styles.profileImage} resizeMode="cover"/>): <Ionicons name="person" size={50} color={isDark ? '#FFF' : '#000'} />}
             </View>
             <Text style = {styles.emailText}>{email}</Text>
             <Text style={styles.quoteText}>Training with INTENSITY</Text>
@@ -53,16 +61,21 @@ function createStyles (isDark){
       alignItems: 'center',
     },
     avatarContainer: {
-      marginTop: 40,
+      marginTop: 80, 
       marginBottom: 20,
-      width: 100,
-      height: 100,
-      borderRadius: 50,
+      width: 120,   
+      height: 120,
+      borderRadius: 60, 
       backgroundColor: isDark ? '#1E1E1E' : '#FFFFFF',
       justifyContent: 'center',
       alignItems: 'center',
-      borderWidth: 2,
-      borderColor: '#D32F2F', 
+      borderWidth: 3,
+      borderColor: '#D32F2F',
+      overflow: 'hidden',
+    },
+    profileImage: {
+      width: '100%',
+      height: '100%',
     },
     emailText: {
       fontSize: 18,
