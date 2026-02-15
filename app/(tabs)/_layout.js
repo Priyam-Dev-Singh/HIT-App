@@ -17,7 +17,7 @@ export default function TabLayout (){
 
     const tabStyles ={
         tabBarActiveTintColor: '#D32F2F', 
-        tabBarBackground:()=><BlurView tint="dark" intensity={100} style={StyleSheet.absoluteFill} />,
+        tabBarBackground:()=><BlurView tint={isDark?'dark':'light'} intensity={100} style={StyleSheet.absoluteFill} />,
         tabBarInactiveTintColor: isDark ? '#888' : '#A0A0A0',
         tabBarStyle: {
         // Lift it off the bottom edge!

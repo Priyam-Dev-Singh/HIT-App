@@ -65,7 +65,10 @@ export default function LoginPage(){
         try{
             setFromLogin(true);
             setLoading(true);
-            const redirectUrl = makeRedirectUri();
+            const redirectUrl = makeRedirectUri({
+              scheme: 'intensity',
+              path:'auth/login'
+            });
             console.log("My redirect url is ", redirectUrl);
             const {data, error} = await supabase.auth.signInWithOAuth({
                 provider:'google',
@@ -105,6 +108,7 @@ export default function LoginPage(){
                         console.log("Session set the router should take over now");
                     }
                 }
+                syncAllUserData();
                 console.log("Google sign in successful");
             }
 

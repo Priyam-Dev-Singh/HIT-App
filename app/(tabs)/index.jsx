@@ -187,7 +187,7 @@ export default function HomeScreen(){
             <AntDesign name="line-chart" size={32} color="white" />
            </TouchableOpacity>
          
-          <StatusBar style="inverted" />
+          <StatusBar style={colorScheme==='dark'?'light':'dark'} />
         </SafeAreaView>
         </ScrollView>
     );
@@ -205,20 +205,20 @@ function createStyles (colorScheme){
       paddingBottom: 70,
     },
     masterHeader:{
-      width: '100%',             // <--- THE FIX
+      width: '100%',             
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'space-between',
-      paddingHorizontal: 20,     // Proper side spacing
-      paddingVertical: 15,       // Breathing room top/bottom
+      paddingHorizontal: 20,     
+      paddingVertical: 15,      
       backgroundColor: 'transparent',
     },
     masterHeaderText:{
-      fontSize: 24,              // 30 is a bit loud, 24 is cleaner
+      fontSize: 24,             
       color: colorScheme === 'dark' ? '#FFFFFF' : '#000000',
-      letterSpacing: 1,          // Makes it look like a brand
+      letterSpacing: 1,          
       textTransform: 'uppercase',
-      fontWeight: '800',         // Extra Bold (Logo feel)
+      fontWeight: '800',         
     },
     header:{
       borderWidth: 1,
@@ -253,18 +253,17 @@ function createStyles (colorScheme){
       justifyContent:'center',
     },
     macrosButton:{
-      backgroundColor: '#2E7D32', // SOLID GREEN
+      backgroundColor: '#2E7D32', 
       width: '92%',
-      height: 100,                // Slightly shorter than Hero to show hierarchy? 
-                                // Or keep 110 for consistency. I used 100 here.
+      height: 100,                
       borderRadius: 20,
-      marginTop: 15,              // Space between Red and Green cards
+      marginTop: 15,              
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'space-between',
       paddingHorizontal: 20,
     
-    // Green Glow/Shadow
+    
       boxShadow: '0px 4px 8px rgba(46, 125, 50, 0.4)',
       elevation: 8,
 
@@ -289,13 +288,13 @@ function createStyles (colorScheme){
       elevation: 8,
     },
     nextWorkout:{
-      color: 'white',                 // Pure White
+      color: 'white',                 
       fontSize: 18,
       fontWeight: 'bold',
       
     },
     mission:{
-      color: 'rgba(255,255,255,0.8)', // White, slightly transparent
+      color: 'rgba(255,255,255,0.8)', 
       fontSize: 10,
       fontWeight: 'bold',
       letterSpacing: 1,
@@ -315,12 +314,12 @@ function createStyles (colorScheme){
       elevation: 8,
     },
     recoveryText:{
-      color: 'white',                 // Pure White
+      color: 'white',                 
       fontSize: 20,
       fontWeight: 'bold',
     },
     progressButton:{
-      backgroundColor: '#EF6C00', // Industrial Orange (High contrast, serious)
+      backgroundColor: '#EF6C00',
       width: '92%',
       height: 80, 
       borderRadius: 20,
@@ -330,7 +329,7 @@ function createStyles (colorScheme){
       justifyContent: 'space-between',
       paddingHorizontal: 20,
 
-    // Orange Glow
+    
       boxShadow: '0px 4px 8px rgba(239, 108, 0, 0.4)',
       elevation: 6,
     },
