@@ -6,18 +6,20 @@ import { useRouter } from "expo-router";
 import { useContext } from "react";
 import { ThemeContext } from "../../src/context/ThemeContext";
 import Octicons from '@expo/vector-icons/Octicons';
+import { WorkoutContext } from "../../src/context/WorkoutContext";
 
 export default function WorkoutSelectionScreen (){
 
     const router = useRouter();
     const {colorScheme, toggleTheme} = useContext(ThemeContext);
+    const {setIsChecking} = useContext(WorkoutContext);
     const styles = createStyles(colorScheme);
     const selectWorkout = (id)=>{
         console.log(id);
         router.push(`/workout/${id}`);
     }
     const renderItem = ({item, index})=>(
-        <Pressable onPress={()=>selectWorkout(item.id)}
+        <Pressable onPress={()=>{selectWorkout(item.id); setIsChecking(true);}}
         style={({pressed})=>[styles.card, pressed && {opacity: 0.7}]}>
             <View style={styles.numberBox}>
                 <Text style={styles.numberText}>{index + 1}</Text>

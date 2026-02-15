@@ -1,5 +1,5 @@
 import { useRouter, useLocalSearchParams } from "expo-router";
-import { Alert, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View, Dimensions, KeyboardAvoidingView, Keyboard, ActivityIndicator } from "react-native";
+import { Alert, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View, Dimensions, KeyboardAvoidingView, Keyboard, ActivityIndicator, Image } from "react-native";
 import { exercises } from "../../data/exercises";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useContext, useEffect, useState, useRef } from "react";
@@ -9,6 +9,7 @@ import { ThemeContext } from "../../src/context/ThemeContext";
 import { LineChart } from "react-native-gifted-charts";
 import { WorkoutContext } from "../../src/context/WorkoutContext";
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import AntDesign from '@expo/vector-icons/AntDesign';
 
 export default function LoggingScreen() {
     const [isLoading, setIsLoading] = useState(false);
@@ -117,7 +118,14 @@ export default function LoggingScreen() {
                         </Pressable>
                     </View>
 
-                    
+                    <View style={styles.visualContainer}>
+                        <View style={styles.imageCard}>
+                            {currentExercise.image?
+                            <Image source={currentExercise.image} style={styles.mainImage} resizeMode="cover"/>
+                            :
+                            (<Text style={{color:'#888'}}>No Image Available</Text>)}
+                        </View>
+                    </View>
                     <View style={{ marginTop: 10 }}>
                         <Text style={styles.muscleGroup}>Muscle Group: {currentExercise.muscleGroup}</Text>
                         <Text style={styles.description}>Description: {currentExercise.description}</Text>
@@ -195,7 +203,13 @@ export default function LoggingScreen() {
 
                     {/* Inputs */}
                     {!isChecking ? (
-                        <>
+                        <>  
+                           {['ex_09','ex_14'].includes(currentExercise.id)?
+                           <View style={{flexDirection:'row', alignItems:'center', marginHorizontal:20}}>
+                            <AntDesign name="info-circle" size={15} color={colorScheme==='dark'?'white':'black'} />
+                            <Text style={[styles.description, {marginTop:10}]}>If doing with no weight mark weight as 1</Text>
+                           </View>
+                           :null}
                             <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-evenly' }}>
                                 <View style={styles.logContainers}>
                                     <Text style={styles.weightAndReps}>Weight (kg)</Text>
@@ -392,6 +406,33 @@ function createStyles(colorScheme) {
             alignItems: 'center',
             paddingLeft: 5,
             gap: 10,
-        }
+        },
+        visualContainer: {
+        width: '100%',
+        alignItems: 'center',
+        marginBottom: 20,
+        marginTop: 10,
+    },
+    imageCard: {
+        width: '90%',       
+        height: 220,         
+        backgroundColor: isDark?'#333':'#FFFFFF', 
+        borderRadius: 20,
+        padding: 10,
+        justifyContent: 'center',
+        alignItems: 'center',
+        
+       
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.3,
+        shadowRadius: 5,
+        elevation: 6,      
+    },
+    mainImage: {
+        width: '100%',
+        height: '100%',
+        borderRadius: 10,
+    },
     })
 }

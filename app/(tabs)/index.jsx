@@ -152,7 +152,7 @@ export default function HomeScreen(){
             </View>
            {isWorkoutActive?
            <TouchableOpacity style={[styles.newWorkout, {gap: 5}]} onPress={()=>{
-                router.push(`/workout/${routine.id}`);
+                router.push(`/workout/${routine.id}`); setIsChecking(false);
               }}>
                 <Text style = {styles.mission}>MISSION IN PROGRESS </Text>
                 <Text style = {styles.nextWorkout}>RESUME</Text>
