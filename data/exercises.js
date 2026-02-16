@@ -6,6 +6,7 @@ export const exercises = [
         'muscleGroup' : 'Chest',
         'description': 'Chest Flyes either with Dumbbell or on a machine',
         'image': require('../assets/exercisesImages/chestFlyes.jpg'),
+        'listImage': require('../assets/exerciseListImages/chestFlyes.jpg'),
     },
     {
         'id': 'ex_02',

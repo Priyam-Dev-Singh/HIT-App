@@ -7,18 +7,19 @@ import { ThemeContext } from '../../src/context/ThemeContext';
 import { fetchLastGlobalWorkout, getCurrentRoutine, getWorkoutHistory, logOut } from '../../src/storage';
 import { HitRoutine, routines } from '../../data/routines';
 import Octicons from '@expo/vector-icons/Octicons';
-import { MaterialCommunityIcons, FontAwesome5 } from '@expo/vector-icons';
+import { FontAwesome5 } from '@expo/vector-icons';
 import Feather from '@expo/vector-icons/Feather';
 import { Calendar } from 'react-native-calendars';
 import { WorkoutContext } from '../../src/context/WorkoutContext';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import { supabase } from '../../src/lib/supabase';
 import { syncAllUserData } from '../../src/lib/sync';
+import MissionCard from '../../src/components/missionCard';
 
 
 export default function HomeScreen(){
     const {isWorkoutActive, routineId, startWorkout, setIsChecking, fromLogin, setFromLogin} = useContext(WorkoutContext);
-    const [markedDates, setMarkedDates] = useState({});
+   //const [markedDates, setMarkedDates] = useState({});
     const[isReady, setIsReady] = useState(true);
     const [routine, setRoutine] = useState({});
     const [lastLog, setLastLog] = useState({});
@@ -47,8 +48,8 @@ export default function HomeScreen(){
           setIsReady(ready);
         }
         const currentRoutine = await findCurrentRoutine();
-        const history = await getWorkoutHistory();
-        setMarkedDates(history);
+       // const history = await getWorkoutHistory();
+       //setMarkedDates(history);
         setRoutine(currentRoutine);
         setLoading(false);
        
@@ -127,8 +128,8 @@ export default function HomeScreen(){
             <Text style={styles.headerText} >Last Workout : {getRoutine()}</Text>
             <Text style={styles.lastWorkout}>{daysAgo(lastLog.date)}</Text>
             </View>}
-            <View style={{width:'92%', marginTop:15, borderRadius:15, overflow:'hidden'}}>
-              <Calendar
+           {/*<View style={{width:'92%', marginTop:15, borderRadius:15, overflow:'hidden'}}>
+             <Calendar
               markedDates={markedDates}
               key={colorScheme}
               theme={{
@@ -149,8 +150,9 @@ export default function HomeScreen(){
                 textMonthFontSize: 16,
                 textDayHeaderFontSize: 14
               }}/>
-            </View>
-           {isWorkoutActive?
+            </View>*/}
+            <MissionCard/>
+           {/*isWorkoutActive?
            <TouchableOpacity style={[styles.newWorkout, {gap: 5}]} onPress={()=>{
                 router.push(`/workout/${routine.id}`); setIsChecking(false);
               }}>
@@ -175,7 +177,7 @@ export default function HomeScreen(){
             <Text style= {styles.recoveryText}>Recovery Mode</Text>
             <Feather name="battery-charging" size={30} color="white" />
            </View>
-            )}
+            )*/}
         
             
           {/* <TouchableOpacity onPress={()=>router.push('/macros')} style={styles.macrosButton}>
@@ -224,7 +226,7 @@ function createStyles (colorScheme){
       borderWidth: 1,
       borderColor: colorScheme==='dark'?'papayawhip':'gray',
       borderRadius: 10,
-      height:'7%',
+      height:'auto',
       width:'92%',
       marginTop:10,
       backgroundColor:colorScheme==='dark'? '#222':'#f1f1f1',

@@ -1,11 +1,13 @@
 import { useContext, useEffect, useState } from "react";
-import { ActivityIndicator, Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { ThemeContext } from "../../src/context/ThemeContext";
 import { supabase } from "../../src/lib/supabase";
 import { logOut } from "../../src/storage";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from '@expo/vector-icons';
 import { WorkoutContext } from "../../src/context/WorkoutContext";
+import DataCalendar from "../../src/components/calendar";
+import MissionCard from "../../src/components/missionCard";
 
 export default function ProfileScreen(){
     const {endWorkout} = useContext(WorkoutContext);
@@ -36,18 +38,25 @@ export default function ProfileScreen(){
     }
     
     return(
-        <SafeAreaView style={styles.container}>
-            <View style={styles.avatarContainer}>
+       <SafeAreaView style={styles.container}>
+      
+             <View style={styles.avatarContainer}>
                {avatarUrl?(<Image source={{uri:avatarUrl}} style={styles.profileImage} resizeMode="cover"/>): <Ionicons name="person" size={50} color={isDark ? '#FFF' : '#000'} />}
             </View>
             <Text style = {styles.emailText}>{email}</Text>
             <Text style={styles.quoteText}>Training with INTENSITY</Text>
+            <View style={styles.calendarTitle}>
+              <Text style={[styles.emailText, {marginBottom:0}]}>Workout History</Text>
+            </View>
+            <DataCalendar/>
             <TouchableOpacity style={styles.logoutButton} onPress={handleLogOut}>
                 <Ionicons name="log-out-outline" size={24} color="#FFF" />
                 {isLoading?<ActivityIndicator color='#fff'/>:
                 <Text style ={styles.logoutText}>Sign Out</Text>}
             </TouchableOpacity>
-        </SafeAreaView>
+            
+            </SafeAreaView>
+        
         
     )
 }
@@ -57,11 +66,10 @@ function createStyles (isDark){
       container: {
       flex: 1,
       backgroundColor: isDark ? '#121212' : '#F5F5F5',
-      padding: 20,
       alignItems: 'center',
     },
     avatarContainer: {
-      marginTop: 80, 
+      marginTop: 50, 
       marginBottom: 20,
       width: 120,   
       height: 120,
@@ -90,7 +98,7 @@ function createStyles (isDark){
         fontSize: 14,
         color: isDark ? '#888' : '#666',
         fontStyle: 'italic',
-        marginBottom: 40,
+        marginBottom: 20,
     },
     logoutButton: {
       flexDirection: 'row',
@@ -110,5 +118,17 @@ function createStyles (isDark){
       fontWeight: 'bold',
       marginLeft: 10,
     },
+    calendarTitle:{
+      height:'45',
+      width:'200',
+      backgroundColor: isDark?'#333':'#cdcdcd',
+      paddingHorizontal: 20,
+      paddingVertical: 5,
+      alignItems:'center',
+      justifyContent:'center',
+      borderColor:'#D32F2F',
+      borderRadius: 5,
+      borderWidth: 1,
+    }
     })
 }

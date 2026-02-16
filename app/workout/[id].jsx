@@ -175,8 +175,8 @@ function createStyles (colorScheme){
       textTransform: 'uppercase',
     },
     thumbnailContainer: {
-        width: 90,     
-        height: 90,
+        width: 130,     
+        height: 100,
         borderRadius: 12,
         marginRight: 15, 
         backgroundColor: colorScheme === 'dark' ? '#333' : '#F0F0F0',
