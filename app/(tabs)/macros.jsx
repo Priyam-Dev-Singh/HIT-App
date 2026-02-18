@@ -65,19 +65,20 @@ export default function MacrosLoggingScreen() {
         const success = await deleteLastMacros();
         if(success){
             Alert.alert("Last set was deleted");
+             router.back();
         }
         else{
             alert("Log your macros first");
         }
     };
-    const handleDelete = ()=>{
+    const handleDelete =  async()=>{
         if(Platform.OS==='web'){
-            if(window.confirm("Delete last Macros Log?")){performDelete();}
+            if(window.confirm("Delete last Macros Log?")){ await performDelete();}
         }
         else{
             Alert.alert("Delete Last Macros Log?", 'This cant be undone',[
                 {text:'cancel', style:'cancel'},
-                {text:'Delete', style:'destructive', onPress: performDelete}
+                {text:'Delete', style:'destructive', onPress:async()=> await performDelete()}
             ]
             )
         };
@@ -163,7 +164,7 @@ export default function MacrosLoggingScreen() {
                             width={screenWidth - 70}
                             isAnimated
                             yAxisTextStyle={{ color: colorScheme === 'dark' ? '#CCCCCC' : '#333333' }}
-                            xAxisLabelTextStyle={{color: 'transparent', // Dynamic color
+                            xAxisLabelTextStyle={{color: colorScheme === 'dark' ? '#CCCCCC' : '#333333', // Dynamic color
                             fontSize: 12}}
                         />
                     </View>
@@ -239,7 +240,7 @@ export default function MacrosLoggingScreen() {
                         <Text style={styles.saveText}>SAVE YOUR MACROS</Text>
                         <FontAwesome5 name="check" size={18} color="white" style={{marginLeft: 10}}/>
                     </TouchableOpacity>
-                    <TouchableOpacity onPress={()=>{handleDelete(); router.back();}}>
+                    <TouchableOpacity onPress={ async ()=>{ await handleDelete(); }}>
                         <Octicons name='trash' size={28} color='red' style={{marginTop:30}}/>
                     </TouchableOpacity>
                     </View>

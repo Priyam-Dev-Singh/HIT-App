@@ -188,7 +188,7 @@ export default function HomeScreen(){
             <Text style={styles.progressText}>View Progress</Text>
             <AntDesign name="line-chart" size={32} color="white" />
            </TouchableOpacity>
-         
+            <Button title='onBoarding' onPress={()=> router.push('/onboarding')}/>
           <StatusBar style={colorScheme==='dark'?'light':'dark'} />
         </SafeAreaView>
         </ScrollView>

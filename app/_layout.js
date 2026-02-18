@@ -59,6 +59,7 @@ export default function Layout (){
                 <SafeAreaProvider>
                 <Stack>
                     <Stack.Screen name="auth/login" options={{headerShown:false}}/>
+                    <Stack.Screen name="onboarding" options={{headerShown:false}}/>
                     <Stack.Screen name='(tabs)' options = {{headerShown:false}} />
                     <Stack.Screen name = 'logger/[id]' options = {{headerShown:false}}/>
                     <Stack.Screen name = 'workout/[id]' options = {{headerShown:false}}/>
