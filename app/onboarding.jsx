@@ -1,10 +1,12 @@
 import { useRouter } from "expo-router";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ThemeContext } from "../src/context/ThemeContext";
 import { FontAwesome5, MaterialCommunityIcons, Ionicons } from '@expo/vector-icons';
 import { supabase } from "../src/lib/supabase";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import LoginPage from "./auth/login";
 //import { DateTimePicker, DateTimePickerAndroid } from "@react-native-community/datetimepicker";
 
 export default function OnboardingScreen(){
@@ -24,36 +26,14 @@ export default function OnboardingScreen(){
         goal_weight:'',
         target_sleep: '',
     });
-    const handleSubmit = async()=>{
-        setLoading(true);
-        try{
-            const {data:{user}} = await supabase.auth.getUser();
-            if(!user) throw new Error("No user found");
 
-            const updates = {
-                user_id: user.id,
-                created_at: new Date(),
-                name: formData.full_name,
-                gender: formData.gender,
-                height: parseFloat(formData.height) || 0,
-                current_weight: parseFloat(formData.current_weight)||0,
-                goal_weight: parseFloat(formData.goal_weight)||0,
-                dob : formData.dob.toISOString().split('T')[0],
-                target_sleep: parseFloat(formData.target_sleep)||8
-            };
-
-            const {error} = await supabase.from('profiles').upsert(updates);
-            if(error)throw error;
-            router.replace('/(tabs)');
-
-        }catch(e){console.error("error handling onboarding submit")}finally{setLoading(false)}
-    }
     const updateForm = (key, value)=>{
         setFormData(prev => ({...prev, [key]: value}));
     }
     const handleNext = ()=>{
-       if(step<3) setStep(step+1);
-       else{handleSubmit()};
+       if(step<4) setStep(step+1);
+       console.log(formData);
+       //else{handleSubmit()};
     }
     const handleBack = ()=>{
         if(step>1) setStep(step-1);
@@ -67,7 +47,7 @@ export default function OnboardingScreen(){
     const renderStep1 = ()=>(
         <View style={styles.stepContainer}>
             <Text style={styles.stepTitle}>IDENTITY</Text>
-            <Text style={styles.stepSubTitle} >Operator Details</Text>
+            <Text style={styles.stepSubtitle} >Operator Details</Text>
             <Text style={styles.label}>FULL NAME</Text>
             <TextInput 
             style={styles.input}
@@ -98,13 +78,18 @@ export default function OnboardingScreen(){
                 maximumDate={new Date()}
                 />
             )*/}
+            <TouchableOpacity onPress={() => setStep(4)} style={{ marginTop: 20, alignItems: 'center' }}>
+                <Text style={{ color: '#888', fontSize: 14, fontWeight: 'bold' }}>
+                ALREADY A USER? <Text style={{ color: '#D32F2F' }}>LOG IN</Text>
+                </Text>
+            </TouchableOpacity>
         </View>
     );
 
     const renderStep2 = ()=>(
         <View style={styles.stepContainer}>
             <Text style={styles.stepTitle}>CALIBRATION</Text>
-            <Text style={styles.stepSubTitle}>Physical Metrics</Text>
+            <Text style={styles.stepSubtitle}>Physical Metrics</Text>
             <View style={styles.row}>
                 <View style={{flex:1}}>
                     <Text style={styles.label}>WEIGHT (KG)</Text>
@@ -136,7 +121,7 @@ export default function OnboardingScreen(){
     const renderStep3 = ()=>(
         <View style={styles.stepContainer}>
             <Text style={styles.stepTitle}>OBJECTIVES</Text>
-            <Text style={styles.stepSubTitle}>Set Your Targets</Text>
+            <Text style={styles.stepSubtitle}>Set Your Targets</Text>
             <Text style={styles.label}>TARGET BODYWEIGHT (KG)</Text>
             <TextInput
             value={formData.goal_weight}
@@ -161,29 +146,37 @@ export default function OnboardingScreen(){
             </View>
         </View>
     )
+
+    const renderStep4=()=>(
+        <LoginPage formData={formData}/>
+    );
+
+    
     return(
         <SafeAreaView style={styles.container}>
             
             <KeyboardAvoidingView behavior={Platform.OS==='ios'?'padding':'height'} style={{flex:1}}>
                 <View style={styles.header}>
                     <View style={styles.progressBar}>
-                        <View style={[styles.progressFill, {width:`${(step/3) *100}%`}]}/>
+                        <View style={[styles.progressFill, {width:`${(step/4) *100}%`}]}/>
                     </View>
-                    <Text style={styles.stepIndicator}>STEP {step} / 3</Text>
+                    <Text style={styles.stepIndicator}>STEP {step} / 4</Text>
                 </View>
 
                 <ScrollView contentContainerStyle={{flexGrow: 1, justifyContent: 'center'}}>
                     {step===1 && renderStep1()}
                     {step===2 && renderStep2()}
                     {step===3 && renderStep3()}
+                    {step===4 && renderStep4()}
+
                 </ScrollView>
                 <View style={styles.footer}>
                     <TouchableOpacity onPress={handleBack} style={[styles.navBtn, styles.backBtn, step===1&&{opacity:0}]} disabled={step===1}>
                         <Text style={styles.backText}>BACK</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity style={[styles.navBtn, styles.nextBtn]} onPress={handleNext}>
-                        <Text style={styles.nextText}>{loading?'SAVING...':(step===3 ? 'INITIALIZE':'NEXT')}</Text>
-                    </TouchableOpacity>
+                   {step!=4 && <TouchableOpacity style={[styles.navBtn, styles.nextBtn]} onPress={handleNext}>
+                        <Text style={styles.nextText}>{loading?'SAVING...':(step===4 ? '':'NEXT')}</Text>
+                    </TouchableOpacity>}
                 </View>
             </KeyboardAvoidingView>
         </SafeAreaView>
@@ -248,8 +241,8 @@ function createStyles(colorScheme){
         infoBox: { flexDirection: 'row', gap: 10, marginTop: 20, padding: 15, backgroundColor: 'rgba(211, 47, 47, 0.1)', borderRadius: 10 },
         infoText: { color: text, fontSize: 12, flex: 1 },
 
-        footer: { padding: 20, flexDirection: 'row', justifyContent: 'space-between' },
-        navBtn: { paddingVertical: 16, paddingHorizontal: 30, borderRadius: 30, minWidth: 120, alignItems: 'center' },
+        footer: { padding: 10, flexDirection: 'row', justifyContent: 'space-between' },
+        navBtn: { paddingVertical: 0, paddingHorizontal: 30, borderRadius: 30, minWidth: 120, alignItems: 'center' },
         backBtn: { backgroundColor: 'transparent' },
         nextBtn: { backgroundColor: primary },
         backText: { color: '#666', fontWeight: 'bold' },

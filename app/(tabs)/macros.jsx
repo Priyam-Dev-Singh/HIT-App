@@ -43,7 +43,7 @@ export default function MacrosLoggingScreen() {
             setDailyWater(waters);
         }
         loadData();
-    },[])
+    },[dailyCalories, dailyWater])
 
 
     const handleSave = async () => {
@@ -57,18 +57,15 @@ export default function MacrosLoggingScreen() {
             setCarbs('');
             setFats('');
             setWater('');
-            alert("Supply Log Updated!");
-            router.back();
+           // alert("Supply Log Updated!");
+            //router.back();
         }
     };
     const performDelete = async()=>{
         const success = await deleteLastMacros();
-        if(success){
-            Alert.alert("Last set was deleted");
-             router.back();
-        }
-        else{
+        if(!success){
             alert("Log your macros first");
+            // router.back();
         }
     };
     const handleDelete =  async()=>{

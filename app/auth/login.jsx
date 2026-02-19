@@ -8,11 +8,12 @@ import { syncAllUserData } from "../../src/lib/sync";
 import * as WebBrowser from 'expo-web-browser';
 import {makeRedirectUri} from 'expo-auth-session';
 import { WorkoutContext } from "../../src/context/WorkoutContext";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 WebBrowser.maybeCompleteAuthSession();
 
 
-export default function LoginPage(){
+export default function LoginPage({formData}){
     const {fromLogin, setFromLogin} = useContext(WorkoutContext);
     const router = useRouter();
     const [email, setEmail]= useState('');
@@ -33,7 +34,8 @@ export default function LoginPage(){
             Alert.alert(error.message);
         }
         else{
-           router.replace('/');
+           await handleProfileData();
+           router.replace('/(tabs)');
            
         }
          setLoading(false);
@@ -54,7 +56,8 @@ export default function LoginPage(){
         else if(!session){Alert.alert("Please check inbox for email verification");
         }
         else{Alert.alert("Account Created");
-            router.replace('/');
+              await handleProfileData();
+            router.replace('/(tabs)');
         }
 
         setLoading(false);
@@ -108,7 +111,9 @@ export default function LoginPage(){
                         console.log("Session set the router should take over now");
                     }
                 }
-                syncAllUserData();
+                
+                 await syncAllUserData();
+                 await handleProfileData();
                 console.log("Google sign in successful");
             }
 
@@ -116,6 +121,36 @@ export default function LoginPage(){
         finally{
             setLoading(false);
         }
+    }
+
+    const handleProfileData = async()=>{
+        
+        try{
+            const {data:{user}} = await supabase.auth.getUser();
+            if(!user) throw new Error("No user found");
+            const {data:profile, error: fetchError} = await supabase.from('profiles').select('onboarding_completed').eq('user_id', user.id).maybeSingle();
+            if(fetchError) throw fetchError;
+            if(!profile?.onboarding_completed){
+              const updates = {
+                //user_id: user.id,
+                created_at: new Date(),
+                name: formData.full_name,
+                gender: formData.gender,
+                height: parseFloat(formData.height) || 0,
+                current_weight: parseFloat(formData.current_weight)||0,
+                goal_weight: parseFloat(formData.goal_weight)||0,
+                dob : formData.dob.toISOString().split('T')[0],
+                target_sleep: parseFloat(formData.target_sleep)||8,
+                onboarding_completed: true,
+            };
+
+            const {error} = await supabase.from('profiles').upsert(updates);
+            if(error)throw error;
+            if(!error) console.log("upserted profile data successfully");
+            await AsyncStorage.setItem("onboarding_completed", 'true');
+            }
+
+        }catch(e){console.error("error handling onboarding submit")}
     }
     return(
            <KeyboardAvoidingView behavior={Platform.OS === 'ios'?'height':'padding'} style={styles.container}>
@@ -193,7 +228,7 @@ function createStyles(){
     flex: 1,
     justifyContent: 'center',
     paddingHorizontal: 20,
-    backgroundColor: '#121212', 
+    backgroundColor: '#000000', 
     },
   header: {
     marginBottom: 40,

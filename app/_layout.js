@@ -6,6 +6,7 @@ import { supabase } from "../src/lib/supabase";
 import { use, useEffect, useState } from "react";
 import { ActivityIndicator, Image, StyleSheet, View } from "react-native";
 import * as SplashScreen from 'expo-splash-screen';
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
     //console.log("Supabase client active", supabase);
 export default function Layout (){
@@ -30,14 +31,27 @@ export default function Layout (){
     useEffect(()=>{
         if(!isInitialized)return;
 
-        const currentGroup= segments[0];
+       const routeUser = async()=>{
+         const currentGroup= segments[0];
 
-        if(!session && currentGroup !=='auth'){
-            router.replace('/auth/login');
-        } else if(session && currentGroup==='auth'){
-            router.replace('/(tabs)');
-        }
-
+        if(!session){
+           if( currentGroup !=='onboarding') {router.replace('/onboarding');}
+           return;
+        
+        } 
+        try{
+           const hasSeenOnboarding =  await AsyncStorage.getItem('onboarding_completed');
+           if(hasSeenOnboarding==='true'){
+            if (currentGroup === 'onboarding' || currentGroup === 'auth') {
+                router.replace('/(tabs)');
+            }
+           }
+           else{
+           if(currentGroup !== 'onboarding') router.replace('/onboarding');
+           }
+        }catch(e){console.error(e); router.replace('/(tabs)');}
+       }
+        routeUser();
     },[session, isInitialized, segments])
 
     if(!isInitialized){
