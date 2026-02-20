@@ -1,4 +1,4 @@
-import { FlatList, Pressable, View, Text, StyleSheet, Appearance } from "react-native";
+import { FlatList, Pressable, View, Text, StyleSheet, Appearance, Image } from "react-native";
 import {SafeAreaView} from 'react-native-safe-area-context'
 import { exercises } from "../../data/exercises";
 import { routines } from "../../data/routines";
@@ -21,8 +21,14 @@ export default function WorkoutSelectionScreen (){
     const renderItem = ({item, index})=>(
         <Pressable onPress={()=>{selectWorkout(item.id); setIsChecking(true);}}
         style={({pressed})=>[styles.card, pressed && {opacity: 0.7}]}>
-            <View style={styles.numberBox}>
-                <Text style={styles.numberText}>{index + 1}</Text>
+            <View style={styles.thumbnailContainer}>
+                {item.image?
+                    <Image source={item.image} style={styles.thumbnail} resizeMode='cover'/>
+                    : 
+                     <View style={styles.numberBox}>
+                        <Text style={styles.numberText}>I</Text>
+                    </View>
+                        }
             </View>
             <View style = {styles.textContainer}>
                 <Text style={styles.workoutSubtext}>Routine {item.id} :</Text>
@@ -133,5 +139,21 @@ function createStyles(colorScheme){
             boxShadow: '0px 2px 5px rgba(0,0,0,0.1)',
             elevation: 3,
         },
+        thumbnailContainer: {
+        width: 130,     
+        height: 100,
+        borderRadius: 12,
+        marginRight: 15, 
+        backgroundColor: colorScheme === 'dark' ? '#333' : '#F0F0F0',
+        justifyContent: 'center',
+        alignItems: 'center',
+        overflow: 'hidden', 
+        borderWidth: 1,
+        borderColor: colorScheme === 'dark' ? '#444' : '#E0E0E0',
+    },
+    thumbnail: {
+        width: '100%',
+        height: '100%',
+    },
     
 })}

@@ -4,10 +4,11 @@ import { ThemeContext } from "../../src/context/ThemeContext";
 import { supabase } from "../../src/lib/supabase";
 import { logOut } from "../../src/storage";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Ionicons } from '@expo/vector-icons';
+import { Ionicons, FontAwesome5 } from '@expo/vector-icons';
 import { WorkoutContext } from "../../src/context/WorkoutContext";
 import DataCalendar from "../../src/components/calendar";
 import MissionCard from "../../src/components/missionCard";
+import ProfileCard from "../../src/components/profileCard";
 
 export default function ProfileScreen(){
     const {endWorkout} = useContext(WorkoutContext);
@@ -40,21 +41,31 @@ export default function ProfileScreen(){
     return(
        <SafeAreaView style={styles.container}>
       
-             <View style={styles.avatarContainer}>
-               {avatarUrl?(<Image source={{uri:avatarUrl}} style={styles.profileImage} resizeMode="cover"/>): <Ionicons name="person" size={50} color={isDark ? '#FFF' : '#000'} />}
+             <View style={styles.headerBar}>
+               <Text style={styles.screenTitle}>OPERATOR DOSSIER</Text>
             </View>
-            <Text style = {styles.emailText}>{email}</Text>
-            <Text style={styles.quoteText}>Training with INTENSITY</Text>
-            <View style={styles.calendarTitle}>
-              <Text style={[styles.emailText, {marginBottom:0}]}>Workout History</Text>
-            </View>
-            <DataCalendar/>
+            <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent} style={{flex: 1}} >
+              <View style={styles.avatarContainer}>{avatarUrl?(<Image source={{uri:avatarUrl}} style={styles.profileImage} resizeMode="cover"/>): <Ionicons name="person" size={50} color={isDark ? '#FFF' : '#000'} />}</View>
+           
+              <Text style = {styles.emailText}>{email}</Text>
+              <Text style={styles.quoteText}>Training with INTENSITY</Text>
+           
+              <ProfileCard/>
+              <View style={styles.divider}/>
+              <View style={styles.sectionHeader}>
+                    <FontAwesome5 name="calendar-check" size={16} color="#D32F2F" />
+                    <Text style={styles.sectionTitle}>WORKOUT LOGS</Text>
+                </View>
+              <View style={styles.calendarWrapper}>
+                <DataCalendar/>
+              </View>
+              <View style={{ height: 100 }} />
+            </ScrollView>
             <TouchableOpacity style={styles.logoutButton} onPress={handleLogOut}>
                 <Ionicons name="log-out-outline" size={24} color="#FFF" />
                 {isLoading?<ActivityIndicator color='#fff'/>:
                 <Text style ={styles.logoutText}>Sign Out</Text>}
             </TouchableOpacity>
-            
             </SafeAreaView>
         
         
@@ -62,14 +73,39 @@ export default function ProfileScreen(){
 }
 
 function createStyles (isDark){
+
+  const cardBg = isDark ? '#111111' : '#FFFFFF';
+  const textMain = isDark ? '#FFFFFF' : '#000000';
+  const primary = '#D32F2F';
+  const border = isDark ? '#222222' : '#E0E0E0';
+  const textMuted = isDark ? '#666666' : '#888888';
+
     return StyleSheet.create({
       container: {
       flex: 1,
       backgroundColor: isDark ? '#121212' : '#F5F5F5',
       alignItems: 'center',
+      
     },
+    headerBar: {
+       paddingHorizontal: 20,
+       borderBottomWidth: 1,
+       borderBottomColor: border,
+       paddingVertical: 17,
+      },
+  screenTitle: {
+    width:'100%',
+    fontWeight: '900',
+    color:'#D32F2F',
+    letterSpacing: 2,
+    
+    fontSize: 22,
+  },
+  scrollContent: {
+    padding: 10,
+  },
     avatarContainer: {
-      marginTop: 50, 
+      marginTop: 30, 
       marginBottom: 20,
       width: 120,   
       height: 120,
@@ -77,6 +113,7 @@ function createStyles (isDark){
       backgroundColor: isDark ? '#1E1E1E' : '#FFFFFF',
       justifyContent: 'center',
       alignItems: 'center',
+      alignSelf: 'center',
       borderWidth: 3,
       borderColor: '#D32F2F',
       overflow: 'hidden',
@@ -89,6 +126,7 @@ function createStyles (isDark){
       fontSize: 18,
       fontWeight: 'bold',
       color: isDark ? '#FFFFFF' : '#000000',
+      textAlign:'center',
       marginBottom: 5,
       letterSpacing:0.5,
     },
@@ -110,7 +148,7 @@ function createStyles (isDark){
       justifyContent: 'center',
       width: '100%',
       position: 'absolute',
-      bottom: 40, 
+      bottom: 10, 
     },
     logoutText: {
       color: '#FFFFFF',
@@ -129,6 +167,30 @@ function createStyles (isDark){
       borderColor:'#D32F2F',
       borderRadius: 5,
       borderWidth: 1,
-    }
+    },
+    calendarWrapper: {
+      backgroundColor: cardBg,
+      borderWidth: 1,
+      borderColor: '#D32F2F',
+      borderRadius: 15,
+        },
+   sectionHeader: {
+     marginHorizontal: 10,
+     alignItems: 'center',
+     marginBottom: 15,
+     flexDirection: 'row',
+    },
+   sectionTitle: {
+     fontWeight: 'bold',
+     color: textMuted,
+     letterSpacing: 1.5,
+     marginLeft: 10,
+     fontSize: 14,
+        },
+   divider: {
+            height: 1,
+            backgroundColor: border,
+            marginBottom: 20,
+        },     
     })
 }

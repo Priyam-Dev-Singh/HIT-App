@@ -29,7 +29,7 @@ export default function ExerciseSelectionScreen(){
             <Image source={item.image} style={styles.thumbnail} resizeMode='cover'/>
             : 
             <View style={styles.numberBox}>
-                <Text style={styles.numberText}>{index+1}</Text>
+                <Text style={styles.numberText}>I</Text>
             </View>
             }
            </View>

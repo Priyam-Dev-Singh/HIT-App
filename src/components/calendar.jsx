@@ -16,7 +16,7 @@ export default function DataCalendar(){
        loadCalendar();
     },[])
     return(
-        <View style={{width:'92%', marginTop:15, borderRadius:15, overflow:'hidden'}}>
+        <View style={{width:'100%', borderRadius:15, overflow:'hidden'}}>
               <Calendar
               markedDates={markedDates}
               key={colorScheme}
