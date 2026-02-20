@@ -1,4 +1,4 @@
-import {View, Text, StyleSheet, Button, Pressable, TouchableOpacity, ScrollView, ActivityIndicator} from 'react-native';
+import {View, Text, StyleSheet, Button, Pressable, TouchableOpacity, ScrollView, ActivityIndicator, Image} from 'react-native';
 import { useFocusEffect, useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
@@ -7,7 +7,7 @@ import { ThemeContext } from '../../src/context/ThemeContext';
 import { fetchLastGlobalWorkout, getCurrentRoutine, getWorkoutHistory, logOut } from '../../src/storage';
 import { HitRoutine, routines } from '../../data/routines';
 import Octicons from '@expo/vector-icons/Octicons';
-import { FontAwesome5 } from '@expo/vector-icons';
+import {Ionicons, FontAwesome5 } from '@expo/vector-icons';
 import Feather from '@expo/vector-icons/Feather';
 import { Calendar } from 'react-native-calendars';
 import { WorkoutContext } from '../../src/context/WorkoutContext';
@@ -21,13 +21,25 @@ export default function HomeScreen(){
     const {isWorkoutActive, routineId, startWorkout, setIsChecking, fromLogin, setFromLogin} = useContext(WorkoutContext);
    //const [markedDates, setMarkedDates] = useState({});
     const[isReady, setIsReady] = useState(true);
+    const[avatarUrl, setAvatarUrl] = useState(null);
     const [routine, setRoutine] = useState({});
     const [lastLog, setLastLog] = useState({});
     const {colorScheme, toggleTheme} = useContext(ThemeContext);
     const styles = createStyles(colorScheme);
     const router = useRouter();
     const [loading, setLoading] = useState(false);
+    let isDark = colorScheme === 'dark';
    
+    useEffect(()=>{
+      const getUser= async()=>{
+        const {data:{user}} = await supabase.auth.getUser();
+        if(!user) return;
+        if(user.user_metadata?.avatar_url){
+          setAvatarUrl(user.user_metadata.avatar_url);
+        }
+      }
+      getUser();
+    })
      useFocusEffect(
        useCallback( ()=>{
         const initializeDashboard = async ()=>{
@@ -112,90 +124,46 @@ export default function HomeScreen(){
       )
     }
     return(
-        <ScrollView style={{ flex: 1, backgroundColor:colorScheme==='dark'?'black':'white',
-         }} showsVerticalScrollIndicator={false}>
+        
           <SafeAreaView style={styles.container}>
              <View style={styles.masterHeader}>
+             <TouchableOpacity style={styles.profile} onPress={()=> router.push('/profile')}>
+              {avatarUrl?
+              <Image source={{uri: avatarUrl}} style={styles.profileImage} resizeMode='cover'/>:<Ionicons name="person" size={30} color={isDark ? '#FFF' : '#000'} />}
+             </TouchableOpacity>
              <Text style={styles.masterHeaderText}>INTENSITY</Text>
             <Pressable onPress={toggleTheme} style={{padding:8}}>
               {colorScheme==='dark'?
-                <Octicons name="moon" size={30} color='white' selectable={undefined} style={{width: 36, marginHorizontal: 10,}}/>:
-                <Octicons name="sun" size={30} color='black' selectable={undefined} style={{width: 36, marginHorizontal: 10, }}/>}
+                <Octicons name="moon" size={30} color='white' selectable={undefined} style={{width: 36,}}/>:
+                <Octicons name="sun" size={30} color='black' selectable={undefined} style={{width: 36,}}/>}
             </Pressable>
-           </View>
+            </View>
+          
+        <ScrollView style={{ flex: 1, backgroundColor:colorScheme==='dark'?'black':'white',width:'100%',
+         }} showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}> 
+           
+           
             {lastLog==null?<View></View>:
             <View style={styles.header}>
             <Text style={styles.headerText} >Last Workout : {getRoutine()}</Text>
             <Text style={styles.lastWorkout}>{daysAgo(lastLog.date)}</Text>
             </View>}
-           {/*<View style={{width:'92%', marginTop:15, borderRadius:15, overflow:'hidden'}}>
-             <Calendar
-              markedDates={markedDates}
-              key={colorScheme}
-              theme={{
-                backgroundColor: colorScheme === 'dark' ? '#1A1A1A' : '#f2f2f2',
-                calendarBackground: colorScheme === 'dark' ? '#1A1A1A' : '#f2f2f2',
-                textSectionTitleColor: '#b6c1cd',
-                selectedDayBackgroundColor: '#D32F2F', // Red Circle
-                selectedDayTextColor: '#ffffff',
-                todayTextColor: '#D32F2F',
-                dayTextColor: colorScheme === 'dark' ? '#ffffff' : '#2d4150',
-                textDisabledColor: '#d9e1e8',
-                monthTextColor: colorScheme === 'dark' ? '#ffffff' : 'black',
-                arrowColor: '#D32F2F',
-                textDayFontWeight: '300',
-                textMonthFontWeight: 'bold',
-                textDayHeaderFontWeight: '300',
-                textDayFontSize: 16,
-                textMonthFontSize: 16,
-                textDayHeaderFontSize: 14
-              }}/>
-            </View>*/}
+          
             <MissionCard/>
-           {/*isWorkoutActive?
-           <TouchableOpacity style={[styles.newWorkout, {gap: 5}]} onPress={()=>{
-                router.push(`/workout/${routine.id}`); setIsChecking(false);
-              }}>
-                <Text style = {styles.mission}>MISSION IN PROGRESS </Text>
-                <Text style = {styles.nextWorkout}>RESUME</Text>
-                <FontAwesome5 name="play" size={24} color={colorScheme==='dark'?'white':'black'} />
-            </TouchableOpacity>
-          :
-           (isReady ?
-              <TouchableOpacity style={styles.newWorkout} onPress={()=>{ 
-                setIsChecking(false);
-                console.log("routine id is ", routine.id);
-                startWorkout(routine.id);
-                router.push(`/workout/${routine.id}`);
-              }}>
-                <Text style = {styles.mission}>Mission: </Text>
-                <Text style = {styles.nextWorkout}>{routine?.name||"Loading..."}</Text>
-                <FontAwesome5 name="dumbbell" size={26} color='rgba(255, 255, 255, 0.8)' />
-            </TouchableOpacity>
-            :
-           <View style = {styles.recoveryCard}>
-            <Text style= {styles.recoveryText}>Recovery Mode</Text>
-            <Feather name="battery-charging" size={30} color="white" />
-           </View>
-            )*/}
-        
-            
-          {/* <TouchableOpacity onPress={()=>router.push('/macros')} style={styles.macrosButton}>
-            <Text style={styles.buttonText}>Save Macros</Text>
-            <FontAwesome5 name="leaf" size={26} color={colorScheme==='dark'?'white':'#B9F6CA'} />
-           </TouchableOpacity>*/}
+           
            <TouchableOpacity onPress={()=>{router.push('/log'); setIsChecking(true)}} style={styles.progressButton}>
             <Text style={styles.progressText}>View Progress</Text>
             <AntDesign name="line-chart" size={32} color="white" />
            </TouchableOpacity>
-           
+          </ScrollView>
           <StatusBar style={colorScheme==='dark'?'light':'dark'} />
         </SafeAreaView>
-        </ScrollView>
+       
     );
 }
 
 function createStyles (colorScheme){
+  let isDark = colorScheme === 'dark';
   return StyleSheet.create({
     container:{
       flex: 1,
@@ -204,16 +172,22 @@ function createStyles (colorScheme){
       display: 'flex',
       flexDirection: 'column',
       gap:10,
-      paddingBottom: 70,
+      
+    },
+    scrollContent:{
+      alignItems:'center',
+      paddingBottom: 10,
     },
     masterHeader:{
       width: '100%',             
       flexDirection: 'row',
       alignItems: 'center',
-      justifyContent: 'space-between',
-      paddingHorizontal: 20,     
+      justifyContent: 'space-around',
+     // paddingHorizontal: 20,     
       paddingVertical: 15,      
       backgroundColor: 'transparent',
+      borderBottomColor: '#D32F2F',
+      borderWidth: 1,
     },
     masterHeaderText:{
       fontSize: 24,             
@@ -247,6 +221,7 @@ function createStyles (colorScheme){
       fontSize:14,
       fontWeight:'500',
     },
+
     buttonSelector:{
       display:'flex',
       flexDirection:"row",
@@ -341,5 +316,21 @@ function createStyles (colorScheme){
       fontWeight: 'bold',
       letterSpacing: 0.5,
     },
+    profile:{
+      width: 40,   
+      height: 40,
+      borderRadius: 20, 
+      backgroundColor: isDark ? '#1E1E1E' : '#FFFFFF',
+      justifyContent: 'center',
+      alignItems: 'center',
+      borderWidth: 1,
+      borderColor: '#D32F2F',
+      overflow: 'hidden',
+    
+    },
+    profileImage:{
+      height:'100%',
+      width:'100%',
+    }
   })
 }

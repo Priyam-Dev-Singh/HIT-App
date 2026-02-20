@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from "react";
-import { StyleSheet, Text } from "react-native";
+import { ActivityIndicator, StyleSheet, Text } from "react-native";
 import { View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ThemeContext } from "../context/ThemeContext";
@@ -10,6 +10,7 @@ export default function ProfileCard(){
  const {colorScheme} = useContext(ThemeContext);
  const isDark = colorScheme==='dark';
  const styles = createStyles(isDark);
+ const [isLoading, setIsLoading] = useState(false);
 
  const [operator, setOperator]= useState({
     name:'--',
@@ -22,6 +23,7 @@ export default function ProfileCard(){
 
  })
  const getProfileData = async()=>{
+    setIsLoading(true);
   try{
       const {data:{user}} = await supabase.auth.getUser();
     if(!user)return;
@@ -38,8 +40,8 @@ export default function ProfileCard(){
         target_sleep: profile?.target_sleep || '--',
 
     });
-    console.log(operator);
-  }catch(e){console.error("Error getting profile data", e);}
+    //console.log(operator);
+  }catch(e){console.error("Error getting profile data", e);}finally{setIsLoading(false);}
  } 
 
  const calculateAge =(dobString)=>{
@@ -61,7 +63,7 @@ export default function ProfileCard(){
        
         <View style={styles.card}>
          <View style={styles.cardHeader}>
-            <Ionicons name="finger-print" size={40} color="#D32F2F" />
+           {isLoading?<ActivityIndicator size={50} color='#D32F2F'/> : <Ionicons name="finger-print" size={40} color="#D32F2F" />}
             <View style={{ marginLeft: 15 }}>
                 <Text style={styles.operatorName}>{operator.name.toUpperCase()}</Text>
                 <Text style={styles.operatorTags}>

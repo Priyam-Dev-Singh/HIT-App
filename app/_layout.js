@@ -77,6 +77,8 @@ export default function Layout (){
                     <Stack.Screen name='(tabs)' options = {{headerShown:false}} />
                     <Stack.Screen name = 'logger/[id]' options = {{headerShown:false}}/>
                     <Stack.Screen name = 'workout/[id]' options = {{headerShown:false}}/>
+                    <Stack.Screen name = 'profile' options = {{headerShown:false}}/>
+
                 </Stack>
             </SafeAreaProvider>
             </WorkoutProvider>

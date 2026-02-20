@@ -1,14 +1,14 @@
 import { useContext, useEffect, useState } from "react";
 import { ActivityIndicator, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { ThemeContext } from "../../src/context/ThemeContext";
-import { supabase } from "../../src/lib/supabase";
-import { logOut } from "../../src/storage";
+import { ThemeContext } from "../src/context/ThemeContext";
+import { supabase } from "../src/lib/supabase";
+import { logOut } from "../src/storage";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons, FontAwesome5 } from '@expo/vector-icons';
-import { WorkoutContext } from "../../src/context/WorkoutContext";
-import DataCalendar from "../../src/components/calendar";
-import MissionCard from "../../src/components/missionCard";
-import ProfileCard from "../../src/components/profileCard";
+import { WorkoutContext } from "../src/context/WorkoutContext";
+import DataCalendar from "../src/components/calendar";
+import MissionCard from "../src/components/missionCard";
+import ProfileCard from "../src/components/profileCard";
 
 export default function ProfileScreen(){
     const {endWorkout} = useContext(WorkoutContext);
@@ -17,6 +17,7 @@ export default function ProfileScreen(){
     const [email, setEmail] = useState('loading...');
     const[avatarUrl, setAvatarUrl] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
+   
 
     const styles = createStyles(isDark);
 
@@ -85,6 +86,7 @@ function createStyles (isDark){
       flex: 1,
       backgroundColor: isDark ? '#121212' : '#F5F5F5',
       alignItems: 'center',
+      paddingBottom: 10,
       
     },
     headerBar: {
@@ -147,7 +149,7 @@ function createStyles (isDark){
       alignItems: 'center',
       justifyContent: 'center',
       width: '100%',
-      position: 'absolute',
+      
       bottom: 10, 
     },
     logoutText: {

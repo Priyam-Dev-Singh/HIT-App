@@ -2,6 +2,7 @@ import { Tabs, useRouter } from "expo-router";
 import { useContext } from "react";
 import { ThemeContext } from "../../src/context/ThemeContext";
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+import Feather from '@expo/vector-icons/Feather';
 import { StyleSheet } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { BlurView } from 'expo-blur';
@@ -35,7 +36,7 @@ export default function TabLayout (){
             <Tabs.Screen name="index" options={{title:'Home', tabBarIcon: ({color})=> <Ionicons name='home' size ={24} color={color}/>, headerShown:false}}/>
             <Tabs.Screen name="macros" options={{title:'Diet', tabBarIcon: ({color})=> <MaterialCommunityIcons name='food-apple' size ={24} color={color}/>, headerShown:false}}/>
             <Tabs.Screen name="log" options={{title:'Progress', tabBarIcon: ({color})=> <Ionicons name='bar-chart' size ={24} color={color}/>, headerShown:false}}/>
-            <Tabs.Screen name="profile" options={{title:'Profile', tabBarIcon: ({color})=> <Ionicons name='person' size ={24} color={color}/>, headerShown:false}}/>
+            <Tabs.Screen name="calibration" options={{title:'Calibration', tabBarIcon: ({color})=> <Feather name="sliders" size={24} color={color} />, headerShown:false}}/>
         </Tabs>
         
         
