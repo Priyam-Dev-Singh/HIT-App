@@ -24,17 +24,25 @@ export default function ProfileCard(){
  })
  const getProfileData = async()=>{
     setIsLoading(true);
+    let weight = null;
+        
   try{
       const {data:{user}} = await supabase.auth.getUser();
     if(!user)return;
+    const {data: metricsRecord} = await supabase.from('dailyMetrics').select('weight_data').eq('user_id', user.id).maybeSingle();
+    const weightLogs = metricsRecord?.weight_data || [];
+    const lastWeightObject = weightLogs.length > 0? weightLogs[weightLogs.length - 1]:null;
+   
+     
     const {data: profile, error} =  await supabase.from('profiles').select('*').eq('user_id', user.id).maybeSingle();
     if(error) throw error;
-
+     
+        
     setOperator({
         name: profile?.name || 'UNKOWN OPERATOR',
         gender: profile?.gender || 'N/A',
         dob: profile?.dob,
-        current_weight: profile?.current_weight || '--',
+        current_weight: lastWeightObject? lastWeightObject.value:(profile?.current_weight || '--'),
         goal_weight: profile?.goal_weight || '--',
         height: profile?.height || '--',
         target_sleep: profile?.target_sleep || '--',

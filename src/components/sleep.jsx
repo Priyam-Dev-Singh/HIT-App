@@ -8,7 +8,7 @@ import { ActivityIndicator } from "react-native";
 import { BarChart } from "react-native-gifted-charts";
 
 const sleepStorageKey = '@sleepData';
-export default function SleepComponent(){
+export default function SleepComponent({targetSleep}){
     const{colorScheme} = useContext(ThemeContext);
     let isDarkMode = colorScheme === 'dark';
     const styles = createStyles(colorScheme);
@@ -100,6 +100,15 @@ export default function SleepComponent(){
                 showLine={false} 
                 yAxisThickness={1}
                 xAxisThickness={1}
+
+                showReferenceLine1={targetSleep>0}
+                referenceLine1Position={targetSleep}
+                referenceLine1Config={{
+                  thickness:2,
+                  color: isDarkMode? '#888888' : '#A0A0A0',
+                  dashWidth: 4,
+                  dashGap: 4,
+                }}
                 />
              </View>
            </View>

@@ -1,16 +1,36 @@
 import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import WeightComponent from "../../src/components/wieght";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { ThemeContext } from "../../src/context/ThemeContext";
 import { StyleSheet } from "react-native";
 import SleepComponent from "../../src/components/sleep";
+import { supabase } from "../../src/lib/supabase";
 
 export default function CalibrationLogger(){
-
+    const [targetWeight, setTargetWeight] = useState(0);
+    const [targetSleep, setTargetSleep] = useState(0);
     const {colorScheme} = useContext(ThemeContext);
     const styles = createStyles(colorScheme);
     const [activeTab, setActiveTab] = useState('weight');
+   useEffect(()=>{
+     const passTargets = async()=>{
+        try{
+            const {data:{user}} = await supabase.auth.getUser();
+            if(!user)return;
+            const {data: profiles, error} = await supabase.from('profiles').select("goal_weight, target_sleep").eq('user_id', user.id).maybeSingle();
+            if(error) throw error;
+           // console.log(profiles.goal_weight);
+            if(profiles){
+                setTargetWeight(profiles.goal_weight || 0);
+                setTargetSleep(profiles.target_sleep || 0);
+            }else{return;}
+
+        }catch(e){console.error(e);}
+    };
+    passTargets();
+   },[])
+  
     return(
         <SafeAreaView style={styles.container} edges={['top']}>
             <View style={styles.header}>
@@ -27,7 +47,7 @@ export default function CalibrationLogger(){
                 </TouchableOpacity>
             </View>
             <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="always">
-                {activeTab==='weight'?(<WeightComponent/>):(<SleepComponent/>)}
+                {activeTab==='weight'?(<WeightComponent targetWeight={targetWeight}/>):(<SleepComponent targetSleep={targetSleep}/>)}
             </ScrollView>
         </SafeAreaView>
     );

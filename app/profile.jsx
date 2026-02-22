@@ -9,6 +9,7 @@ import { WorkoutContext } from "../src/context/WorkoutContext";
 import DataCalendar from "../src/components/calendar";
 import MissionCard from "../src/components/missionCard";
 import ProfileCard from "../src/components/profileCard";
+import FadeInView from "../src/components/FadeInView";
 
 export default function ProfileScreen(){
     const {endWorkout} = useContext(WorkoutContext);
@@ -51,7 +52,9 @@ export default function ProfileScreen(){
               <Text style = {styles.emailText}>{email}</Text>
               <Text style={styles.quoteText}>Training with INTENSITY</Text>
            
-              <ProfileCard/>
+             <FadeInView delay={500}>
+               <ProfileCard/>
+             </FadeInView>
               <View style={styles.divider}/>
               <View style={styles.sectionHeader}>
                     <FontAwesome5 name="calendar-check" size={16} color="#D32F2F" />

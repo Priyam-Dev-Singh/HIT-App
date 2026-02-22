@@ -8,7 +8,8 @@ import { LineChart } from "react-native-gifted-charts";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const weightStorageKey = '@weightData';
-export default function WeightComponent(){
+export default function WeightComponent({targetWeight}){
+  
     const {colorScheme} = useContext(ThemeContext);
     let isDarkMode = colorScheme === 'dark';
     const styles = createStyles(colorScheme);
@@ -26,10 +27,10 @@ export default function WeightComponent(){
 
     useEffect(()=>{
         loadChartData();
-    },[chartData])
+    },[])
     return(
         <View style={styles.card}>
-          {/*<Text style={styles.title}>WEIGHT CALIBRATION</Text>*/}
+         
             <View style={styles.graphicContainer}>
                 <View style={styles.scaleBody}>
                     <View style={styles.ledScreen}>
@@ -104,6 +105,15 @@ export default function WeightComponent(){
                 shadowRadius={6}
                 initialSpacing={20}
                 spacing={40}
+
+                showReferenceLine1={targetWeight>0}
+                referenceLine1Position={targetWeight}
+                referenceLine1Config={{
+                  thickness:2,
+                  color: isDarkMode? '#888888' : '#A0A0A0',
+                  dashWidth: 4,
+                  dashGap: 4,
+                }}
 
                 />
                </View>
