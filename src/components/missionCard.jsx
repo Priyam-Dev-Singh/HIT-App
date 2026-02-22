@@ -51,14 +51,15 @@ export default function MissionCard(){
       if(diffHrs>48){return true;}
       else {return false;}
     }
-
+    const badgeColor = isWorkoutActive ? '#FF4444' : (isReady ? '#00FF66' : '#0088FF');
+    const badgeText = isWorkoutActive ? "IN PROGRESS" : (isReady ? 'SYSTEM READY' : 'RECOVERING');
        
     return(
         <View style={styles.cardContainer}>
             <View style={styles.imageArea}>
                 <Image source={isReady?routine.image:recoveryImage} style={styles.heroImage} resizeMode="cover" />
-                <View style={[styles.statusBadge, {backgroundColor: isWorkoutActive ? '#D32F2F' : (isReady ? '#4CAF50' : '#1976D2')}]}>
-                    <Text style={styles.statusText}>{isWorkoutActive?"IN PROGRESS":(isReady?'SYSTEM READY':'RECOVERING')}</Text>
+                <View style={[styles.statusBadge, {borderColor: badgeColor}]}>
+                    <Text style={styles.statusText}>{badgeText}</Text>
                 </View>
             </View>
             {isWorkoutActive?
@@ -139,8 +140,8 @@ function createStyles (colorScheme){
     cardContainer: {
             width: '92%',
             height: 380, // Taller to fit image + button
-            backgroundColor: isDark ? '#1C1C1E' : '#FFFFFF',
-            borderRadius: 24,
+            backgroundColor: isDark ? '#141414' : '#FFFFFF',
+            borderRadius: 20,
             alignSelf: 'center',
             marginTop: 20,
             overflow: 'hidden', // Clips the image to the border radius
@@ -153,6 +154,8 @@ function createStyles (colorScheme){
             elevation: 10,
         },
         imageArea: {
+            padding:10,
+           
             flex: 3, // Takes up 3/4 of the card
             width: '100%',
             backgroundColor: isDark ? '#111' : '#F5F5F5',
@@ -161,22 +164,25 @@ function createStyles (colorScheme){
             position: 'relative',
         },
         heroImage: {
+            borderRadius: 20,
             width: '100%',
             height: '100%',
         },
         statusBadge: {
-            position: 'absolute',
-            alignSelf:'center',
-            top:15,
+            position: 'absolute', 
+            top: 15, 
             paddingVertical: 6,
             paddingHorizontal: 12,
-            borderRadius: 8,
+            borderRadius: 6, 
+            backgroundColor: 'rgba(0,0,0,0.6)',
+            borderWidth: 1, 
+            borderColor: 'rgba(255,255,255,0.2)',
         },
         statusText: {
             color: 'white',
             fontSize: 10,
-            fontWeight: 'bold',
-            letterSpacing: 1,
+            fontWeight: '900', 
+            letterSpacing: 1.5,
         },
         actionButton: {
             flex: 1, // Takes up 1/4 of the card

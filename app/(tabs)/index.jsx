@@ -151,10 +151,10 @@ export default function HomeScreen(){
           
             <MissionCard/>
            
-           <TouchableOpacity onPress={()=>{router.push('/log'); setIsChecking(true)}} style={styles.progressButton}>
+          {/* <TouchableOpacity onPress={()=>{router.push('/log'); setIsChecking(true)}} style={styles.progressButton}>
             <Text style={styles.progressText}>View Progress</Text>
             <AntDesign name="line-chart" size={32} color="white" />
-           </TouchableOpacity>
+           </TouchableOpacity>*/}
           </ScrollView>
           <StatusBar style={colorScheme==='dark'?'light':'dark'} />
         </SafeAreaView>

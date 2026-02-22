@@ -113,13 +113,31 @@ export const syncCalendarData = async()=>{
     }
 }
 
+export const syncWeightAndSleepData = async()=>{
+    const weightStorageKey = '@weightData';
+    const sleepStorageKey = '@sleepData';
+    try{
+        const {data:{user}} = await supabase.auth.getUser();
+        if(!user)return;
+
+        const {data, error} = await supabase.from('dailyMetrics').select('weight_data,sleep_data').eq('user_id', user.id).maybeSingle();
+        if(error) console.error("error getting weight data from supabase");
+
+        if(data && data.weight_data)await AsyncStorage.setItem(weightStorageKey, JSON.stringify(data.weight_data));
+        if(data && data.sleep_data) await AsyncStorage.setItem(sleepStorageKey, JSON.stringify(data.sleep_data));
+
+        console.log('sleep and weight data synced successfully');
+    }catch(e){console.error("error syncing wegiht data");}
+}
+
 export const syncAllUserData = async ()=>{
     console.log('Starting data restore');
     await Promise.all([
         syncData(),
         syncMacros(),
         syncHITRoutine(),
-        syncCalendarData()
+        syncCalendarData(),
+        syncWeightAndSleepData(),
     ]);
     console.log("All data restored");
     return true;
