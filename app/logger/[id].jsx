@@ -105,17 +105,11 @@ export default function LoggingScreen() {
                 behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
                 keyboardVerticalOffset={Platform.OS === 'ios' ? 10 : 0}
             >
-                <ScrollView contentContainerStyle={{ flexGrow: 1, paddingBottom: 50 }} keyboardShouldPersistTaps="handled">
+                <ScrollView contentContainerStyle={{ flexGrow: 1, paddingBottom: 50 }} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
                     
                    
                     <View style={styles.header}>
-                        <Pressable onPress={() => router.push("/")}>
-                            <Octicons name="home" size={24} color={colorScheme === 'dark' ? 'white' : 'black'} />
-                        </Pressable>
                         <Text style={styles.headerText}>{currentExercise.name}</Text>
-                        <Pressable onPress={toggleTheme}>
-                            <Octicons name={colorScheme === 'dark' ? "moon" : "sun"} size={24} color={colorScheme === 'dark' ? 'white' : 'black'} />
-                        </Pressable>
                     </View>
 
                     <View style={styles.visualContainer}>
@@ -265,7 +259,7 @@ function createStyles(colorScheme) {
             paddingVertical: 15,
             paddingHorizontal: 20,
             borderBottomWidth: 1,
-            backgroundColor: colorScheme === 'dark' ? '#111111' : '#FFFFFF',
+            backgroundColor: colorScheme === 'dark' ? '#000000' : '#FFFFFF',
             borderBottomColor: colorScheme === 'dark' ? '#333' : '#E5E5EA',
             flexDirection: 'row',
             justifyContent: "space-between",
@@ -375,7 +369,7 @@ function createStyles(colorScheme) {
         },
         headerText: {
             color: colorScheme === 'dark' ? 'white' : 'black',
-            fontSize: 20,
+            fontSize: 28,
             fontWeight: '700',
             letterSpacing: 0.5,
         },

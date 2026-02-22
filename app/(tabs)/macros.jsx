@@ -5,6 +5,7 @@ import { deleteLastMacros, getWeeklyCalories, getWeeklyWater, saveMacros } from 
 import { ThemeContext } from "../../src/context/ThemeContext";
 import Octicons from '@expo/vector-icons/Octicons';
 import { FontAwesome5, MaterialCommunityIcons } from '@expo/vector-icons';
+import Feather from '@expo/vector-icons/Feather';
 import { useRouter } from "expo-router";
 import { BarChart } from "react-native-gifted-charts"; // Ensure this is installed
 
@@ -92,17 +93,14 @@ export default function MacrosLoggingScreen() {
             >
                
                 <View style={styles.header}>
-                    <Pressable onPress={() => { router.push("/") }}>
-                        <Octicons name="home" size={28} color={colorScheme === 'dark' ? 'white' : 'black'} />
-                    </Pressable>
                     <Text style={styles.headerText}>MACRO SAVER</Text>
-                    <Pressable onPress={toggleTheme}>
+                   { /*<Pressable onPress={toggleTheme}>
                         <Octicons 
                             name={colorScheme === 'dark' ? "moon" : "sun"} 
                             size={30} 
                             color={colorScheme === 'dark' ? 'white' : 'black'} 
                         />
-                    </Pressable>
+                    </Pressable>*/}
                 </View>
 
                 <ScrollView
@@ -261,8 +259,6 @@ function createStyles(colorScheme) {
         container: {
             flex: 1,
             backgroundColor: bg,
-            
-            
         },
         scrollContent: {
             paddingBottom: 40,
@@ -272,15 +268,15 @@ function createStyles(colorScheme) {
             height: 60,
             flexDirection: 'row',
             alignItems: 'center',
-            justifyContent: 'space-between',
+            //justifyContent: '',
             paddingHorizontal: 20,
             borderBottomWidth: 1,
             borderBottomColor: border,
-            backgroundColor: isDark ? '#111111' : '#FFFFFF',
+            backgroundColor: isDark ? '#000000' : '#FFFFFF',
         },
         headerText: {
             color: textMain,
-            fontSize: 20,
+            fontSize: 28,
             fontWeight: '700',
             letterSpacing: 0.5,
         },

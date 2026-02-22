@@ -186,8 +186,6 @@ function createStyles (colorScheme){
      // paddingHorizontal: 20,     
       paddingVertical: 15,      
       backgroundColor: 'transparent',
-      borderBottomColor: '#D32F2F',
-      borderWidth: 1,
     },
     masterHeaderText:{
       fontSize: 24,             

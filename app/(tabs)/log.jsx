@@ -45,14 +45,7 @@ export default function WorkoutSelectionScreen (){
     return(
        <SafeAreaView style={styles.container}>
         <View style={styles.header}> 
-            <Pressable onPress={()=>{router.push("/")}}>
-                <Octicons name="home" size={33} color={colorScheme==='dark'?'white':'black'} selectable={undefined} style={{width: 36, marginHorizontal: 10,}}/>
-            </Pressable>
             <Text style = {styles.headerText}>Select a Workout</Text>
-            <Pressable onPress={toggleTheme}>
-                {colorScheme==='dark'?
-                <Octicons name="moon" size={36} color='white' selectable={undefined} style={{width: 36, marginHorizontal: 10,}}/>:<Octicons name="sun" size={36} color='black' selectable={undefined} style={{width: 36, marginHorizontal: 10,}}/>}
-            </Pressable>
         </View>
         <FlatList
         data = {routines}
@@ -75,7 +68,7 @@ function createStyles(colorScheme){
         paddingVertical: 15,
         paddingHorizontal: 20,
         borderBottomWidth: 1,
-        backgroundColor: colorScheme === 'dark' ? '#111111' : '#FFFFFF',
+        backgroundColor: colorScheme === 'dark' ? '#000000' : '#FFFFFF',
         flexDirection: 'row',
         justifyContent: "space-between",
         alignItems: 'center',
@@ -107,7 +100,7 @@ function createStyles(colorScheme){
         },
     headerText:{
         color: colorScheme === 'dark' ? '#FFFFFF' : '#000000',
-        fontSize: 20,
+        fontSize: 28,
         fontWeight: '700',
         letterSpacing: 0.5,
     },

@@ -9,6 +9,10 @@ const workoutStorageKey = '@workoutLogs';
 const macrosStorageKey = '@macrosLogs';
 const routineIndexKey = '@HITroutine';
 const historyKey = '@workoutHistory';
+const weightStorageKey = '@weightData';
+const sleepStorageKey = '@sleepData';
+
+//workout functions starts here -----------------------------------------------------------------------------
 
 export const saveSet = async (exerciseId, weight, reps)=>{
     try{
@@ -119,6 +123,8 @@ export const deleteLastLog = async (exerciseId) => {
    }
 };
 
+//macros functions start here -----------------------------------------------------------------------------
+
 export const saveMacros = async (protein, carbs, fats, water) => {
     try{
         const newId = uuid.v4();
@@ -204,6 +210,8 @@ export const deleteLastMacros = async()=>{
         return false;
     }
 };
+
+// chart and calendar and helper functions start here --------------------------------------------------------
 
 function calculate1RM(type, weight, reps ){
     const R = parseFloat(reps);
@@ -426,7 +434,10 @@ export const logOut = async ()=>{
         '@workoutLogs',
         '@macrosLogs',      
         '@HITroutine',
-        '@workoutHistory'
+        '@workoutHistory',
+        '@weightData',
+        '@sleepData'
+
     ];
     await AsyncStorage.multiRemove(keys);
     console.log("Logged out and data cleared"); 
@@ -453,4 +464,123 @@ export const insertRoutineInDB = async (newIndex)=>{
     }catch(e){
         console.log("Error syncing routine to database");
     }
+};
+
+//weight logic --------------------------------------------------------------------------------------
+export const saveWeight = async(weight)=>{
+    const timeStamp = new Date().toISOString();
+    const dateObj = new Date(timeStamp);
+    const day = String(dateObj.getDate()).padStart(2, '0');
+    const month = String(dateObj.getMonth() + 1).padStart(2, '0')
+    try{
+        const jsonValue = await AsyncStorage.getItem(weightStorageKey);
+        const currentLogs = jsonValue != null ? JSON.parse(jsonValue):[];
+        const newLog = {
+            value: parseFloat(weight),
+            label: `${day}/${month}`,
+            createdAt: timeStamp 
+        }
+        const updatedLogs = [...currentLogs, newLog];
+        await AsyncStorage.setItem(weightStorageKey, JSON.stringify(updatedLogs));
+        console.log("weight data added sucessfully");
+
+        try{
+            const {data:{user}} = await supabase.auth.getUser();
+            if(!user) return;
+            const {error} = await supabase.from('dailyMetrics').upsert({
+                user_id : user.id,
+                weight_data : updatedLogs,
+                updated_at : timeStamp
+            });
+            if(error) {console.error("error upserting weight data", error); }
+           else console.log("weight_data updated successfully in supabase");
+
+        }catch(e){console.error("error saving weight logs to DB",e);}
+
+    }catch(e){console.error("Error saving weight logs", e);}
+}
+
+export const deleteLastWeight = async()=>{
+    try{
+        const jsonValue = await AsyncStorage.getItem(weightStorageKey);
+        let allLogs = jsonValue != null ? JSON.parse(jsonValue):[];
+        if(!allLogs || allLogs.length === 0){
+            Alert.alert("Log weight first");
+            return;
+        }
+        allLogs.pop(); 
+        await AsyncStorage.setItem(weightStorageKey, JSON.stringify(allLogs));
+        console.log("weight log deleted from async storage");
+
+        try{
+            const {data:{user}} = await supabase.auth.getUser();
+            if(!user)return;
+            const {error} = await supabase.from("dailyMetrics").upsert({
+                user_id: user.id,
+                weight_data: allLogs,
+            });
+            if(error)throw error;
+            console.log("weight data updated successfully");
+        }catch(e){console.error("error deleting weight from supabase", e)}
+    }catch(e){console.error("error deleting last entry from wieght logs")}
+}
+
+//sleep logic ------------------------------------------------------------------------------------------
+
+export const saveSleep = async(sleep)=>{
+    const timeStamp = new Date().toISOString();
+    const dateObj = new Date(timeStamp);
+    const day = String(dateObj.getDate()).padStart(2, '0');
+    const month = String(dateObj.getMonth() + 1).padStart(2, '0')
+    try{
+        const jsonValue = await AsyncStorage.getItem(sleepStorageKey);
+        const currentLogs = jsonValue != null ? JSON.parse(jsonValue):[];
+
+        const newLog = {
+            value: parseFloat(sleep),
+            label: `${day}/${month}`,
+            createdAt: timeStamp
+        }
+        const updatedLogs = [...currentLogs, newLog];
+        await AsyncStorage.setItem(sleepStorageKey, JSON.stringify(updatedLogs));
+        console.log(" sleep data saved in async storage");
+        try{
+            const {data:{user}} = await supabase.auth.getUser();
+            if(!user) return;
+            
+            const {error} = await supabase.from('dailyMetrics').upsert({
+                user_id: user.id,
+                sleep_data : updatedLogs,
+                updated_at: timeStamp
+            });
+            if(error) console.log('error upserting sleep data', error);
+            else {console.log("data updated in uspabase successfully");}
+        }catch(e){console.error("error updating sleep data in DB")}
+    }catch(e){console.error("error saving sleep in storage", e);}
+}
+
+export const deleteLastSleep = async()=>{
+    try{
+        const jsonValue = await AsyncStorage.getItem(sleepStorageKey);
+        let allLogs = jsonValue != null ? JSON.parse(jsonValue):[];
+        if(!allLogs || allLogs.length === 0){
+            Alert.alert("Log sleep hours first");
+            return;
+        }
+        allLogs.pop();
+        await AsyncStorage.setItem(sleepStorageKey, JSON.stringify(allLogs));
+        console.log("Last sleep log deleted successfully");
+
+        try{
+            const {data:{user}} = await supabase.auth.getUser();
+            if(!user)return;
+            const {error} = await supabase.from('dailyMetrics').upsert({
+                user_id: user.id,
+                sleep_data: allLogs,
+            });
+            if(error)throw error;
+            console.log("Sleep data updated in DB");
+
+        }catch(e){console.error("error deleting last sleep log from supabase", e);}
+    }catch(e){console.error("error deleting last sleep");}
 }

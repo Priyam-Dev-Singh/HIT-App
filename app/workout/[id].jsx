@@ -61,15 +61,8 @@ export default function ExerciseSelectionScreen(){
     return(
         <SafeAreaView style = {styles.container}>
            <View style={styles.header}>  
-                   <Pressable onPress={()=>{router.push("/")}}>
-                        <Octicons name="home" size={33} color={colorScheme==='dark'?'white':'black'} selectable={undefined} style={{width: 36, marginHorizontal: 10,}}/>
-                    </Pressable>
-                       <Text style = {styles.headerText}>{currentRoutine.name}</Text>
-                       <Pressable onPress={toggleTheme}>
-                           {colorScheme==='dark'?
-                           <Octicons name="moon" size={30} color='white' selectable={undefined} style={{width: 30, marginHorizontal: 10,}}/>:<Octicons name="sun" size={30} color='black' selectable={undefined} style={{width: 30, marginHorizontal: 10,}}/>}
-                       </Pressable>
-                   </View>
+                <Text style = {styles.headerText}>{currentRoutine.name}</Text>
+            </View>
             <FlatList
             data={currentExercises}
             keyExtractor={item=>item.id}
@@ -97,14 +90,15 @@ function createStyles (colorScheme){
         
     },
     header:{
-        height: '7%', 
+        //height: '7%', 
         borderBottomWidth:1,
-        backgroundColor: colorScheme === 'dark' ? '#111111' : '#FFFFFF',
+        backgroundColor: colorScheme === 'dark' ? '#000000' : '#FFFFFF',
         borderBottomColor: colorScheme === 'dark' ? '#333' : '#E5E5EA',
         display: 'flex', 
         flexDirection:'row', 
         justifyContent:"space-between", 
-        alignItems:'center'
+        alignItems:'center',
+        paddingHorizontal: 20,
     },
      list:{
         marginTop: 10,
@@ -149,7 +143,7 @@ function createStyles (colorScheme){
     headerText:{
         color: colorScheme === 'dark' ? '#FFFFFF' : '#000000',
         padding: 10,
-        fontSize: 22,
+        fontSize: 28,
         fontWeight: '700',
         letterSpacing: 0.5,
     },
