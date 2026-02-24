@@ -3,7 +3,6 @@ import uuid from 'react-native-uuid';
 import {Alert, Text} from 'react-native';
 import React from 'react';
 import { supabase } from './lib/supabase';
-import { counterEvent } from 'react-native/Libraries/Performance/Systrace';
 
 const workoutStorageKey = '@workoutLogs';
 const macrosStorageKey = '@macrosLogs';

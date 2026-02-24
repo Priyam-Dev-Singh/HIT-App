@@ -15,6 +15,7 @@ import AntDesign from '@expo/vector-icons/AntDesign';
 import { supabase } from '../../src/lib/supabase';
 import { syncAllUserData } from '../../src/lib/sync';
 import MissionCard from '../../src/components/missionCard';
+import ProtocolChecklist from '../../src/components/protocolChecklist';
 
 
 export default function HomeScreen(){
@@ -125,7 +126,7 @@ export default function HomeScreen(){
     }
     return(
         
-          <SafeAreaView style={styles.container}>
+          <SafeAreaView style={styles.container} edges={['top']}>
              <View style={styles.masterHeader}>
              <TouchableOpacity style={styles.profile} onPress={()=> router.push('/profile')}>
               {avatarUrl?
@@ -150,6 +151,8 @@ export default function HomeScreen(){
             </View>}
           
             <MissionCard/>
+
+            <ProtocolChecklist/>
            
           {/* <TouchableOpacity onPress={()=>{router.push('/log'); setIsChecking(true)}} style={styles.progressButton}>
             <Text style={styles.progressText}>View Progress</Text>
