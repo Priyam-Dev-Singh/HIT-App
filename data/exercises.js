@@ -5,8 +5,9 @@ export const exercises = [
         'type' : 'isolation',
         'muscleGroup' : 'Chest',
         'description': 'Chest Flyes either with Dumbbell or on a machine',
-        'image': require('../assets/exercisesImages/chestFlyes.jpg'),
-        'listImage': require('../assets/exerciseListImages/chestFlyes.jpg'),
+        'imageD': require('../assets/exercisesImages/chestFlyesD.jpg'),
+        'imageL': require('../assets/exercisesImages/chestFlyesL.jpg'),
+        
     },
     {
         'id': 'ex_02',
@@ -14,7 +15,8 @@ export const exercises = [
         'type': 'compound',
         'muscleGroup' : 'Chest (Upper Chest)',
         'description': 'Incline Chest Press either free weights or a machine',
-        'image': require('../assets/exercisesImages/inclinePress.jpg'),  
+        'imageD': require('../assets/exercisesImages/inclinePressD.jpg'),  
+        'imageL': require('../assets/exercisesImages/inclinePressL.jpg'),  
     },
     {
         'id':'ex_03',
@@ -22,7 +24,8 @@ export const exercises = [
         'type' : 'isolation',
         'muscleGroup':'Back (Lats)',
         'description':'Straight arm Lat Pulldowns on a Lat pulldown machine',
-        'image': require('../assets/exercisesImages/straightArmLatPulldown.jpg'),
+        'imageD': require('../assets/exercisesImages/straightArmLatPulldownD.jpg'),
+        'imageL': require('../assets/exercisesImages/straightArmLatPulldownL.jpg'),
     },
     {
         'id':'ex_04',
@@ -30,7 +33,8 @@ export const exercises = [
         'type': 'compound',
         'muscleGroup':'Back and Biceps',
         'description': 'Close grip palms up pulldown on a Lat pulldown machine',
-        'image': require('../assets/exercisesImages/palmsUpPulldowns.jpg'),
+        'imageD': require('../assets/exercisesImages/palmsUpPulldownsD.jpg'),
+        'imageL': require('../assets/exercisesImages/palmsUpPulldownsL.jpg'),
     },
     {
         'id':'ex_05',
@@ -38,7 +42,8 @@ export const exercises = [
         'type': 'compound',
         'muscleGroup':'Back',
         'description': 'Conventional Deadlift with shoulder width stance',
-        'image': require('../assets/exercisesImages/deadlift.jpg'),
+        'imageD': require('../assets/exercisesImages/deadliftD.jpg'),
+        'imageL': require('../assets/exercisesImages/deadliftL.jpg'),
     },
     {
         'id':'ex_06',
@@ -46,7 +51,8 @@ export const exercises = [
         'type' : 'isolation',
         'muscleGroup':'Quads',
         'description': 'Leg Extensions on a machine',
-        'image': require('../assets/exercisesImages/legExtensions.jpg'),
+        'imageD': require('../assets/exercisesImages/legExtensionsD.jpg'),
+        'imageL': require('../assets/exercisesImages/legExtensionsL.jpg'),
     },
     {
         'id':'ex_07',
@@ -54,7 +60,8 @@ export const exercises = [
         'type': 'compound',
         'muscleGroup':'Legs',
         'description': 'Leg Press either seated or laying down',
-        'image': require('../assets/exercisesImages/legPress.jpg'),
+        'imageD': require('../assets/exercisesImages/legPressD.jpg'),
+        'imageL': require('../assets/exercisesImages/legPressL.jpg'),
     },
     {
         'id':'ex_08',
@@ -62,7 +69,8 @@ export const exercises = [
         'type' : 'isolation',
         'muscleGroup':'Calves',
         'description': 'Standing Calf raises preferably on a machine',
-        'image': require('../assets/exercisesImages/calfRaises.jpg'),
+        'imageD': require('../assets/exercisesImages/calfRaisesD.jpg'),
+        'imageL': require('../assets/exercisesImages/calfRaisesL.jpg'),
     },
     {
         'id':'ex_09',
@@ -70,7 +78,8 @@ export const exercises = [
         'type' : 'isolation',
         'muscleGroup':'Abdominals',
         'description': 'Sit ups preferably on a supported machine',
-        'image': require('../assets/exercisesImages/crunches.jpg'),
+        'imageD': require('../assets/exercisesImages/crunchesD.jpg'),
+        'imageL': require('../assets/exercisesImages/crunchesL.jpg'),
     },
     {
         'id':'ex_10',
@@ -78,7 +87,8 @@ export const exercises = [
         'type' : 'isolation',
         'muscleGroup':'Lateral Delts',
         'description': 'Shoulder Lateral Raises either free weight or on a machine',
-        'image': require('../assets/exercisesImages/lateralRaises.jpg'),
+        'imageD': require('../assets/exercisesImages/lateralRaisesD.jpg'),
+        'imageL': require('../assets/exercisesImages/lateralRaisesL.jpg'),
     },
     {
         'id':'ex_11',
@@ -86,7 +96,8 @@ export const exercises = [
         'type' : 'isolation',
         'muscleGroup':'Rear Delts',
         'description': 'Rear Delt flyes preferably on a machine',
-        'image': require('../assets/exercisesImages/rearDeltFly.jpg'),
+        'imageD': require('../assets/exercisesImages/rearDeltFlyD.jpg'),
+        'imageL': require('../assets/exercisesImages/rearDeltFlyL.jpg'),
     },
     {
         'id':'ex_12',
@@ -94,7 +105,8 @@ export const exercises = [
         'type': 'compound',
         'muscleGroup':'Biceps and Back',
         'description': 'Close grip palms up pulldown on a Lat pulldown machine',
-        'image': require('../assets/exercisesImages/palmsUpPulldowns.jpg'),
+        'imageD': require('../assets/exercisesImages/palmsUpPulldownsD.jpg'),
+        'imageL': require('../assets/exercisesImages/palmsUpPulldownsL.jpg'),
     },
     {
         'id':'ex_13',
@@ -102,7 +114,8 @@ export const exercises = [
         'type' : 'isolation',
         'muscleGroup':'Triceps',
         'description': 'Tricep press downs on a machine',
-        'image': require('../assets/exercisesImages/tricepPushdowns.jpg'),
+        'imageD': require('../assets/exercisesImages/tricepPushdownsD.jpg'),
+        'imageL': require('../assets/exercisesImages/tricepPushdownsL.jpg'),
     },
     
     {
@@ -111,7 +124,8 @@ export const exercises = [
         'type': 'compound',
         'muscleGroup':'Chest',
         'description': 'Standard bar dips or bench dips',
-        'image': require('../assets/exercisesImages/dips.jpg'),
+        'imageD': require('../assets/exercisesImages/dipsD.jpg'),
+        'imageL': require('../assets/exercisesImages/dipsL.jpg'),
     },
     
 ]

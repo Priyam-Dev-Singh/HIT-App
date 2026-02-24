@@ -152,7 +152,7 @@ export default function HomeScreen(){
           
             <MissionCard/>
 
-            <ProtocolChecklist/>
+            <ProtocolChecklist isReady={isReady} routine={routine}  />
            
           {/* <TouchableOpacity onPress={()=>{router.push('/log'); setIsChecking(true)}} style={styles.progressButton}>
             <Text style={styles.progressText}>View Progress</Text>

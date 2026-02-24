@@ -25,12 +25,10 @@ export default function ExerciseSelectionScreen(){
     const renderItem = ({item, index})=>(
         <Pressable onPress={()=>openLogger(item.id)} style={({pressed})=>[styles.exerciseCard, pressed&&{opacity:0.7}]}>
            <View style={styles.thumbnailContainer}>
-            {item.image?
-            <Image source={item.image} style={styles.thumbnail} resizeMode='cover'/>
+            {colorScheme==='dark'?
+            <Image source={item.imageD} style={styles.thumbnail} resizeMode='cover'/>
             : 
-            <View style={styles.numberBox}>
-                <Text style={styles.numberText}>I</Text>
-            </View>
+            <Image source={item.imageL} style={styles.thumbnail} resizeMode='cover'/>
             }
            </View>
             <View style={styles.textContainer}>

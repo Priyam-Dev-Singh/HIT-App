@@ -114,10 +114,10 @@ export default function LoggingScreen() {
 
                     <View style={styles.visualContainer}>
                         <View style={styles.imageCard}>
-                            {currentExercise.image?
-                            <Image source={currentExercise.image} style={styles.mainImage} resizeMode="cover"/>
+                            {colorScheme==='dark'?
+                            <Image source={currentExercise.imageD} style={styles.mainImage} resizeMode="cover"/>
                             :
-                            (<Text style={{color:'#888'}}>No Image Available</Text>)}
+                             <Image source={currentExercise.imageL} style={styles.mainImage} resizeMode="cover"/>}
                         </View>
                     </View>
                     <View style={{ marginTop: 10 }}>

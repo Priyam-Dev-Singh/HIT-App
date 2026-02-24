@@ -5,16 +5,20 @@ import { useFocusEffect, useRouter } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import FadeInView from "./FadeInView";
 import { FontAwesome5, MaterialCommunityIcons, Ionicons } from '@expo/vector-icons';
+import { WorkoutContext } from "../context/WorkoutContext";
 
-export default function ProtocolChecklist(){
+export default function ProtocolChecklist({isReady, routine}){
+    
     const router = useRouter();
+    const {isWorkoutAcitve} = useContext(WorkoutContext);
     const {colorScheme} = useContext(ThemeContext);
     let isDark = colorScheme === 'dark';
     const styles= createStyles(isDark);
     const [tasks, setTasks] = useState({
         weight: false,
         sleep: false,
-        macros: false,  
+        macros: false,
+        workout: false,  
     });
 
     const isToday=(timestamp)=>{
@@ -31,10 +35,12 @@ export default function ProtocolChecklist(){
                     const weightJson = await AsyncStorage.getItem('@weightData');
                     const sleepJson = await AsyncStorage.getItem('@sleepData');
                     const macrosJson = await AsyncStorage.getItem('@macrosLogs');
+                    const liftJson = await AsyncStorage.getItem('@workoutLogs');
 
                     let weightLogged = false;
                     let sleepLogged = false;
                     let macrosLogged = false;
+                    let workoutCompleted = false;
 
                     if(weightJson){
                         const weightLogs = JSON.parse(weightJson);
@@ -54,7 +60,13 @@ export default function ProtocolChecklist(){
                             macrosLogged = isToday(macrosLogs[macrosLogs.length-1].date);
                         }
                     }
-                    setTasks({weight: weightLogged, sleep: sleepLogged, macros: macrosLogged});
+                    if(liftJson){
+                        const liftLogs = JSON.parse(liftJson);
+                        if(liftLogs.length>0){
+                            workoutCompleted = isToday(liftLogs[liftLogs.length-1].date);
+                        }
+                    }
+                    setTasks({weight: weightLogged, sleep: sleepLogged, macros: macrosLogged, workout: workoutCompleted});
                 }catch(e){console.error("error checking completed or not");}
             }
             checkDailyLogs();
@@ -82,13 +94,20 @@ export default function ProtocolChecklist(){
         <View style={styles.container}>
             <View style={styles.headerRow}>
                 <Text style={styles.headerTitle}>DAILY PROTOCOL</Text>
-                <Text style={[styles.headerSubtitle, completedCount===3 && {color: isDark ? '#00FF66' : '#00C851'}]}>{completedCount}/3 CLEARED</Text>
+               {(isReady||tasks.workout)? <Text style={[styles.headerSubtitle, completedCount===4 && {color: isDark ? '#00FF66' : '#00C851'}]}>{completedCount}/4 CLEARED</Text>:<Text style={[styles.headerSubtitle, completedCount===3 && {color: isDark ? '#00FF66' : '#00C851'}]}>{completedCount}/3 CLEARED</Text>}
             </View>
+            {(isReady || tasks.workout )&& <TaskItem
+            label={`TRAIN ${String(routine?.name||' ').toUpperCase()} TODAY`}
+            isCompleted={tasks.workout}
+            delay={100}
+            route= {`/workout/${routine.id}`}
+            icon='dumbbell'
+            /> }
             <TaskItem
             label='LOG MORNING WEIGHT'
             icon='weight'
             isCompleted={tasks.weight}
-            delay={100}
+            delay={200}
             route='/calibration'
             />
             <TaskItem

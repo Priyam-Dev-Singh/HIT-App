@@ -22,12 +22,10 @@ export default function WorkoutSelectionScreen (){
         <Pressable onPress={()=>{selectWorkout(item.id); setIsChecking(true);}}
         style={({pressed})=>[styles.card, pressed && {opacity: 0.7}]}>
             <View style={styles.thumbnailContainer}>
-                {item.image?
-                    <Image source={item.image} style={styles.thumbnail} resizeMode='cover'/>
+                {colorScheme==='dark'?
+                    <Image source={item.imageD} style={styles.thumbnail} resizeMode='cover'/>
                     : 
-                     <View style={styles.numberBox}>
-                        <Text style={styles.numberText}>I</Text>
-                    </View>
+                     <Image source={item.imageL} style={styles.thumbnail} resizeMode='cover'/>
                         }
             </View>
             <View style = {styles.textContainer}>

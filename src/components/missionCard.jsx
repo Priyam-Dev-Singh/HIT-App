@@ -57,7 +57,7 @@ export default function MissionCard(){
     return(
         <View style={styles.cardContainer}>
             <View style={styles.imageArea}>
-                <Image source={isReady?routine.image:recoveryImage} style={styles.heroImage} resizeMode="cover" />
+                <Image source={isReady?(colorScheme==='dark'?routine.imageD:routine.imageL):recoveryImage} style={styles.heroImage} resizeMode="cover" />
                 <View style={[styles.statusBadge, {borderColor: badgeColor}]}>
                     <Text style={styles.statusText}>{badgeText}</Text>
                 </View>

@@ -16,12 +16,15 @@ export default function Layout (){
     const [isInitialized, setIsInitialised] = useState(false);
     
     useEffect(()=>{
-       supabase.auth.getSession().then(({data:{session}})=>{
-            setSession(session);
-            setIsInitialised(true);
-        })
-       
-         const {data :{subscription}} = supabase.auth.onAuthStateChange((_event, session)=>{
+        const initializeAuth = async()=>{
+            try{
+                const {data:{session}, error} = await supabase.auth.getSession();
+                if(error)throw error;
+                setSession(session);
+            }catch(e){console.error("Auth initialisation error", e); setSession(null);}finally{setIsInitialised(true)}
+        };
+        initializeAuth();
+        const {data :{subscription}} = supabase.auth.onAuthStateChange((_event, session)=>{
             setSession(session);
         });
         return ()=> subscription?.unsubscribe();
