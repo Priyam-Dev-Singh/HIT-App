@@ -61,6 +61,11 @@ export default function OnboardingScreen(){
                 <TouchableOpacity style={styles.primaryButton} onPress={()=> setStep(2)}>
                     <Text style={styles.buttonText}>INITIALIZE</Text>
                 </TouchableOpacity>
+                <TouchableOpacity onPress={() => setStep(6)} style={{ marginTop: 20, alignItems: 'center' }}>
+                <Text style={{ color: '#888', fontSize: 14, fontWeight: 'bold' }}>
+                ALREADY A USER? <Text style={{ color: '#D32F2F' }}>LOG IN</Text>
+                </Text>
+            </TouchableOpacity>
             </FadeInView>
         </View>
     )
@@ -96,6 +101,11 @@ export default function OnboardingScreen(){
                 <TouchableOpacity style={styles.primaryButton} onPress={()=> setStep(3)}>
                     <Text style={styles.buttonText}>BEGIN CALIBRATION</Text>
                 </TouchableOpacity>
+                <TouchableOpacity onPress={() => setStep(6)} style={{ marginTop: 20, alignItems: 'center' }}>
+                <Text style={{ color: '#888', fontSize: 14, fontWeight: 'bold' }}>
+                ALREADY A USER? <Text style={{ color: '#D32F2F' }}>LOG IN</Text>
+                </Text>
+            </TouchableOpacity>
             </FadeInView>
         </View>
     )

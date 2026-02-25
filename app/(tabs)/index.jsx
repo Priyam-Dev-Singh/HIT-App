@@ -128,16 +128,8 @@ export default function HomeScreen(){
         
           <SafeAreaView style={styles.container} edges={['top']}>
              <View style={styles.masterHeader}>
-             <TouchableOpacity style={styles.profile} onPress={()=> router.push('/profile')}>
-              {avatarUrl?
-              <Image source={{uri: avatarUrl}} style={styles.profileImage} resizeMode='cover'/>:<Ionicons name="person" size={30} color={isDark ? '#FFF' : '#000'} />}
-             </TouchableOpacity>
+              <Pressable onPress={()=>router.push('/misc/menu')}><Feather name="menu" size={30} color={colorScheme==='dark'?'white':'black'} /></Pressable>
              <Text style={styles.masterHeaderText}>INTENSITY</Text>
-            <Pressable onPress={toggleTheme} style={{padding:8}}>
-              {colorScheme==='dark'?
-                <Octicons name="moon" size={30} color='white' selectable={undefined} style={{width: 36,}}/>:
-                <Octicons name="sun" size={30} color='black' selectable={undefined} style={{width: 36,}}/>}
-            </Pressable>
             </View>
           
         <ScrollView style={{ flex: 1, backgroundColor:colorScheme==='dark'?'black':'white',width:'100%',
@@ -185,17 +177,18 @@ function createStyles (colorScheme){
       width: '100%',             
       flexDirection: 'row',
       alignItems: 'center',
-      justifyContent: 'space-around',
-     // paddingHorizontal: 20,     
+      justifyContent: 'flex-start',
+      paddingHorizontal: 20,     
       paddingVertical: 15,      
       backgroundColor: 'transparent',
+      gap:'22%',
     },
     masterHeaderText:{
       fontSize: 24,             
       color: colorScheme === 'dark' ? '#FFFFFF' : '#000000',
       letterSpacing: 1,          
       textTransform: 'uppercase',
-      fontWeight: '800',         
+      fontWeight: '800',      
     },
     header:{
       borderWidth: 1,

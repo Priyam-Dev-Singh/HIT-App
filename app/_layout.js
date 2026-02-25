@@ -7,6 +7,7 @@ import { use, useEffect, useState } from "react";
 import { ActivityIndicator, Image, StyleSheet, View } from "react-native";
 import * as SplashScreen from 'expo-splash-screen';
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Text } from "react-native";
 
     //console.log("Supabase client active", supabase);
 export default function Layout (){
@@ -14,6 +15,7 @@ export default function Layout (){
     const segments = useSegments();
     const [session, setSession] = useState(null);
     const [isInitialized, setIsInitialised] = useState(false);
+    const [isOffline, setIsOffline] = useState(false);
     
     useEffect(()=>{
         const initializeAuth = async()=>{
@@ -21,13 +23,28 @@ export default function Layout (){
                 const {data:{session}, error} = await supabase.auth.getSession();
                 if(error)throw error;
                 setSession(session);
-            }catch(e){console.error("Auth initialisation error", e); setSession(null);}finally{setIsInitialised(true)}
+                setIsOffline(false);
+                if(session)await AsyncStorage.setItem('@active_user', 'true');
+
+            }catch(e){
+                console.error("Auth initialisation error", e); 
+               
+                setIsOffline(true);
+                const isActiveUser = await AsyncStorage.getItem('@active_user');
+                const hasSeenOnboarding = await AsyncStorage.getItem('onboarding_completed');
+                if(isActiveUser==='true' || hasSeenOnboarding==='true'){
+                    setSession({offlineMode : true})
+                }else{ setSession(null);}
+
+                    }finally{setIsInitialised(true)}
         };
         initializeAuth();
+
         const {data :{subscription}} = supabase.auth.onAuthStateChange((_event, session)=>{
-            setSession(session);
+           if(session) setSession(session);
         });
         return ()=> subscription?.unsubscribe();
+
     },[]);
 
    
@@ -74,6 +91,11 @@ export default function Layout (){
         <ThemeProvider>
             <WorkoutProvider>
                 <SafeAreaProvider>
+                {isOffline && (
+                    <View style={styles.offlineBanner}>
+                        <Text style={styles.offlineText}>⚠️ NO INTERNET CONNECTION! VIEW ONLY MODE</Text>
+                    </View>
+                )}
                 <Stack>
                     <Stack.Screen name="auth/login" options={{headerShown:false}}/>
                     <Stack.Screen name="onboarding" options={{headerShown:false}}/>
@@ -81,6 +103,8 @@ export default function Layout (){
                     <Stack.Screen name = 'logger/[id]' options = {{headerShown:false}}/>
                     <Stack.Screen name = 'workout/[id]' options = {{headerShown:false}}/>
                     <Stack.Screen name = 'profile' options = {{headerShown:false}}/>
+                    <Stack.Screen name = 'misc/menu' options = {{headerShown:false}}/>
+                    <Stack.Screen name = 'misc/aboutUs' options = {{headerShown:false}}/>
 
                 </Stack>
             </SafeAreaProvider>
@@ -99,5 +123,19 @@ const styles = StyleSheet.create({
     splashImage: {
         width: '50%',
         height: '50%',
+    },
+    offlineBanner: {
+        backgroundColor: '#D32F2F', // Intensity Red
+        paddingTop: 50, // Pushes it down below the iOS/Android status bar
+        paddingBottom: 10,
+        alignItems: 'center',
+        justifyContent: 'center',
+        zIndex: 999, // Ensures it floats above everything else
+    },
+    offlineText: {
+        color: '#FFFFFF',
+        fontSize: 12,
+        fontWeight: '900',
+        letterSpacing: 1.5,
     }
 })
