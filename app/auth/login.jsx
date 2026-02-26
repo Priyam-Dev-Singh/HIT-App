@@ -9,19 +9,21 @@ import * as WebBrowser from 'expo-web-browser';
 import {makeRedirectUri} from 'expo-auth-session';
 import { WorkoutContext } from "../../src/context/WorkoutContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { ThemeContext } from "../../src/context/ThemeContext";
 
 WebBrowser.maybeCompleteAuthSession();
 
 
 export default function LoginPage({formData}){
     const {fromLogin, setFromLogin} = useContext(WorkoutContext);
+    const {colorScheme} = useContext(ThemeContext);
     const router = useRouter();
     const [email, setEmail]= useState('');
     const [password, setPassword] = useState('');
     const [loading, setLoading] = useState(false);
     const [isLogin, setIsLogin] = useState(true);
 
-    const styles = createStyles();
+    const styles = createStyles(colorScheme);
 
     const signInWithEmail = async ()=>{
         setFromLogin(true);
@@ -208,12 +210,6 @@ export default function LoginPage({formData}){
 
 
             </View>
-           
-           
-       {/* <View>
-            <Button title="Sing Up" onPress={signUpWithEmail} disabled={loading}/>
-            <Button title="Sing In" onPress={signInWithEmail} disabled={loading}/>
-        </View>*/}
 
             <StatusBar style="light" />
             
@@ -221,14 +217,14 @@ export default function LoginPage({formData}){
     );
 }
 
-function createStyles(){
-
+function createStyles(colorScheme){
+  let isDark = colorScheme==='dark';
     return StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
     paddingHorizontal: 20,
-    backgroundColor: '#000000', 
+    backgroundColor: isDark?'#000000':'#ffffff', 
     },
   header: {
     marginBottom: 40,
@@ -239,7 +235,7 @@ function createStyles(){
     width:'100%',
     fontSize: 42,
     fontWeight: '900', 
-    color: '#FFF',
+    color:!isDark?'#000000':'#ffffff', 
     letterSpacing: 1,
     fontStyle: 'italic', 
     paddingHorizontal: 12,  
@@ -271,7 +267,7 @@ function createStyles(){
     fontWeight: '600',
   },
   activeTabText: {
-    color: '#FFF',
+    color: !isDark?'#000000':'#ffffff', 
   },
   form: {
     width: '100%',
@@ -280,14 +276,14 @@ function createStyles(){
     marginBottom: 20,
   },
   label: {
-    color: '#BBB',
+    color:  '#BBB',
     marginBottom: 8,
     fontSize: 14,
     fontWeight: '500',
   },
   input: {
-    backgroundColor: '#1E1E1E',
-    color: '#FFF',
+    backgroundColor: isDark?'#1E1E1E':'#e1dcdc', 
+    color: !isDark?'#000000':'#ffffff', 
     paddingHorizontal: 15,
     paddingVertical: 15,
     borderRadius: 8,
@@ -308,7 +304,7 @@ function createStyles(){
     elevation: 5, 
   },
   primaryButtonText: {
-    color: '#FFF',
+    color: isDark?'#FFFFFF':'#000000', 
     fontSize: 16,
     fontWeight: 'bold',
     letterSpacing: 0.5,
@@ -330,7 +326,7 @@ function createStyles(){
     fontWeight: 'bold',
   },
   googleButton: {
-    backgroundColor: '#FFF',
+    backgroundColor: !isDark?'#000000':'#ffffff', 
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
@@ -341,7 +337,7 @@ function createStyles(){
     marginRight: 10,
   },
   googleButtonText: {
-    color: '#000',
+    color: isDark?'#000000':'#ffffff', 
     fontSize: 16,
     fontWeight: '600',
   },

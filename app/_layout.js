@@ -40,8 +40,9 @@ export default function Layout (){
         };
         initializeAuth();
 
-        const {data :{subscription}} = supabase.auth.onAuthStateChange((_event, session)=>{
-           if(session) setSession(session);
+        const {data :{subscription}} = supabase.auth.onAuthStateChange((event, session)=>{
+            if(event === 'SIGNED_OUT'){setSession(null); setIsOffline(false);}
+          else if(session) setSession(session);
         });
         return ()=> subscription?.unsubscribe();
 
@@ -53,14 +54,19 @@ export default function Layout (){
 
        const routeUser = async()=>{
          const currentGroup= segments[0];
+         const hasSeenOnboarding =  await AsyncStorage.getItem('onboarding_completed');
 
         if(!session){
-           if( currentGroup !=='onboarding') {router.replace('/onboarding');}
-           return;
-        
+           if(hasSeenOnboarding==='true'){
+            if( currentGroup !=='auth') {router.replace('/auth/login');  return;}
+           }
+           else{
+            if(currentGroup!=='onboarding'){router.require('/onboarding');}
+           }
+           return
         } 
         try{
-           const hasSeenOnboarding =  await AsyncStorage.getItem('onboarding_completed');
+          
            if(hasSeenOnboarding==='true'){
             if (currentGroup === 'onboarding' || currentGroup === 'auth') {
                 router.replace('/(tabs)');

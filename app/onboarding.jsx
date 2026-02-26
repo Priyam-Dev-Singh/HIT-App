@@ -247,13 +247,13 @@ export default function OnboardingScreen(){
 
     const renderStep6=()=>(
        <FadeInView delay={500}>
-         <LoginPage formData={formData}/>
+         <LoginPage formData={formData} colorScheme={colorScheme}/>
        </FadeInView>
     );
 
     
     return(
-        <SafeAreaView style={styles.container}>
+        <SafeAreaView style={styles.container} >
             
             <KeyboardAvoidingView behavior={Platform.OS==='ios'?'padding':'height'} style={{flex:1}}>
                 <View style={styles.header}>
@@ -352,14 +352,14 @@ function createStyles(colorScheme){
             flex: 1,
             justifyContent: 'center',
             paddingHorizontal: 25,
-            backgroundColor: isDark ? '#000000' : '#121212', // Forcing dark mode for the intro looks best
+            backgroundColor: isDark?'#000000':'#ffffff', // Forcing dark mode for the intro looks best
         },
         centerIcon: {
             textAlign: 'center',
             marginBottom: 20,
         },
         massiveTitle: {
-            color: '#FFFFFF',
+            color: !isDark?'#000000':'#ffffff', 
             fontSize: 42,
             fontWeight: '900',
             textAlign: 'center',
@@ -385,7 +385,7 @@ function createStyles(colorScheme){
             marginBottom: 25,
         },
         featureText: {
-            color: '#E0E0E0',
+            color: !isDark?'#000000': '#E0E0E0',
             fontSize: 16,
             fontWeight: '600',
             marginLeft: 15,

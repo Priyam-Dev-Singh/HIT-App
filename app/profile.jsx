@@ -10,8 +10,10 @@ import DataCalendar from "../src/components/calendar";
 import MissionCard from "../src/components/missionCard";
 import ProfileCard from "../src/components/profileCard";
 import FadeInView from "../src/components/FadeInView";
+import { useRouter } from "expo-router";
 
 export default function ProfileScreen(){
+    const router = useRouter();
     const {endWorkout} = useContext(WorkoutContext);
     const {colorScheme} = useContext(ThemeContext);
     const isDark = colorScheme === 'dark';
@@ -38,6 +40,7 @@ export default function ProfileScreen(){
         endWorkout();
         await logOut();
         setIsLoading(false);
+        router.replace('/auth/login');
     }
     
     return(

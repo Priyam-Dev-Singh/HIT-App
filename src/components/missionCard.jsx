@@ -15,7 +15,8 @@ export default function MissionCard(){
     const [routine, setRoutine] = useState({});
     const[isReady, setIsReady] = useState(true);
     const styles = createStyles(colorScheme);
-    const recoveryImage = require('./recovery.jpg');
+    const recoveryImageD = require('./recoveryD.jpg');
+    const recoveryImageL = require('./recoveryL.jpg');
 
     useEffect(()=>{
         const getCardData = async()=>{
@@ -57,7 +58,7 @@ export default function MissionCard(){
     return(
         <View style={styles.cardContainer}>
             <View style={styles.imageArea}>
-                <Image source={isReady?(colorScheme==='dark'?routine.imageD:routine.imageL):recoveryImage} style={styles.heroImage} resizeMode="cover" />
+                <Image source={isReady?(colorScheme==='dark'?routine.imageD:routine.imageL):(colorScheme==='dark'?recoveryImageD:recoveryImageL)} style={styles.heroImage} resizeMode="cover" />
                 <View style={[styles.statusBadge, {borderColor: badgeColor}]}>
                     <Text style={styles.statusText}>{badgeText}</Text>
                 </View>
