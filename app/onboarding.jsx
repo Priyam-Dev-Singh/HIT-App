@@ -1,6 +1,6 @@
 import { useRouter } from "expo-router";
 import { useContext, useEffect, useState } from "react";
-import { Image, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { Image, KeyboardAvoidingView, Platform, ScrollView, StatusBar, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ThemeContext } from "../src/context/ThemeContext";
 import { FontAwesome5, MaterialCommunityIcons, Ionicons } from '@expo/vector-icons';
@@ -31,8 +31,9 @@ export default function OnboardingScreen(){
     const updateForm = (key, value)=>{
         setFormData(prev => ({...prev, [key]: value}));
     }
-    const handleNext = ()=>{
+    const handleNext = async ()=>{
        if(step<6) setStep(step+1);
+       if(step===5){await AsyncStorage.setItem('onboarding_completed', 'true');}
       // console.log(formData);
        //else{handleSubmit()};
     }
@@ -61,7 +62,7 @@ export default function OnboardingScreen(){
                 <TouchableOpacity style={styles.primaryButton} onPress={()=> setStep(2)}>
                     <Text style={styles.buttonText}>INITIALIZE</Text>
                 </TouchableOpacity>
-                <TouchableOpacity onPress={() => setStep(6)} style={{ marginTop: 20, alignItems: 'center' }}>
+                <TouchableOpacity onPress={async() => {await AsyncStorage.setItem('onboarding_completed', 'true'); setStep(6);}} style={{ marginTop: 20, alignItems: 'center' }}>
                 <Text style={{ color: '#888', fontSize: 14, fontWeight: 'bold' }}>
                 ALREADY A USER? <Text style={{ color: '#D32F2F' }}>LOG IN</Text>
                 </Text>
@@ -101,7 +102,7 @@ export default function OnboardingScreen(){
                 <TouchableOpacity style={styles.primaryButton} onPress={()=> setStep(3)}>
                     <Text style={styles.buttonText}>BEGIN CALIBRATION</Text>
                 </TouchableOpacity>
-                <TouchableOpacity onPress={() => setStep(6)} style={{ marginTop: 20, alignItems: 'center' }}>
+                <TouchableOpacity onPress={async() => {await AsyncStorage.setItem('onboarding_completed', 'true'); setStep(6);}} style={{ marginTop: 20, alignItems: 'center' }}>
                 <Text style={{ color: '#888', fontSize: 14, fontWeight: 'bold' }}>
                 ALREADY A USER? <Text style={{ color: '#D32F2F' }}>LOG IN</Text>
                 </Text>
@@ -130,7 +131,7 @@ export default function OnboardingScreen(){
              <Text style={styles.label}>GENDER</Text>
              <View style={styles.row}>{['Male','Female'].map(g=>(
                 <TouchableOpacity key={g} style={[styles.choiceBtn, formData.gender=== g && styles.activeChoice]} onPress={()=> updateForm('gender', g)} >
-                    <Text style={[styles.choiceText, formData.gender === g && styles.activeChoicetext]}>{g}</Text>
+                    <Text style={[styles.choiceText, formData.gender === g && styles.activeChoiceText]}>{g}</Text>
                 </TouchableOpacity>
             ))}</View>
            </FadeInView>
@@ -151,7 +152,7 @@ export default function OnboardingScreen(){
                 />)
             }</FadeInView>
             <FadeInView delay={1500}>
-                <TouchableOpacity onPress={() => setStep(6)} style={{ marginTop: 20, alignItems: 'center' }}>
+                <TouchableOpacity onPress={async() => {await AsyncStorage.setItem('onboarding_completed', 'true'); setStep(6);} } style={{ marginTop: 20, alignItems: 'center' }}>
                 <Text style={{ color: '#888', fontSize: 14, fontWeight: 'bold' }}>
                 ALREADY A USER? <Text style={{ color: '#D32F2F' }}>LOG IN</Text>
                 </Text>
@@ -279,7 +280,9 @@ export default function OnboardingScreen(){
                         <Text style={styles.nextText}>{loading?'SAVING...':'NEXT'}</Text>
                     </TouchableOpacity>}
                 </View>
+                
             </KeyboardAvoidingView>
+            <StatusBar style={colorScheme==='dark'?'light':'dark'} />
         </SafeAreaView>
     );
 }

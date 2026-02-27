@@ -4,16 +4,18 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export const ThemeContext = createContext({});
 export const ThemeProvider = ({children}) => {
-    const [colorScheme, setColorScheme] = useState(Appearance.getColorScheme()||'dark');
+    const [colorScheme, setColorScheme] = useState('dark');
 
     useEffect(()=>{
-        try{
+        
             const loadTheme = async ()=>{
+            try{
                 const savedTheme = await AsyncStorage.getItem('userTheme');
                 if(savedTheme){setColorScheme(savedTheme);};
+                }catch(e){console.error("Error getting theme!", e)}
             }
             loadTheme();
-        }catch(e){console.error("Error getting theme!", e)}
+       
     },[]);
 
     const toggleTheme = async ()=> {

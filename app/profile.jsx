@@ -40,7 +40,7 @@ export default function ProfileScreen(){
         endWorkout();
         await logOut();
         setIsLoading(false);
-        router.replace('/auth/login');
+      
     }
     
     return(
