@@ -97,7 +97,7 @@ export default function ProtocolChecklist({isReady, routine}){
                {(isReady||tasks.workout)? <Text style={[styles.headerSubtitle, completedCount===4 && {color: isDark ? '#00FF66' : '#00C851'}]}>{completedCount}/4 CLEARED</Text>:<Text style={[styles.headerSubtitle, completedCount===3 && {color: isDark ? '#00FF66' : '#00C851'}]}>{completedCount}/3 CLEARED</Text>}
             </View>
             {(isReady || tasks.workout )&& <TaskItem
-            label={`TRAIN ${String(routine?.name||' ').toUpperCase()} TODAY`}
+            label={`TRAIN TODAY`}
             isCompleted={tasks.workout}
             delay={100}
             route= {`/workout/${routine.id}`}

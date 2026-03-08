@@ -32,7 +32,7 @@ export default function OnboardingScreen(){
         setFormData(prev => ({...prev, [key]: value}));
     }
     const handleNext = async ()=>{
-       if(step<6) setStep(step+1);
+       if(step<9) setStep(step+1);
        if(step===5){await AsyncStorage.setItem('onboarding_completed', 'true');}
       // console.log(formData);
        //else{handleSubmit()};
@@ -56,13 +56,13 @@ export default function OnboardingScreen(){
                 <Text style={styles.massiveTitle}>INTENSITY</Text>
             </FadeInView>
             <FadeInView delay={1200}>
-                <Text style={styles.introSubtitle}>THE OPTIMAL TRAINING CONSOLE</Text>
+                <Text style={styles.introSubtitle}>High Intensity Training System {'\n'}Train hard. Recover fully. Progress.</Text>
             </FadeInView>
             <FadeInView delay={1800} style={styles.bottomButtonContainer}>
                 <TouchableOpacity style={styles.primaryButton} onPress={()=> setStep(2)}>
                     <Text style={styles.buttonText}>INITIALIZE</Text>
                 </TouchableOpacity>
-                <TouchableOpacity onPress={async() => {await AsyncStorage.setItem('onboarding_completed', 'true'); setStep(6);}} style={{ marginTop: 20, alignItems: 'center' }}>
+                <TouchableOpacity onPress={async() => {await AsyncStorage.setItem('onboarding_completed', 'true'); setStep(9);}} style={{ marginTop: 20, alignItems: 'center' }}>
                 <Text style={{ color: '#888', fontSize: 14, fontWeight: 'bold' }}>
                 ALREADY A USER? <Text style={{ color: '#D32F2F' }}>LOG IN</Text>
                 </Text>
@@ -71,7 +71,51 @@ export default function OnboardingScreen(){
         </View>
     )
 
-    const renderStep2 = ()=>(
+    const renderStep2 =()=>(
+        <View style={styles.introContainer}>
+            <FadeInView delay={200} style={styles.centerIcon}>
+                <FontAwesome5 name="brain" size={60} color="#D32F2F" />
+            </FadeInView>
+            <FadeInView delay={600}>
+                <Text style={styles.philosophyTitle}>TRAIN LESS.{'\n'}GROW MORE.</Text>
+            </FadeInView>
+            <FadeInView delay = {1200}>
+                <Text style={styles.philosophyText}>High Intensity Training focuses on maximum effort and full recovery. We eradicate junk volume and focus strictly on the stimulus.</Text>
+            </FadeInView>
+        </View>
+    )
+
+    const renderStep3 = ()=>(
+        <View style={styles.introContainer}>
+            <FadeInView delay={200} style={styles.centerIcon}>
+                <FontAwesome5 name="fire-alt" size={60} color="#EF6C00" />
+            </FadeInView>
+            <FadeInView delay={600}>
+                <Text style={styles.philosophyTitle}>ONE SET TO{"\n"}FAILURE.</Text>
+            </FadeInView>
+            <FadeInView delay={1200}>
+                <Text style={styles.philosophyText}>Each exercise is performed with proper warmup and ONE all-out set to absolute muscular failure. If you can PHYSICALLY do another rep, the set isn't over.</Text>
+            </FadeInView>
+        </View>
+    )
+
+    const renderStep4=()=>(
+        <View style={styles.introContainer}>
+            <FadeInView delay={200} style={styles.centerIcon}>
+                <Ionicons name="battery-charging" size={70} color="#0088FF" />
+            </FadeInView>
+            <FadeInView delay={600}>
+                <Text style={styles.philosophyTitle}>RECOVERY{"\n"}DRIVES GROWTH.</Text>
+            </FadeInView>
+            <FadeInView delay={1200}>
+                <Text style={styles.philosophyText}>
+                    The gym provides the stimulus. Growth happens outside of it. Your next workout unlocks ONLY after your muscles fully recover.
+                </Text>
+            </FadeInView>
+        </View>
+    )
+
+    const renderStep5 = ()=>(
         <View style={styles.introContainer}>
             <FadeInView delay={100}>
                 <Text style={styles.massiveTitle}>PROTOCOLS</Text>
@@ -99,10 +143,10 @@ export default function OnboardingScreen(){
                 </FadeInView>
             </View>
             <FadeInView delay={2400} style={styles.bottomButtonContainer}>
-                <TouchableOpacity style={styles.primaryButton} onPress={()=> setStep(3)}>
+                <TouchableOpacity style={styles.primaryButton} onPress={()=> setStep(6)}>
                     <Text style={styles.buttonText}>BEGIN CALIBRATION</Text>
                 </TouchableOpacity>
-                <TouchableOpacity onPress={async() => {await AsyncStorage.setItem('onboarding_completed', 'true'); setStep(6);}} style={{ marginTop: 20, alignItems: 'center' }}>
+                <TouchableOpacity onPress={async() => {await AsyncStorage.setItem('onboarding_completed', 'true'); setStep(9);}} style={{ marginTop: 20, alignItems: 'center' }}>
                 <Text style={{ color: '#888', fontSize: 14, fontWeight: 'bold' }}>
                 ALREADY A USER? <Text style={{ color: '#D32F2F' }}>LOG IN</Text>
                 </Text>
@@ -110,7 +154,7 @@ export default function OnboardingScreen(){
             </FadeInView>
         </View>
     )
-    const renderStep3 = ()=>(
+    const renderStep6 = ()=>(
         <View style={styles.stepContainer}>
            <FadeInView delay={200}>
             <Text style={styles.stepTitle}>IDENTITY</Text>
@@ -161,7 +205,7 @@ export default function OnboardingScreen(){
         </View>
     );
 
-    const renderStep4 = () => (
+    const renderStep7 = () => (
         <View style={styles.stepContainer}>
             
             <FadeInView delay={200}>
@@ -203,7 +247,7 @@ export default function OnboardingScreen(){
 
         </View>
     );
-   const renderStep5 = () => (
+   const renderStep8 = () => (
         <View style={styles.stepContainer}>
             
             <FadeInView delay={200}>
@@ -246,7 +290,7 @@ export default function OnboardingScreen(){
     );
 
 
-    const renderStep6=()=>(
+    const renderStep9 =()=>(
        <FadeInView delay={500}>
          <LoginPage formData={formData} colorScheme={colorScheme}/>
        </FadeInView>
@@ -259,7 +303,7 @@ export default function OnboardingScreen(){
             <KeyboardAvoidingView behavior={Platform.OS==='ios'?'padding':'height'} style={{flex:1}}>
                 <View style={styles.header}>
                     <View style={styles.progressBar}>
-                        <View style={[styles.progressFill, {width:`${(step/6) *100}%`}]}/>
+                        <View style={[styles.progressFill, {width:`${(step/9) *100}%`}]}/>
                     </View>
                 </View>
 
@@ -270,13 +314,16 @@ export default function OnboardingScreen(){
                     {step===4 && renderStep4()}
                     {step===5 && renderStep5()}
                     {step===6 && renderStep6()}
+                    {step===7 && renderStep7()}
+                    {step===8 && renderStep8()}
+                    {step===9 && renderStep9()}
 
                 </ScrollView>
                 <View style={styles.footer}>
                     <TouchableOpacity onPress={handleBack} style={[styles.navBtn, styles.backBtn, step===1&&{opacity:0}]} disabled={step===1}>
                         <Text style={styles.backText}>BACK</Text>
                     </TouchableOpacity>
-                   {step>2 && step <6 && <TouchableOpacity style={[styles.navBtn, styles.nextBtn]} onPress={handleNext}>
+                   {step>1 && step <9 && <TouchableOpacity style={[styles.navBtn, styles.nextBtn]} onPress={handleNext}>
                         <Text style={styles.nextText}>{loading?'SAVING...':'NEXT'}</Text>
                     </TouchableOpacity>}
                 </View>
@@ -358,8 +405,8 @@ function createStyles(colorScheme){
             backgroundColor: isDark?'#000000':'#ffffff', // Forcing dark mode for the intro looks best
         },
         centerIcon: {
-            textAlign: 'center',
-            marginBottom: 20,
+            alignItems: 'center',
+            marginBottom: 30,
         },
         massiveTitle: {
             color: !isDark?'#000000':'#ffffff', 
@@ -414,6 +461,23 @@ function createStyles(colorScheme){
             height: 200,
             alignSelf: 'center', // Centers the image perfectly
             marginBottom: 20,
+        },
+        philosophyTitle: {
+            color: !isDark ? '#000000' : '#ffffff', 
+            fontSize: 34,
+            fontWeight: '900',
+            textAlign: 'center',
+            letterSpacing: 2,
+            textTransform: 'uppercase',
+            marginBottom: 20,
+        },
+        philosophyText: {
+            color: '#A0A0A0',
+            fontSize: 18,
+            fontWeight: '600',
+            textAlign: 'center',
+            lineHeight: 28,
+            paddingHorizontal: 10,
         },
     })
 }

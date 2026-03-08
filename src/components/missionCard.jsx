@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from "react";
-import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Image, Modal, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { WorkoutContext } from "../context/WorkoutContext";
 import { FontAwesome5, Feather } from '@expo/vector-icons';
 import { fetchLastGlobalWorkout, getCurrentRoutine } from "../storage";
@@ -14,6 +14,8 @@ export default function MissionCard(){
     const [lastLog, setLastLog] = useState({});
     const [routine, setRoutine] = useState({});
     const[isReady, setIsReady] = useState(true);
+    const [restTime, setrestTime] = useState('');
+    const[showInfoModal, setShowInfoModal] = useState(false);
     const styles = createStyles(colorScheme);
     const recoveryImageD = require('./recoveryD.jpg');
     const recoveryImageL = require('./recoveryL.jpg');
@@ -48,7 +50,12 @@ export default function MissionCard(){
       const past = new Date (dateString);
       const now = new Date();
       const diffTime = Math.abs(now-past);
-      const diffHrs = Math.floor(diffTime/(1000*60*60));
+      const diffMin = Math.floor(diffTime/(1000*60));
+      const diffHrs = Math.floor(diffMin/60);
+      const hrs = 47-diffHrs;
+    
+      const minutes = 60 - diffMin%60;
+      setrestTime(`${hrs}h ${minutes}m`);
       if(diffHrs>48){return true;}
       else {return false;}
     }
@@ -59,9 +66,10 @@ export default function MissionCard(){
         <View style={styles.cardContainer}>
             <View style={styles.imageArea}>
                 <Image source={isReady?(colorScheme==='dark'?routine.imageD:routine.imageL):(colorScheme==='dark'?recoveryImageD:recoveryImageL)} style={styles.heroImage} resizeMode="cover" />
-                <View style={[styles.statusBadge, {borderColor: badgeColor}]}>
+                <TouchableOpacity style={[styles.statusBadge, {borderColor: badgeColor}]} onPress={()=> setShowInfoModal(true)} >
                     <Text style={styles.statusText}>{badgeText}</Text>
-                </View>
+                    <Feather name="info" size={18} color={colorScheme==='dark'?'white':'black'} />
+                </TouchableOpacity>
             </View>
             {isWorkoutActive?
                        <TouchableOpacity style={[styles.actionButton, { backgroundColor: '#D32F2F' }]} onPress={()=>{
@@ -79,16 +87,38 @@ export default function MissionCard(){
                             startWorkout(routine.id);
                             router.push(`/workout/${routine.id}`);
                           }}>
-                            <Text style = {styles.mission}>Mission: </Text>
-                            <Text style = {styles.nextWorkout}>{routine?.name||"Loading..."}</Text>
-                            <FontAwesome5 name="dumbbell" size={26} color='rgba(255, 255, 255, 0.8)' />
+                            <View style={{width: '100%',flexDirection:'row',alignItems: 'center',justifyContent: 'space-evenly', }}>
+                                <Text style = {styles.mission}>Next Workout: </Text>
+                                <Text style = {styles.nextWorkout}>{routine?.name||"Loading..."}</Text>
+                                <FontAwesome5 name="dumbbell" size={26} color='rgba(255, 255, 255, 0.8)' />
+                            </View>
+                            <Text style={styles.philosophySubtitle}>Perform 1 all-out set to failure for each exercise after proper warmup.</Text>
                         </TouchableOpacity>
                         :
                        <View style = {styles.recoveryCard}>
-                        <Text style= {styles.recoveryText}>Recovery Mode</Text>
-                        <Feather name="battery-charging" size={30} color="white" />
+                        <View style={{width:'100%', flexDirection:'row', alignItems:'center', justifyContent:'space-evenly'}}>
+                            <Text style= {styles.recoveryText}>Recovery Mode</Text>
+                            <Feather name="battery-charging" size={30} color="white" />
+                        </View>
+                         <Text style= {styles.timerText}>Next session unlocks in: {restTime}</Text>
                        </View>
                         )}
+            
+            <Modal animationType="fade" transparent={true} visible={showInfoModal} onRequestClose={()=> setShowInfoModal(false)}>
+                <View style={styles.modalOverlay}>
+                    <View style={styles.modalContent}>
+                        <Text style={styles.modalTitle}>THE PROTOCOL</Text>
+                        <Text style={styles.modalText}>
+                        {isReady 
+                        ? "SYSTEM READY\nYour central nervous system and musculature have recovered.\nExecute exactly one all-out set per exercise to absolute muscular failure.\n No junk volume." 
+                        : "RECOVERY PHASE\nMuscle repair in progress. \nThe gym only provides the stimulus; actual growth happens during this phase. \nDo not train until the timer clears."}
+                        </Text>
+                        <TouchableOpacity style={styles.modalCloseBtn} onPress={()=> setShowInfoModal(false)}>
+                            <Text style={styles.modalCloseText}>UNDERSTOOD</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            </Modal>
         </View>
     );
 }
@@ -125,9 +155,9 @@ function createStyles (colorScheme){
     recoveryCard:{
       backgroundColor: '#1976D2',
       flex: 1, // Takes up 1/4 of the card
-      flexDirection: 'row',
+      flexDirection: 'cloumn',
       alignItems: 'center',
-      justifyContent: 'space-evenly',
+      justifyContent: 'center',
       borderRadius:15,
       borderTopWidth: 1,
       borderColor: 'rgba(255,255,255,0.1)',
@@ -172,6 +202,10 @@ function createStyles (colorScheme){
         statusBadge: {
             position: 'absolute', 
             top: 15, 
+            gap: 10,
+            flexDirection:'row',
+            justifyContent:'center',
+            alignItems:'center',
             paddingVertical: 6,
             paddingHorizontal: 12,
             borderRadius: 6, 
@@ -188,12 +222,63 @@ function createStyles (colorScheme){
         actionButton: {
             flex: 1, // Takes up 1/4 of the card
             margin:10,
-            flexDirection: 'row',
+            flexDirection: 'column',
             alignItems: 'center',
-            justifyContent: 'space-evenly',
+            justifyContent: 'center',
             borderRadius:15,
             borderTopWidth: 1,
             borderColor: 'rgba(255,255,255,0.1)',
+        },
+        philosophySubtitle: {
+            color: 'rgba(255,255,255,0.6)',
+            fontSize: 10,
+            fontStyle: 'italic',
+            marginTop: 2,
+        },
+        timerText: {
+            color: '#FFA726', // Warning orange for recovery
+            fontSize: 12,
+            fontWeight: 'bold',
+            marginTop: 4,
+            letterSpacing: 1,
+        },
+        modalTitle: {
+            color: isDark ? '#FFF' : '#000',
+            fontSize: 20,
+            fontWeight: '900',
+            letterSpacing: 1,
+            marginBottom: 10,
+            textTransform: 'uppercase',
+        },
+        modalText: {
+            color: '#888',
+            fontSize: 14,
+            lineHeight: 22,
+            marginBottom: 20,
+        },
+        modalCloseBtn: {
+            backgroundColor: '#D32F2F',
+            padding: 12,
+            borderRadius: 8,
+            alignItems: 'center',
+        },
+        modalCloseText: {
+            color: '#FFF',
+            fontWeight: 'bold',
+        },
+        modalOverlay: {
+            flex: 1,
+            backgroundColor: 'rgba(0,0,0,0.8)',
+            justifyContent: 'center',
+            alignItems: 'center',
+        },
+        modalContent: {
+            backgroundColor: isDark ? '#1C1C1E' : '#FFFFFF',
+            width: '85%',
+            padding: 25,
+            borderRadius: 15,
+            borderWidth: 1,
+            borderColor: isDark ? '#333' : '#E5E5EA',
         },
     })
 }

@@ -15,6 +15,13 @@ export default function MenuScreen(){
     const privacyPolicy = "https://intensity-privacy-policy.vercel.app";
     const deleteForm = 'https://forms.gle/PPjdkMiv1xdamQh48';
 
+    const sendFeedback=()=>{
+        const email = 'priyamdevsingh9@gmail.com';
+        const subject = 'INTENSITY app feedback';
+        const body = 'What confused you? \n\n What would you improve? \n\n';
+        Linking.openURL(`mailto:${email}?subject=${subject}&body=${encodeURIComponent(body)}`)
+    };
+
     useEffect(()=>{
         const getUser = async()=>{
             const {data:{user}} = await supabase.auth.getUser();
@@ -78,6 +85,9 @@ export default function MenuScreen(){
                 <Text style={styles.sectionTitle}>INFORMATION</Text>
                 <MenuItem icon="info-circle" label="About INTENSITY" onPress={() => router.push('/misc/aboutUs')} />
                 <MenuItem icon="shield-alt" label="Privacy Policy" onPress={() => Linking.openURL(privacyPolicy)} />
+            </View>
+            <View style={styles.section}>
+                <MenuItem icon="comment-alt" label="Send Feedback" onPress={sendFeedback} isDanger={false} />
             </View>
             <View style={styles.section}>
                 <Text style={[styles.sectionTitle, { color: '#D32F2F' }]}>DANGER ZONE</Text>

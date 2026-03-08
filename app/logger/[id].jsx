@@ -10,6 +10,7 @@ import { LineChart } from "react-native-gifted-charts";
 import { WorkoutContext } from "../../src/context/WorkoutContext";
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import AntDesign from '@expo/vector-icons/AntDesign';
+import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
 
 export default function LoggingScreen() {
     const [isLoading, setIsLoading] = useState(false);
@@ -124,12 +125,23 @@ export default function LoggingScreen() {
                         <Text style={styles.muscleGroup}>Muscle Group: {currentExercise.muscleGroup}</Text>
                         <Text style={styles.description}>Description: {currentExercise.description}</Text>
                     </View>
+                    <View style={styles.executionCard}>
+                        <Text style={styles.executionTitle}>EXECUTION PROTOCOL</Text>
+                        <View style={styles.executionRow}>
+                            <FontAwesome5 name="stopwatch" size={14} color="#D32F2F" />
+                            <Text style={styles.executionText}>TEMPO: 4 Sec Negative, 2 Sec Positive.</Text>
+                        </View>
+                        <View style={styles.executionRow}>
+                            <FontAwesome5 name="skull" size={14} color="#D32F2F" />
+                            <Text style={styles.executionText}>FAILURE: Push until the weight absolutely cannot be moved.</Text>
+                        </View>
+                    </View>
                     <View style={styles.chartCard}>
                         <View style={styles.chartHeaderComp}>
                             <Text style={styles.chartHeader}>Strength Curve (1RM)</Text>
                             <MaterialCommunityIcons name="arm-flex" size={20} color="#D32F2F" />
                         </View>
-                        
+                    
                         
                         <LineChart
                             data={chartData}
@@ -404,7 +416,7 @@ function createStyles(colorScheme) {
         visualContainer: {
         width: '100%',
         alignItems: 'center',
-        marginBottom: 20,
+        marginBottom: 10,
         marginTop: 10,
     },
     imageCard: {
@@ -428,5 +440,34 @@ function createStyles(colorScheme) {
         height: '100%',
         borderRadius: 10,
     },
+    executionCard: {
+            backgroundColor: 'rgba(211, 47, 47, 0.05)',
+            borderWidth: 1,
+            borderColor: 'rgba(211, 47, 47, 0.3)',
+            borderRadius: 12,
+            padding: 15,
+            marginVertical: 15,
+            width: '90%',
+            alignSelf: 'center',
+        },
+        executionTitle: {
+            color: '#D32F2F',
+            fontSize: 12,
+            fontWeight: '900',
+            letterSpacing: 2,
+            marginBottom: 10,
+        },
+        executionRow: {
+            flexDirection: 'row',
+            alignItems: 'center',
+            marginBottom: 6,
+            gap: 10,
+        },
+        executionText: {
+            color: '#A0A0A0',
+            fontSize: 13,
+            fontWeight: '600',
+            flex: 1,
+        },
     })
 }
