@@ -130,6 +130,7 @@ export const syncWeightAndSleepData = async()=>{
     }catch(e){console.error("error syncing wegiht data");}
 }
 
+
 export const syncAllUserData = async ()=>{
     console.log('Starting data restore');
     await Promise.all([

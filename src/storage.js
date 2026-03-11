@@ -11,6 +11,7 @@ const historyKey = '@workoutHistory';
 const weightStorageKey = '@weightData';
 const sleepStorageKey = '@sleepData';
 
+
 //workout functions starts here -----------------------------------------------------------------------------
 
 export const saveSet = async (exerciseId, weight, reps)=>{
@@ -436,7 +437,8 @@ export const logOut = async ()=>{
         '@workoutHistory',
         '@weightData',
         '@sleepData',
-        '@active_user'
+        '@active_user',
+        '@activeProtocol'
 
     ];
     await AsyncStorage.multiRemove(keys);

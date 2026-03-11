@@ -16,10 +16,11 @@ import { supabase } from '../../src/lib/supabase';
 import { syncAllUserData } from '../../src/lib/sync';
 import MissionCard from '../../src/components/missionCard';
 import ProtocolChecklist from '../../src/components/protocolChecklist';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 export default function HomeScreen(){
-    const {isWorkoutActive, routineId, startWorkout, setIsChecking, fromLogin, setFromLogin} = useContext(WorkoutContext);
+    const {fromLogin, setFromLogin, setActiveProtocol, activeProtocol, isProtocolLoading} = useContext(WorkoutContext);
    //const [markedDates, setMarkedDates] = useState({});
     const[isReady, setIsReady] = useState(true);
     const[avatarUrl, setAvatarUrl] = useState(null);
@@ -31,16 +32,25 @@ export default function HomeScreen(){
     const [loading, setLoading] = useState(false);
     let isDark = colorScheme === 'dark';
    
-    useEffect(()=>{
+   /* useEffect(()=>{
       const getUser= async()=>{
-        const {data:{user}} = await supabase.auth.getUser();
+       try{
+         const {data:{user}} = await supabase.auth.getUser();
         if(!user) return;
-        if(user.user_metadata?.avatar_url){
-          setAvatarUrl(user.user_metadata.avatar_url);
+        const {data:profile} = await supabase.from('profiles').select('active_protocol').eq('user_id', user.id).maybeSingle();
+        if(profile && profile.active_protocol != null){
+          return;
         }
+        if(lastLog || lastLog.length>0){
+          await supabase.from('profiles').update({active_protocol : 'hit'}).eq('user_id', user.id);
+          setActiveProtocol('hit');
+        }
+       }catch(e){console.log('error is coming while setting actvie-protocol',e)}
       }
+     
       getUser();
-    })
+    },[]);*/
+
      useFocusEffect(
        useCallback( ()=>{
         const initializeDashboard = async ()=>{
@@ -48,9 +58,7 @@ export default function HomeScreen(){
           
        if(fromLogin){
          await syncAllUserData();
-          setFromLogin(false);
-        
-         
+          setFromLogin(false);  
        }
       
         const data = await fetchLastGlobalWorkout();
@@ -61,19 +69,19 @@ export default function HomeScreen(){
           setIsReady(ready);
         }
         const currentRoutine = await findCurrentRoutine();
-       // const history = await getWorkoutHistory();
-       //setMarkedDates(history);
+    
+      
         setRoutine(currentRoutine);
         setLoading(false);
        
       };
       
      initializeDashboard();
-      
-     
+
     },[fromLogin])
-     );
-      
+      );
+    
+    
 
     const getRoutine = ()=>{
      if(routines[0].exerciseIds.includes(lastLog.exerciseId)){
@@ -114,10 +122,17 @@ export default function HomeScreen(){
       return currentRoutine;
 
     }
-    //console.log(routine);
-    //console.log(isReady);
 
-    if(loading){
+    const setHIT = async()=>{
+      try{
+        const{data:{user}} = await supabase.auth.getUser();
+        await supabase.from('profiles').update({active_protocol : 'hit'}).eq('user_id', user.id);
+        await AsyncStorage.setItem('active_protocol', 'hit');
+        setActiveProtocol('hit');
+      }catch(e){console.log("error setting active protocol",e)}
+    }
+   
+    if(loading||isProtocolLoading){
       return(
         <View style={{ flex: 1, backgroundColor: colorScheme==='dark' ? '#121212' : '#F5F5F5', justifyContent: 'center', alignItems: 'center' }}>
             <ActivityIndicator size={60} color="#D32F2F" />
@@ -135,8 +150,28 @@ export default function HomeScreen(){
         <ScrollView style={{ flex: 1, backgroundColor:colorScheme==='dark'?'black':'white',width:'100%',
          }} showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}> 
            
-           
-            {lastLog==null?<View></View>:
+        {activeProtocol === null ?
+        (
+          <View style={styles.uncalibratedContainer}>
+            <FontAwesome5 name="dumbbell" size={40} color="#EF6C00" style={{marginBottom: 15}}/>
+            <Text style={styles.uncalibratedTitle}>SYSTEM UNCALIBRATED</Text>
+            <Text style={styles.uncalibratedSubtitle}>Select your training directive to initialize the console.</Text>
+            <TouchableOpacity style={[styles.directiveBtn, styles.primaryDirective]} onPress={setHIT}>
+              <Text style={styles.directiveBtnTitle}>THE INTENSITY PROTOCOL</Text>
+              <Text style={styles.directiveBtnSub}>Pre-calibrated 3-day HIT split. Optimal growth.(recommended for intermediate lifters)</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={[styles.directiveBtn, styles.secondaryDirective]}>
+              <Text style={styles.directiveBtnTitle}>CUSTOM DIRECTIVE</Text>
+              <Text style={styles.directiveBtnSub}>Create your own 7-day split. Top-set tracking only.</Text>
+            </TouchableOpacity>
+            <View style={{flexDirection:'row', gap:5,}}>
+              <AntDesign name="info-circle" size={14} color="white" />
+              <Text style={styles.directiveBtnSub}>You can always switch routines in the future</Text>
+            </View>
+          </View>)
+        :
+        (<>
+           {lastLog==null?<View></View>:
             <View style={styles.header}>
             <Text style={styles.headerText} >Last Workout : {getRoutine()}</Text>
             <Text style={styles.lastWorkout}>{daysAgo(lastLog.date)}</Text>
@@ -145,11 +180,10 @@ export default function HomeScreen(){
             <MissionCard/>
 
             <ProtocolChecklist isReady={isReady} routine={routine}  />
+          </>
+        )}    
            
-          {/* <TouchableOpacity onPress={()=>{router.push('/log'); setIsChecking(true)}} style={styles.progressButton}>
-            <Text style={styles.progressText}>View Progress</Text>
-            <AntDesign name="line-chart" size={32} color="white" />
-           </TouchableOpacity>*/}
+           
           </ScrollView>
           <StatusBar style={colorScheme==='dark'?'light':'dark'} />
         </SafeAreaView>
@@ -325,6 +359,56 @@ function createStyles (colorScheme){
     profileImage:{
       height:'100%',
       width:'100%',
-    }
+    },
+    uncalibratedContainer: {
+            width: '92%',
+            marginTop: 40,
+            padding: 25,
+            backgroundColor: isDark ? '#1C1C1E' : '#F5F5F5',
+            borderRadius: 15,
+            alignItems: 'center',
+            borderWidth: 1,
+            borderColor: isDark ? '#333' : '#E0E0E0',
+        },
+        uncalibratedTitle: {
+            color: '#EF6C00',
+            fontSize: 22,
+            fontWeight: '900',
+            letterSpacing: 1.5,
+            marginBottom: 5,
+        },
+        uncalibratedSubtitle: {
+            color: '#888',
+            textAlign: 'center',
+            marginBottom: 30,
+            fontSize: 13,
+        },
+        directiveBtn: {
+            width: '100%',
+            padding: 20,
+            borderRadius: 12,
+            marginBottom: 15,
+            alignItems: 'center',
+        },
+        primaryDirective: {
+            backgroundColor: '#D32F2F',
+        },
+        secondaryDirective: {
+            backgroundColor: 'transparent',
+            borderWidth: 1,
+            borderColor: '#D32F2F',
+        },
+        directiveBtnTitle: {
+            color: '#FFF',
+            fontSize: 16,
+            fontWeight: 'bold',
+            letterSpacing: 1,
+            marginBottom: 4,
+        },
+        directiveBtnSub: {
+            color: 'rgba(255,255,255,0.7)',
+            fontSize: 11,
+            textAlign: 'center',
+        },
   })
 }
