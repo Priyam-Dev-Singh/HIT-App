@@ -30,36 +30,19 @@ export default function HomeScreen(){
     const styles = createStyles(colorScheme);
     const router = useRouter();
     const [loading, setLoading] = useState(false);
+
+    const [customRoutineData, setCustomRoutineData] = useState(null);
+    const [nextCustomMission, setNextCustomMission] = useState(null);
     let isDark = colorScheme === 'dark';
    
-   /* useEffect(()=>{
-      const getUser= async()=>{
-       try{
-         const {data:{user}} = await supabase.auth.getUser();
-        if(!user) return;
-        const {data:profile} = await supabase.from('profiles').select('active_protocol').eq('user_id', user.id).maybeSingle();
-        if(profile && profile.active_protocol != null){
-          return;
-        }
-        if(lastLog || lastLog.length>0){
-          await supabase.from('profiles').update({active_protocol : 'hit'}).eq('user_id', user.id);
-          setActiveProtocol('hit');
-        }
-       }catch(e){console.log('error is coming while setting actvie-protocol',e)}
-      }
-     
-      getUser();
-    },[]);*/
-
      useFocusEffect(
        useCallback( ()=>{
         const initializeDashboard = async ()=>{
           setLoading(true);
-          
-       if(fromLogin){
-         await syncAllUserData();
-          setFromLogin(false);  
-       }
+          if(fromLogin){
+            await syncAllUserData();
+            setFromLogin(false);  
+          }
       
         const data = await fetchLastGlobalWorkout();
         setLastLog(data);
@@ -68,14 +51,27 @@ export default function HomeScreen(){
           const ready = hoursAgo(data.date);
           setIsReady(ready);
         }
-        const currentRoutine = await findCurrentRoutine();
-    
-      
-        setRoutine(currentRoutine);
+       if(activeProtocol==='hit'){
+         const currentRoutine = await findCurrentRoutine();
+         setRoutine(currentRoutine);
+
+       }
+       else if(activeProtocol === 'custom'){
+          const storedRoutine = await AsyncStorage.getItem("customRoutine");
+          const lastWorkoutId = await AsyncStorage.getItem("lastWorkoutId");
+         
+          if(storedRoutine){
+            const parsedRoutine = JSON.parse(storedRoutine);
+            setCustomRoutineData(parsedRoutine);
+            const nextMission = getNextCustomRoutine(customRoutineData, lastWorkoutId);
+            console.log("next mission is: ",nextMission);
+            setNextCustomMission(nextMission);
+          }
+        }
         setLoading(false);
-       
       };
-      
+
+     
      initializeDashboard();
 
     },[fromLogin])
@@ -107,9 +103,19 @@ export default function HomeScreen(){
       const now = new Date();
       const diffTime = Math.abs(now-past);
       const diffHrs = Math.floor(diffTime/(1000*60*60));
-      if(diffHrs>48){return true;}
-      else {return false;}
+      if(activeProtocol === 'hit'){
+        if(diffHrs>48){
+          return true;
+        }
+        else {return false;}
+      }
+      else{
+        if(diffHrs>12) return true;
+        else false;
+      }
     }
+   
+
 
     const findCurrentRoutine = async ()=>{
       const index = await getCurrentRoutine();
@@ -130,6 +136,24 @@ export default function HomeScreen(){
         await AsyncStorage.setItem('active_protocol', 'hit');
         setActiveProtocol('hit');
       }catch(e){console.log("error setting active protocol",e)}
+    }
+
+    const getNextCustomRoutine = (customRoutineData, lastWorkoutId) =>{
+
+      if(!customRoutineData || !customRoutineData.workouts || customRoutineData.workouts.length === 0){
+        return null;
+      }
+      const workouts = customRoutineData.workouts;
+      if(!lastWorkoutId){
+        return workouts[0];
+      }
+      const currentIndex = workouts.findIndex(w=>w.id===lastWorkoutId);
+      if(currentIndex === -1){
+        return workouts[0];
+      }
+      const nextIndex = (currentIndex+1)%workouts.length;
+      return workouts[nextIndex];
+
     }
    
     if(loading||isProtocolLoading){
@@ -156,20 +180,23 @@ export default function HomeScreen(){
             <FontAwesome5 name="dumbbell" size={40} color="#EF6C00" style={{marginBottom: 15}}/>
             <Text style={styles.uncalibratedTitle}>SYSTEM UNCALIBRATED</Text>
             <Text style={styles.uncalibratedSubtitle}>Select your training directive to initialize the console.</Text>
+
             <TouchableOpacity style={[styles.directiveBtn, styles.primaryDirective]} onPress={setHIT}>
               <Text style={styles.directiveBtnTitle}>THE INTENSITY PROTOCOL</Text>
               <Text style={styles.directiveBtnSub}>Pre-calibrated 3-day HIT split. Optimal growth.(recommended for intermediate lifters)</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={[styles.directiveBtn, styles.secondaryDirective]}>
+
+            <TouchableOpacity style={[styles.directiveBtn, styles.secondaryDirective]} onPress={()=>router.push('/routine/customBuilder')}>
               <Text style={styles.directiveBtnTitle}>CUSTOM DIRECTIVE</Text>
               <Text style={styles.directiveBtnSub}>Create your own 7-day split. Top-set tracking only.</Text>
             </TouchableOpacity>
+
             <View style={{flexDirection:'row', gap:5,}}>
               <AntDesign name="info-circle" size={14} color="white" />
               <Text style={styles.directiveBtnSub}>You can always switch routines in the future</Text>
             </View>
           </View>)
-        :
+        : activeProtocol === 'hit'?
         (<>
            {lastLog==null?<View></View>:
             <View style={styles.header}>
@@ -180,6 +207,33 @@ export default function HomeScreen(){
             <MissionCard/>
 
             <ProtocolChecklist isReady={isReady} routine={routine}  />
+          </>
+        ):(
+          <>
+          {lastLog && 
+          <View style={styles.header}>
+            <Text style={styles.headerText}>Last Log : {daysAgo(lastLog.date)}</Text>
+          </View>}
+          {nextCustomMission ? 
+          <View style={styles.customMissionContainer}>
+            <Text style={styles.missionLabel}>NEXT MISSION</Text>
+            <Text style={styles.customMissionTitle}>{nextCustomMission.title}</Text>
+            <Text style={styles.customMissionSub}>{nextCustomMission.exercises.length} Movements</Text>
+            <TouchableOpacity style={[styles.newWorkout, isReady && {backgroundColor:'#555'} ]} onPress={()=>{
+              if(isReady){
+                router.push({
+                  pathname:'/workout/[id]',
+                  params: {id: nextCustomMission.id, type:'custom'}
+                });
+              }
+              else{
+                alert("System Locked. Recovery in progress");
+              }
+            }} >
+              <Text style={styles.nextWorkout}>{isReady? 'INITIATE PROTOCOL': 'SYSTEM RECOVERING'}</Text>
+              <Feather name="play" size={20} color="white" />
+            </TouchableOpacity>
+          </View> : (<Text style={{color: 'white', marginTop: 20}}>Loading Custom Directive...</Text>) }
           </>
         )}    
            
@@ -410,5 +464,44 @@ function createStyles (colorScheme){
             fontSize: 11,
             textAlign: 'center',
         },
+    customMissionContainer: {
+        width: '92%',
+        backgroundColor: isDark ? '#121212' : '#FFFFFF',
+        borderWidth: 1,
+        borderColor: isDark ? '#333333' : '#E0E0E0',
+        borderRadius: 20,
+        paddingTop: 25,
+        paddingBottom: 20,
+        paddingHorizontal: 20,
+        marginTop: 15,
+        alignItems: 'center',
+        // Subtle shadow to make it pop off the background
+        boxShadow: isDark ? '0px 4px 12px rgba(0,0,0,0.5)' : '0px 4px 12px rgba(0,0,0,0.08)',
+        elevation: 5, 
+    },
+    missionLabel: {
+        color: '#D32F2F',
+        fontSize: 11,
+        fontWeight: '900',
+        letterSpacing: 2.5,
+        marginBottom: 8,
+        textTransform: 'uppercase',
+    },
+    customMissionTitle: {
+        color: isDark ? '#FFFFFF' : '#000000',
+        fontSize: 26,
+        fontWeight: '900',
+        letterSpacing: 0.5,
+        marginBottom: 6,
+        textAlign: 'center',
+    },
+    customMissionSub: {
+        color: isDark ? '#888888' : '#666666',
+        fontSize: 14,
+        fontWeight: '600',
+        marginBottom: 5, // The existing newWorkout button has its own marginTop
+        textTransform: 'uppercase',
+        letterSpacing: 1,
+    },
   })
 }

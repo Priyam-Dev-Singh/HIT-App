@@ -438,7 +438,7 @@ export const logOut = async ()=>{
         '@weightData',
         '@sleepData',
         '@active_user',
-        '@activeProtocol'
+        'active_protocol'
 
     ];
     await AsyncStorage.multiRemove(keys);

@@ -139,6 +139,7 @@ export default function Layout() {
                         <Stack.Screen name="profile" options={{headerShown: false}} />
                         <Stack.Screen name="misc/menu" options={{headerShown: false}} />
                         <Stack.Screen name="misc/aboutUs" options={{headerShown: false}} />
+                        <Stack.Screen name="routine/customBuilder" options={{headerShown: false}} />
                     </Stack>
                 </SafeAreaProvider>
             </WorkoutProvider>
