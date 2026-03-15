@@ -20,7 +20,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 export default function HomeScreen(){
-    const {fromLogin, setFromLogin, setActiveProtocol, activeProtocol, isProtocolLoading} = useContext(WorkoutContext);
+    const {fromLogin, setFromLogin, setActiveProtocol,activeProtocol, isProtocolLoading} = useContext(WorkoutContext);
    //const [markedDates, setMarkedDates] = useState({});
     const[isReady, setIsReady] = useState(true);
     const[avatarUrl, setAvatarUrl] = useState(null);
@@ -33,7 +33,7 @@ export default function HomeScreen(){
 
     const [customRoutineData, setCustomRoutineData] = useState(null);
     const [nextCustomMission, setNextCustomMission] = useState(null);
-    let isDark = colorScheme === 'dark';
+    let isDark = colorScheme === 'dark'; 
    
      useFocusEffect(
        useCallback( ()=>{
@@ -43,7 +43,6 @@ export default function HomeScreen(){
             await syncAllUserData();
             setFromLogin(false);  
           }
-      
         const data = await fetchLastGlobalWorkout();
         setLastLog(data);
         //console.log(data);
@@ -58,13 +57,14 @@ export default function HomeScreen(){
        }
        else if(activeProtocol === 'custom'){
           const storedRoutine = await AsyncStorage.getItem("customRoutine");
+         // console.log(storedRoutine);
           const lastWorkoutId = await AsyncStorage.getItem("lastWorkoutId");
          
           if(storedRoutine){
             const parsedRoutine = JSON.parse(storedRoutine);
             setCustomRoutineData(parsedRoutine);
-            const nextMission = getNextCustomRoutine(customRoutineData, lastWorkoutId);
-            console.log("next mission is: ",nextMission);
+            const nextMission = getNextCustomRoutine(parsedRoutine, lastWorkoutId);
+           // console.log("next mission is: ",nextMission);
             setNextCustomMission(nextMission);
           }
         }
@@ -74,7 +74,7 @@ export default function HomeScreen(){
      
      initializeDashboard();
 
-    },[fromLogin])
+    },[fromLogin, activeProtocol])
       );
     
     
@@ -141,7 +141,7 @@ export default function HomeScreen(){
     const getNextCustomRoutine = (customRoutineData, lastWorkoutId) =>{
 
       if(!customRoutineData || !customRoutineData.workouts || customRoutineData.workouts.length === 0){
-        return null;
+        return 0;
       }
       const workouts = customRoutineData.workouts;
       if(!lastWorkoutId){
@@ -179,7 +179,7 @@ export default function HomeScreen(){
           <View style={styles.uncalibratedContainer}>
             <FontAwesome5 name="dumbbell" size={40} color="#EF6C00" style={{marginBottom: 15}}/>
             <Text style={styles.uncalibratedTitle}>SYSTEM UNCALIBRATED</Text>
-            <Text style={styles.uncalibratedSubtitle}>Select your training directive to initialize the console.</Text>
+            <Text style={styles.uncalibratedSubtitle}>Select your training routine to initialize the console.</Text>
 
             <TouchableOpacity style={[styles.directiveBtn, styles.primaryDirective]} onPress={setHIT}>
               <Text style={styles.directiveBtnTitle}>THE INTENSITY PROTOCOL</Text>
@@ -187,8 +187,8 @@ export default function HomeScreen(){
             </TouchableOpacity>
 
             <TouchableOpacity style={[styles.directiveBtn, styles.secondaryDirective]} onPress={()=>router.push('/routine/customBuilder')}>
-              <Text style={styles.directiveBtnTitle}>CUSTOM DIRECTIVE</Text>
-              <Text style={styles.directiveBtnSub}>Create your own 7-day split. Top-set tracking only.</Text>
+              <Text style={styles.directiveBtnTitle}>CREATE YOUR OWN ROUTINE</Text>
+              <Text style={styles.directiveBtnSub}>Create your own workout routine. Top-set tracking only.</Text>
             </TouchableOpacity>
 
             <View style={{flexDirection:'row', gap:5,}}>
@@ -206,7 +206,7 @@ export default function HomeScreen(){
           
             <MissionCard/>
 
-            <ProtocolChecklist isReady={isReady} routine={routine}  />
+            <ProtocolChecklist isReady={isReady} routine={routine}/>
           </>
         ):(
           <>
@@ -216,15 +216,14 @@ export default function HomeScreen(){
           </View>}
           {nextCustomMission ? 
           <View style={styles.customMissionContainer}>
-            <Text style={styles.missionLabel}>NEXT MISSION</Text>
+            <Text style={styles.missionLabel}>TODAY'S MISSION</Text>
             <Text style={styles.customMissionTitle}>{nextCustomMission.title}</Text>
             <Text style={styles.customMissionSub}>{nextCustomMission.exercises.length} Movements</Text>
-            <TouchableOpacity style={[styles.newWorkout, isReady && {backgroundColor:'#555'} ]} onPress={()=>{
+            <TouchableOpacity style={[styles.newWorkout, !isReady && {backgroundColor:'#555'} ]} onPress={()=>{
               if(isReady){
-                router.push({
-                  pathname:'/workout/[id]',
-                  params: {id: nextCustomMission.id, type:'custom'}
-                });
+                router.push(
+                  `/workout/${nextCustomMission.id}?type=custom`,
+                );
               }
               else{
                 alert("System Locked. Recovery in progress");
@@ -233,6 +232,7 @@ export default function HomeScreen(){
               <Text style={styles.nextWorkout}>{isReady? 'INITIATE PROTOCOL': 'SYSTEM RECOVERING'}</Text>
               <Feather name="play" size={20} color="white" />
             </TouchableOpacity>
+             <ProtocolChecklist isReady={isReady} routine={nextCustomMission}/>
           </View> : (<Text style={{color: 'white', marginTop: 20}}>Loading Custom Directive...</Text>) }
           </>
         )}    

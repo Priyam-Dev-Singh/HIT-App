@@ -1,5 +1,5 @@
 import { useContext, useState } from "react";
-import { Alert, Image, Modal, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { Alert, Image, KeyboardAvoidingView, Modal, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ThemeContext } from "../../src/context/ThemeContext";
 import { StatusBar } from "expo-status-bar";
@@ -32,7 +32,7 @@ export default function CustomRoutineBuilderScreen(){
     ]);
 
     const updateWorkoutTitle = (id, newTitle)=>{
-        setWorkouts(workouts.map(w=> w.id===id?{...workouts, title: newTitle}:w));
+        setWorkouts(workouts.map(w=> w.id===id?{...w, title: newTitle}:w));
     }
 
     const removeWorkoutDay = (id)=>{
@@ -111,8 +111,10 @@ export default function CustomRoutineBuilderScreen(){
                 <Text style={styles.headerTitle}>CUSTOM ROUTINE</Text>
                 <View style={{width: 28,}}/>
             </View>
-
-            <View style={styles.warningBanner}>
+        <KeyboardAvoidingView style={{flex:1}} behavior={Platform.OS==='ios'?'padding':'height'} keyboardVerticalOffset={Platform.OS==='ios'?10:0}>
+           <ScrollView contentContainerStyle={{flexGrow: 1, paddingBottom: 50}} keyboardShouldPersistTaps='always' showsVerticalScrollIndicator={false}>
+           
+                 <View style={styles.warningBanner}>
                 <View style={styles.warningHeader}>
                     <Feather name="info" size={18} color="#D32F2F" />
                     <Text style={styles.warningTitle}>THE INTENSITY RULE</Text>
@@ -146,7 +148,7 @@ export default function CustomRoutineBuilderScreen(){
                         <View style={styles.cardBody}>
                             <View style={styles.exerciseData}>
                                 <MaterialIcons name="fitness-center" size={18} color={isDark ? '#888' : '#666'} />
-                                <Text style={styles.exerciseCount}>{workout.exercises.length===0?'No movements assigned': `${workout.exercises.length} movemments assigned`}</Text>
+                                <Text style={styles.exerciseCount}>{(workout.exercises.length===0 || !workout.exercises)?'No movements assigned': `${workout.exercises.length} movemments assigned`}</Text>
                             </View>
                             <TouchableOpacity style={styles.editBtn} onPress={()=> handleEditExercises(workout.id)}>
                                 <Text style={styles.editBtnText}>EDIT WORKOUT</Text>
@@ -154,7 +156,7 @@ export default function CustomRoutineBuilderScreen(){
                             </TouchableOpacity>
                         </View>
                         
-                            {workout.exercises.map((exId)=>{
+                            {(workout.exercises||[]).map((exId)=>{
                                 const exercise = customExercises.find(e=>e.id===exId);
                                 if(!exercise) return null;
                                 return(
@@ -168,20 +170,23 @@ export default function CustomRoutineBuilderScreen(){
                     </View>
                 ))}
             </View>
+          
             <TouchableOpacity style={styles.addBtn} onPress={addWorkoutDay}>
                 <Feather name="plus-circle" size={20} color={isDark ? '#FFF' : '#000'} />
                 <Text style={styles.addBtnText}>ADD WORKOUT TO THE ROUTINE</Text>
             </TouchableOpacity>
             
             <TouchableOpacity style={styles.saveBtn} onPress={saveRoutine}>
-              { isSaving ? <ActivityIndicator color="white" size={18}/>:<Text style={styles.saveBtnText}>INITIALIZE SYSTEM</Text>}
+              <Text style={styles.saveBtnText}>{isSaving? 'INITIALIZING...':'INITIALIZE SYSTEM'}</Text>
                 <Ionicons name="shield-checkmark" size={20} color="#FFF" />
             </TouchableOpacity>
-
+           
+             </ScrollView>
+        </KeyboardAvoidingView>
 
             <Modal animationType='slide' transparent={true} visible={isModalVisible} onRequestClose={()=>setIsModalVisible(false)}>
                 <View style={styles.modalContainer}>
-                    <SafeAreaView style={styles.modalContent} edges={['top']}>
+                    <SafeAreaView style={styles.modalContent} >
                         <View style={styles.modalHeader}>
                             <Text style={styles.modalTitle}>THE ARSENAL</Text>
                             <TouchableOpacity onPress={() => setIsModalVisible(false)} style={styles.closeBtn}>

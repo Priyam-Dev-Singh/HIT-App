@@ -8,20 +8,71 @@ import Octicons from '@expo/vector-icons/Octicons';
 import { ThemeContext } from '../../src/context/ThemeContext';
 import { getCurrentRoutine, markDayCompleted, saveNextRoutineIndex } from '../../src/storage';
 import { WorkoutContext } from '../../src/context/WorkoutContext';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { customExercises } from '../../data/customExercises';
 
 export default function ExerciseSelectionScreen(){
+
+    const {activeProtocol} = useContext(WorkoutContext);
+    const isCustomRoutineUser = activeProtocol === 'custom';
+    const [customRoutine, setCustomRoutine] = useState(null);
+    const [isCustomRoutineLoading, setIsCustomRoutineLoading] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const {endWorkout, isChecking} = useContext(WorkoutContext);
     const{colorScheme, toggleTheme} = useContext(ThemeContext);
     const styles = createStyles(colorScheme);
     const {id} = useLocalSearchParams();
     const router = useRouter();
-    const currentRoutine = routines.find((routine)=> routine.id===id);
-    const currentExerciseIds = [...currentRoutine.exerciseIds];
-    const currentExercises = currentExerciseIds.map(id => exercises.find(obj => obj.id === id));
+     
+        useEffect(()=>{
+            const getCustomRoutineData = async()=>{
+               if (isCustomRoutineUser){
+                setIsCustomRoutineLoading(true);
+                const jsonValue = await AsyncStorage.getItem('customRoutine');
+                const customRoutine = jsonValue != null? JSON.parse(jsonValue): null;
+                //console.log(customRoutine);
+                setCustomRoutine(customRoutine);
+                setIsCustomRoutineLoading(false);
+            }
+        }
+            getCustomRoutineData();
+        },[isCustomRoutineUser]);
+    
+    let currentRoutine = null;
+    let currentExercises = [];
+    if(isCustomRoutineUser){
+        //console.log('availableIds: ', customRoutine.workouts.map(w=>w.id));
+        const decodeId = decodeURIComponent(id);
+        if(!customRoutine){
+
+           //console.log("router id: ", id);
+            //console.log("decodedId: ", decodeId);
+
+          return(
+            <SafeAreaView style={[styles.container, {alignItems: 'center'}]}>
+                <ActivityIndicator size="large" color="#D32F2F" />
+                <Text style={{color: colorScheme === 'dark' ? '#FFF' : '#000', marginTop: 20}}>Loading Arsenal...</Text>
+            </SafeAreaView> 
+          )
+        }
+
+        currentRoutine = customRoutine.workouts.find(r=>String(r.id).trim() === String(decodeId).trim());
+        //console.log(currentRoutine);
+        const currentExerciseIds = currentRoutine?.exercises || [];
+        currentExercises = currentExerciseIds.map(id=>customExercises.find(e=>e.id===id))
+
+    }
+    else{
+        currentRoutine = routines.find((routine)=> routine.id===id);
+        const currentExerciseIds = [...currentRoutine.exerciseIds];
+        currentExercises = currentExerciseIds.map(id => exercises.find(obj => obj.id === id));
+    }
+
+
     const openLogger = (id)=>{
         router.push(`/logger/${id}`);
     }
+
     const renderItem = ({item, index})=>(
         <Pressable onPress={()=>openLogger(item.id)} style={({pressed})=>[styles.exerciseCard, pressed&&{opacity:0.7}]}>
            <View style={styles.thumbnailContainer}>
@@ -42,24 +93,34 @@ export default function ExerciseSelectionScreen(){
     const handleCompletedSession = async ()=>{
     try{
         setIsLoading(true);
-        const index = await getCurrentRoutine();
-        const currentIndex = index+1 < HitRoutine.length ? index+1 : 0;
+        if(isCustomRoutineUser){
+            await AsyncStorage.setItem('lastWorkoutId', id);
+            const success = await markDayCompleted();
+            if(success){
+                endWorkout();
+                router.replace('/');
+            }
+        }
+        else{
+           
+            const index = await getCurrentRoutine();
+            const currentIndex = index+1 < HitRoutine.length ? index+1 : 0;
         //console.log("next routine index: ", currentIndex);
         //console.log("previous routine index: ", currentIndex);
-        await saveNextRoutineIndex(currentIndex);
-        const success = await markDayCompleted();
-        if(success){
-            endWorkout();
-            setIsLoading(false);
-            router.replace("/");
+            await saveNextRoutineIndex(currentIndex);
+            const success = await markDayCompleted();
+            if(success){
+                endWorkout();
+                router.replace("/");
+            }
+            else{Alert.alert("Error marking workout completed");}
         }
-        else{Alert.alert("Error marking workout completed");}
-    }catch(e){console.error("error handling the completed session", e);}
+    }catch(e){console.error("error handling the completed session", e);}finally{setIsLoading(false);}
 };
     return(
         <SafeAreaView style = {styles.container}>
            <View style={styles.header}>  
-                <Text style = {styles.headerText}>{currentRoutine.name}</Text>
+                <Text style = {styles.headerText}>{isCustomRoutineUser? currentRoutine.title :currentRoutine.name}</Text>
             </View>
             <FlatList
             data={currentExercises}
