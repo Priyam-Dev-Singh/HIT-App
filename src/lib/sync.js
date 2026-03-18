@@ -130,6 +130,25 @@ export const syncWeightAndSleepData = async()=>{
     }catch(e){console.error("error syncing wegiht data");}
 }
 
+export const syncCustomRoutine = async()=>{
+    try{
+        const {data:{user}} = await supabase.auth.getUser();
+        if(!user) return;
+
+        const {data, error} = await supabase.from('profiles').select('active_protocol').eq('user_id', user.id).maybeSingle();
+        if(error)console.error("error getting active_protocol");
+        const isCustomRoutineUser = data?.active_protocol === 'custom';
+        if(isCustomRoutineUser){
+            const {data, error} = await supabase.from('customRoutines').select('routine_data').eq('user_id', user.id).maybeSingle();
+            if(error) console.error("error getting customRoutine routine");
+            if(data && data.routine_data){
+                const customRoutine = JSON.stringify(data.routine_data);
+                await AsyncStorage.setItem('customRoutine', customRoutine);
+            }
+        }
+
+    }catch(e){console.error("error getting custom routine from DB");}
+}
 
 export const syncAllUserData = async ()=>{
     console.log('Starting data restore');
@@ -139,6 +158,7 @@ export const syncAllUserData = async ()=>{
         syncHITRoutine(),
         syncCalendarData(),
         syncWeightAndSleepData(),
+        syncCustomRoutine(),
     ]);
     console.log("All data restored");
     return true;

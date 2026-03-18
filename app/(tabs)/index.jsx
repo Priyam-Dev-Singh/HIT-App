@@ -9,7 +9,6 @@ import { HitRoutine, routines } from '../../data/routines';
 import Octicons from '@expo/vector-icons/Octicons';
 import {Ionicons, FontAwesome5 } from '@expo/vector-icons';
 import Feather from '@expo/vector-icons/Feather';
-import { Calendar } from 'react-native-calendars';
 import { WorkoutContext } from '../../src/context/WorkoutContext';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import { supabase } from '../../src/lib/supabase';
@@ -17,6 +16,7 @@ import { syncAllUserData } from '../../src/lib/sync';
 import MissionCard from '../../src/components/missionCard';
 import ProtocolChecklist from '../../src/components/protocolChecklist';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import CustomMissionCard from '../../src/components/customMissionCard';
 
 
 export default function HomeScreen(){
@@ -31,11 +31,10 @@ export default function HomeScreen(){
     const router = useRouter();
     const [loading, setLoading] = useState(false);
 
-    const [customRoutineData, setCustomRoutineData] = useState(null);
-    const [nextCustomMission, setNextCustomMission] = useState(null);
+    const [lastCustomWorkout, setLastCustomWorkout] = useState(null);
     let isDark = colorScheme === 'dark'; 
    
-     useFocusEffect(
+     useFocusEffect(  
        useCallback( ()=>{
         const initializeDashboard = async ()=>{
           setLoading(true);
@@ -53,21 +52,16 @@ export default function HomeScreen(){
        if(activeProtocol==='hit'){
          const currentRoutine = await findCurrentRoutine();
          setRoutine(currentRoutine);
-
        }
-       else if(activeProtocol === 'custom'){
-          const storedRoutine = await AsyncStorage.getItem("customRoutine");
-         // console.log(storedRoutine);
-          const lastWorkoutId = await AsyncStorage.getItem("lastWorkoutId");
-         
-          if(storedRoutine){
-            const parsedRoutine = JSON.parse(storedRoutine);
-            setCustomRoutineData(parsedRoutine);
-            const nextMission = getNextCustomRoutine(parsedRoutine, lastWorkoutId);
-           // console.log("next mission is: ",nextMission);
-            setNextCustomMission(nextMission);
-          }
-        }
+       else if(activeProtocol==='custom'){
+        const jsonValue = await AsyncStorage.getItem('customRoutine');
+        const customRoutine = JSON.parse(jsonValue);
+        const lastWorkoutId = await AsyncStorage.getItem('lastWorkoutId');
+        const lastCustomWorkout = customRoutine.workouts.find(w=>w.id===lastWorkoutId);
+        setLastCustomWorkout(lastCustomWorkout);
+        
+       }
+       
         setLoading(false);
       };
 
@@ -114,8 +108,6 @@ export default function HomeScreen(){
         else false;
       }
     }
-   
-
 
     const findCurrentRoutine = async ()=>{
       const index = await getCurrentRoutine();
@@ -138,24 +130,6 @@ export default function HomeScreen(){
       }catch(e){console.log("error setting active protocol",e)}
     }
 
-    const getNextCustomRoutine = (customRoutineData, lastWorkoutId) =>{
-
-      if(!customRoutineData || !customRoutineData.workouts || customRoutineData.workouts.length === 0){
-        return 0;
-      }
-      const workouts = customRoutineData.workouts;
-      if(!lastWorkoutId){
-        return workouts[0];
-      }
-      const currentIndex = workouts.findIndex(w=>w.id===lastWorkoutId);
-      if(currentIndex === -1){
-        return workouts[0];
-      }
-      const nextIndex = (currentIndex+1)%workouts.length;
-      return workouts[nextIndex];
-
-    }
-   
     if(loading||isProtocolLoading){
       return(
         <View style={{ flex: 1, backgroundColor: colorScheme==='dark' ? '#121212' : '#F5F5F5', justifyContent: 'center', alignItems: 'center' }}>
@@ -205,37 +179,17 @@ export default function HomeScreen(){
             </View>}
           
             <MissionCard/>
-
-            <ProtocolChecklist isReady={isReady} routine={routine}/>
           </>
         ):(
           <>
           {lastLog && 
           <View style={styles.header}>
-            <Text style={styles.headerText}>Last Log : {daysAgo(lastLog.date)}</Text>
+            <Text style={styles.headerText}>Last Workout {lastCustomWorkout?.title||''} : {daysAgo(lastLog.date)}</Text>
           </View>}
-          {nextCustomMission ? 
-          <View style={styles.customMissionContainer}>
-            <Text style={styles.missionLabel}>TODAY'S MISSION</Text>
-            <Text style={styles.customMissionTitle}>{nextCustomMission.title}</Text>
-            <Text style={styles.customMissionSub}>{nextCustomMission.exercises.length} Movements</Text>
-            <TouchableOpacity style={[styles.newWorkout, !isReady && {backgroundColor:'#555'} ]} onPress={()=>{
-              if(isReady){
-                router.push(
-                  `/workout/${nextCustomMission.id}?type=custom`,
-                );
-              }
-              else{
-                alert("System Locked. Recovery in progress");
-              }
-            }} >
-              <Text style={styles.nextWorkout}>{isReady? 'INITIATE PROTOCOL': 'SYSTEM RECOVERING'}</Text>
-              <Feather name="play" size={20} color="white" />
-            </TouchableOpacity>
-             <ProtocolChecklist isReady={isReady} routine={nextCustomMission}/>
-          </View> : (<Text style={{color: 'white', marginTop: 20}}>Loading Custom Directive...</Text>) }
+          <CustomMissionCard isReady={isReady}/> 
           </>
-        )}    
+        )}  
+        <ProtocolChecklist isReady={isReady} routine={routine}/>  
            
            
           </ScrollView>
@@ -464,44 +418,6 @@ function createStyles (colorScheme){
             fontSize: 11,
             textAlign: 'center',
         },
-    customMissionContainer: {
-        width: '92%',
-        backgroundColor: isDark ? '#121212' : '#FFFFFF',
-        borderWidth: 1,
-        borderColor: isDark ? '#333333' : '#E0E0E0',
-        borderRadius: 20,
-        paddingTop: 25,
-        paddingBottom: 20,
-        paddingHorizontal: 20,
-        marginTop: 15,
-        alignItems: 'center',
-        // Subtle shadow to make it pop off the background
-        boxShadow: isDark ? '0px 4px 12px rgba(0,0,0,0.5)' : '0px 4px 12px rgba(0,0,0,0.08)',
-        elevation: 5, 
-    },
-    missionLabel: {
-        color: '#D32F2F',
-        fontSize: 11,
-        fontWeight: '900',
-        letterSpacing: 2.5,
-        marginBottom: 8,
-        textTransform: 'uppercase',
-    },
-    customMissionTitle: {
-        color: isDark ? '#FFFFFF' : '#000000',
-        fontSize: 26,
-        fontWeight: '900',
-        letterSpacing: 0.5,
-        marginBottom: 6,
-        textAlign: 'center',
-    },
-    customMissionSub: {
-        color: isDark ? '#888888' : '#666666',
-        fontSize: 14,
-        fontWeight: '600',
-        marginBottom: 5, // The existing newWorkout button has its own marginTop
-        textTransform: 'uppercase',
-        letterSpacing: 1,
-    },
+    
   })
 }

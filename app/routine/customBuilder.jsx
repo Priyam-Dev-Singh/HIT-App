@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Alert, Image, KeyboardAvoidingView, Modal, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ThemeContext } from "../../src/context/ThemeContext";
@@ -30,6 +30,22 @@ export default function CustomRoutineBuilderScreen(){
     const [workouts, setWorkouts] = useState([
         {id: new Date().toISOString(), title:'Workout 1', exercises:[]}
     ]);
+
+    useEffect(()=>{
+        const loadExistingRoutine = async()=>{
+           try{
+             const existingRoutine = await AsyncStorage.getItem('customRoutine');
+            if(existingRoutine){
+                const parsedData = JSON.parse(existingRoutine);
+                if(parsedData && parsedData.workouts){
+                    setWorkouts(parsedData.workouts);
+                }
+            }
+           }catch(e){console.error('error getting current routine to update');}
+        }
+        loadExistingRoutine();
+    },[])
+
 
     const updateWorkoutTitle = (id, newTitle)=>{
         setWorkouts(workouts.map(w=> w.id===id?{...w, title: newTitle}:w));

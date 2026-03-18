@@ -11,10 +11,14 @@ import { WorkoutContext } from "../../src/context/WorkoutContext";
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
+import { customExercises } from "../../data/customExercises";
 
 export default function LoggingScreen() {
     const [isLoading, setIsLoading] = useState(false);
-    const { isChecking } = useContext(WorkoutContext);
+
+    const { isChecking, activeProtocol } = useContext(WorkoutContext);
+    const isCustomRoutineUser = activeProtocol === 'custom';
+
     const router = useRouter();
     const [weight, setWeight] = useState('');
     const [reps, setReps] = useState('');
@@ -26,8 +30,8 @@ export default function LoggingScreen() {
     const repsInputRef = useRef(null);
 
     const { id } = useLocalSearchParams();
-    const currentExercise = exercises.find(item => item.id === id);
-    const { colorScheme, toggleTheme } = useContext(ThemeContext);
+    const currentExercise =isCustomRoutineUser? customExercises.find(item=> item.id === id) : exercises.find(item => item.id === id);
+    const { colorScheme } = useContext(ThemeContext);
     const styles = createStyles(colorScheme);
     
    
@@ -100,13 +104,13 @@ export default function LoggingScreen() {
     }, [currentExercise.id]);
 
     return (
-        <SafeAreaView style={styles.container}>
+        <SafeAreaView style={styles.container} >
             <KeyboardAvoidingView
                 style={{ flex: 1 }}
                 behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-                keyboardVerticalOffset={80}
+                keyboardVerticalOffset={0}
             >
-                <ScrollView contentContainerStyle={{ flexGrow: 1, paddingBottom: 50 }} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
+                <ScrollView contentContainerStyle={{ flexGrow: 1, paddingBottom: 30}} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
                     
                    
                     <View style={styles.header}>
@@ -129,7 +133,7 @@ export default function LoggingScreen() {
                         <Text style={styles.executionTitle}>EXECUTION PROTOCOL</Text>
                         <View style={styles.executionRow}>
                             <FontAwesome5 name="stopwatch" size={14} color="#D32F2F" />
-                            <Text style={styles.executionText}>TEMPO: 4 Sec Negative, 2 Sec Positive.</Text>
+                            <Text style={styles.executionText}>TEMPO: 3 Sec Negative, 2 Sec Positive.</Text>
                         </View>
                         <View style={styles.executionRow}>
                             <FontAwesome5 name="skull" size={14} color="#D32F2F" />

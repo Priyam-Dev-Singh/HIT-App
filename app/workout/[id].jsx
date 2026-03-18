@@ -10,6 +10,7 @@ import { getCurrentRoutine, markDayCompleted, saveNextRoutineIndex } from '../..
 import { WorkoutContext } from '../../src/context/WorkoutContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { customExercises } from '../../data/customExercises';
+import { supabase } from '../../src/lib/supabase';
 
 export default function ExerciseSelectionScreen(){
 

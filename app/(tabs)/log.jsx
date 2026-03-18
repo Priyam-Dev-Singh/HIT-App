@@ -3,34 +3,51 @@ import {SafeAreaView} from 'react-native-safe-area-context'
 import { exercises } from "../../data/exercises";
 import { routines } from "../../data/routines";
 import { useRouter } from "expo-router";
-import { useContext } from "react";
+import { useContext, useEffect, useState } from "react";
 import { ThemeContext } from "../../src/context/ThemeContext";
 import Octicons from '@expo/vector-icons/Octicons';
 import { WorkoutContext } from "../../src/context/WorkoutContext";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function WorkoutSelectionScreen (){
 
     const router = useRouter();
     const {colorScheme, toggleTheme} = useContext(ThemeContext);
-    const {setIsChecking} = useContext(WorkoutContext);
+    const {setIsChecking, activeProtocol} = useContext(WorkoutContext);
+    const isCustomRoutineUser = activeProtocol === 'custom';
+    const [customRoutine, setCustomRoutine] = useState(null);
     const styles = createStyles(colorScheme);
     const selectWorkout = (id)=>{
         console.log(id);
         router.push(`/workout/${id}`);
     }
+
+    useEffect(()=>{
+        const getCustomRoutine = async()=>{
+            if(isCustomRoutineUser){
+                const jsonValue = await AsyncStorage.getItem('customRoutine');
+                const parsedRoutine = JSON.parse(jsonValue);
+                setCustomRoutine(parsedRoutine.workouts);
+            }
+        }
+        getCustomRoutine();
+    },[])
+
     const renderItem = ({item, index})=>(
         <Pressable onPress={()=>{selectWorkout(item.id); setIsChecking(true);}}
         style={({pressed})=>[styles.card, pressed && {opacity: 0.7}]}>
             <View style={styles.thumbnailContainer}>
-                {colorScheme==='dark'?
+               {isCustomRoutineUser? 
+                <Image source={require('../../assets/myIcon.png')} style={styles.thumbnail} resizeMode="cover" />
+               : (colorScheme==='dark'?
                     <Image source={item.imageD} style={styles.thumbnail} resizeMode='cover'/>
                     : 
                      <Image source={item.imageL} style={styles.thumbnail} resizeMode='cover'/>
-                        }
+                        )}
             </View>
             <View style = {styles.textContainer}>
-                <Text style={styles.workoutSubtext}>Routine {item.id} :</Text>
-                <Text style={styles.workoutText}>{item.name}</Text>   
+                <Text style={styles.workoutSubtext}>Routine {isCustomRoutineUser? index+1 : item.id} :</Text>
+                <Text style={styles.workoutText}>{isCustomRoutineUser? item.title :item.name}</Text>   
             </View>
             <Octicons 
                 name="chevron-right" 
@@ -46,7 +63,7 @@ export default function WorkoutSelectionScreen (){
             <Text style = {styles.headerText}>Select a Workout</Text>
         </View>
         <FlatList
-        data = {routines}
+        data = {isCustomRoutineUser? customRoutine :routines}
         keyExtractor={item => item.id}
         renderItem={renderItem}
         style={styles.list}

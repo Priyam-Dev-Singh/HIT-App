@@ -1,13 +1,17 @@
 import { useContext, useEffect, useState } from "react";
-import { Alert, Image, Linking, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Alert, Image, Linking, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { ThemeContext } from "../../src/context/ThemeContext";
 import { supabase } from "../../src/lib/supabase";
 import {Ionicons, FontAwesome5 } from '@expo/vector-icons';
 import { useRouter } from "expo-router";
+import { WorkoutContext } from "../../src/context/WorkoutContext";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function MenuScreen(){
     const router = useRouter();
     const {colorScheme, toggleTheme} = useContext(ThemeContext);
+    const {activeProtocol, setActiveProtocol} = useContext(WorkoutContext);
     let isDark = colorScheme==='dark';
     const styles = createStyles(isDark);
     const [avatar, setAvatar] = useState(null);
@@ -21,6 +25,48 @@ export default function MenuScreen(){
         const body = 'What confused you? \n\n What would you improve? \n\n';
         Linking.openURL(`mailto:${email}?subject=${subject}&body=${encodeURIComponent(body)}`)
     };
+
+    const handleSwitchProtocol = ()=>{
+        const currentName = activeProtocol === 'custom'?'CUSTOM':'INTENSITY';
+        const targetName = activeProtocol === 'custom'?'INTENSITY':'CUSTOM';
+        Alert.alert("SWITCH PROTOCOL", `You are currenlty running the ${currentName} protocol. Are you sure you want to switch to ${targetName} routine`,
+            [
+                {text: 'cancel', style:'cancel'},
+                {
+                    text:'SWITCH PROTOCOL',
+                    style: 'destructive',
+                    onPress: async()=>{
+                        const newProtocol = activeProtocol === 'custom'?'hit':'custom';
+
+                        if(newProtocol==='custom'){
+                            const existingRoutine = await AsyncStorage.getItem('customRoutine');
+                            const parsedRoutine = JSON.parse(existingRoutine);
+
+                            if(!parsedRoutine|| !parsedRoutine.workouts || parsedRoutine.workouts.lenght===0){
+                                Alert.alert('No routine saved', 'You must create a custom routine to activate this protocol');
+                                router.push('/routine/customBuilder');
+                                return;
+                            }
+                        }
+
+                        await AsyncStorage.setItem('activeProtocol', newProtocol);
+                        setActiveProtocol(newProtocol);
+                        try{
+                            const {data:{user}} = await supabase.auth.getUser();
+                            if(!user) return;
+
+                            const {error} = await supabase.from('profiles').update({active_protocol: newProtocol}).eq('user_id', user.id);
+                            if(error) throw error;
+                        }catch(e){console.error("error updating active protocol while switching");}
+
+                        
+                        Alert.alert("System updated", `Switched to ${targetName} PROTOCOL`);
+                        router.replace('/');
+                    }
+                }
+            ]
+        )
+    }
 
     useEffect(()=>{
         const getUser = async()=>{
@@ -56,14 +102,15 @@ export default function MenuScreen(){
     )
 
     return(
-        <View style={styles.container}>
+        <SafeAreaView style={styles.container}>
             <View style={styles.header}>
                 <Text style={styles.title}>COMMAND CENTER</Text>
                 <TouchableOpacity style={styles.closeBtn} onPress={()=>router.back()}>
                     <FontAwesome5 name="times" size={24} color={isDark ? '#FFF' : '#000'} />
                 </TouchableOpacity>
             </View>
-            <TouchableOpacity style={styles.profileCard} onPress={()=>router.push('/profile')}>
+           <ScrollView showsVerticalScrollIndicator={false} >
+             <TouchableOpacity style={styles.profileCard} onPress={()=>router.push('/profile')}>
                 <View style={styles.profileImageContainer}>
                     {avatar ? 
                     (<Image source={{uri: avatar}} style={styles.profileImage}/>):
@@ -82,18 +129,26 @@ export default function MenuScreen(){
                 <MenuItem icon="moon" label="Toggle Theme" onPress={toggleTheme} />
             </View>
             <View style={styles.section}>
+                <Text style={styles.sectionTitle}>PROTOCOLS</Text>
+                {activeProtocol==='custom' && (<MenuItem icon='clipboard-list' label='Edit Custom Routine' onPress={()=>router.push('/routine/customBuilder')}/>)}
+                <MenuItem icon="exchange-alt" label='Switch Training Protocol' onPress={handleSwitchProtocol} isDanger={true}  />
+            </View>
+
+            <View style={styles.section}>
                 <Text style={styles.sectionTitle}>INFORMATION</Text>
                 <MenuItem icon="info-circle" label="About INTENSITY" onPress={() => router.push('/misc/aboutUs')} />
                 <MenuItem icon="shield-alt" label="Privacy Policy" onPress={() => Linking.openURL(privacyPolicy)} />
             </View>
             <View style={styles.section}>
+                <Text style={styles.sectionTitle}>FEEDBACK & QUERIES</Text>
                 <MenuItem icon="comment-alt" label="Send Feedback" onPress={sendFeedback} isDanger={false} />
             </View>
             <View style={styles.section}>
                 <Text style={[styles.sectionTitle, { color: '#D32F2F' }]}>DANGER ZONE</Text>
                 <MenuItem icon="skull" label="Delete Account" onPress={handleDelete} isDanger={true} />
             </View>
-        </View>
+           </ScrollView>
+        </SafeAreaView>
     )
 }
 
