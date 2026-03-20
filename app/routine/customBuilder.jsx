@@ -1,5 +1,5 @@
-import { useContext, useEffect, useState } from "react";
-import { Alert, Image, KeyboardAvoidingView, Modal, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { useCallback, useContext, useEffect, useMemo, useState } from "react";
+import { Alert, FlatList, Image, KeyboardAvoidingView, Modal, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ThemeContext } from "../../src/context/ThemeContext";
 import { StatusBar } from "expo-status-bar";
@@ -24,8 +24,9 @@ export default function CustomRoutineBuilderScreen(){
     const[searchQuery, setSearchQuery] = useState('');
     const [activeFilter, setActiveFiler] = useState('All');
     const[isSaving, setIsSaving] = useState(false);
+    const [exerciseListLoading, setExerciseListLoading] = useState(false);
 
-    const CATEGORIES = ['All','Chest','Back','Legs','Triceps','Biceps','Abs','Calves'];
+    const CATEGORIES = ['All','Chest','Back','Legs','Triceps','Biceps','Abs','Calves','Forearms'];
 
     const [workouts, setWorkouts] = useState([
         {id: new Date().toISOString(), title:'Workout 1', exercises:[]}
@@ -60,12 +61,16 @@ export default function CustomRoutineBuilderScreen(){
     }
 
     const handleEditExercises = (id)=>{
+        setExerciseListLoading(true);
+
         const workout = workouts.find(w=>w.id===id);
         setActiveWorkoutId(id);
         setDraftExercises([...workout.exercises]);
         setActiveFiler('All');
         setSearchQuery('');
         setIsModalVisible(true);
+
+        setExerciseListLoading(false);
         console.log("edit exercise button pressed");
     }
 
@@ -116,6 +121,32 @@ export default function CustomRoutineBuilderScreen(){
         setActiveWorkoutId(null);
        // console.log(workouts);
     }
+
+    const filteredExercises = useMemo(()=>{
+        return customExercises.filter(ex => activeFilter==='All'|| ex.muscleGroup===activeFilter).filter(ex=>ex.name.toLowerCase().includes(searchQuery.toLowerCase()));
+    },[activeFilter, searchQuery, customExercises]);
+
+    const renderExerciseRow = useCallback(({item: exercise})=>{
+        const isSelected = draftExercises.includes(exercise.id);
+
+        return(
+            <TouchableOpacity onPress={()=>toggleExercise(exercise.id)} activeOpacity={0.7} style={[styles.exerciseRow, isSelected && styles.exerciseRowSelected]} >
+                <View style={styles.exerciseImagePlaceholder}>
+                    <Image 
+                        source={isDark ? exercise.imageD : exercise.imageL} 
+                        style={{ width: '100%', height: '100%', borderRadius: 8, resizeMode: 'cover' }}
+                    />
+                </View>
+                <View style={styles.exerciseInfo}>
+                    <Text style={styles.exerciseName}>{exercise.name}</Text>
+                    <Text style={styles.exerciseTarget}>{exercise.muscleGroup}</Text>
+                </View>
+                <View style={[styles.checkbox, isSelected && styles.checkboxSelected]}>
+                    {isSelected && <Feather name="check" size={16} color="#FFF" />}
+                </View>
+            </TouchableOpacity>
+        )
+    },[draftExercises, isDark, toggleExercise])
     
     return(
         <SafeAreaView style={styles.container} edges={["top",'left','right']}>
@@ -231,26 +262,19 @@ export default function CustomRoutineBuilderScreen(){
                             </ScrollView>
                         </View>
 
-                        <ScrollView style={styles.exerciseList} contentContainerStyle={{paddingBottom: 100}}>
-                            {customExercises.filter(ex=> activeFilter === 'All'|| ex.muscleGroup === activeFilter).filter(ex => ex.name.toLowerCase().includes(searchQuery.toLowerCase()))
-                            .map((exercise)=>{
-                                const isSelected = draftExercises.includes(exercise.id);
-                                return(
-                                    <TouchableOpacity key={exercise.id} onPress={()=>toggleExercise(exercise.id)} activeOpacity={0.7} style={[styles.exerciseRow, isSelected && styles.exerciseRowSelected]} >
-                                        <View style={styles.exerciseImagePlaceholder}>
-                                            <Image source={isDark ? exercise.imageD:exercise.imageL} style={{width: '100%', height:'100%', borderRadius: 8, resizeMode:'cover'}}/>
-                                        </View>
-                                        <View style={styles.exerciseInfo}>
-                                            <Text style={styles.exerciseName}>{exercise.name}</Text>
-                                            <Text style={styles.exerciseTarget}>{exercise.muscleGroup}</Text>
-                                        </View>
-                                        <View style={[styles.checkbox, isSelected && styles.checkboxSelected]}>
-                                            {isSelected && <Feather name="check" size={16} color="#FFF" />}
-                                        </View>
-                                    </TouchableOpacity>
-                                )
-                            }) }
-                        </ScrollView>
+                       <FlatList
+                        style={styles.exerciseList}
+                        contentContainerStyle={{paddingBottom: 100}}
+                        data={filteredExercises}
+                        keyExtractor={(item)=> item.id}
+                        renderItem={renderExerciseRow}
+
+                        initialNumToRender={10}
+                        maxToRenderPerBatch={10}
+                        windowSize={5}
+                        removeClippedSubviews={true}
+                        showsVerticalScrollIndicator={false}
+                       />
 
                         <View style={styles.floatingFooter}>
                             <TouchableOpacity style={styles.confirmBtn} onPress={confirmSelection}>

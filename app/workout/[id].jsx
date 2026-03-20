@@ -117,7 +117,8 @@ export default function ExerciseSelectionScreen(){
             else{Alert.alert("Error marking workout completed");}
         }
     }catch(e){console.error("error handling the completed session", e);}finally{setIsLoading(false);}
-};
+};  
+    
     return(
         <SafeAreaView style = {styles.container}>
            <View style={styles.header}>  

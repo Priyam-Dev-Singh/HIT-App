@@ -1,11 +1,12 @@
 import { useCallback, useContext, useState } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { ThemeContext } from "../context/ThemeContext";
+
 import { useFocusEffect, useRouter } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import FadeInView from "./FadeInView";
 import { FontAwesome5, MaterialCommunityIcons, Ionicons } from '@expo/vector-icons';
 import { WorkoutContext } from "../context/WorkoutContext";
+import { ThemeContext } from "../context/ThemeContext";
 
 export default function ProtocolChecklist({isReady, routine}){
     

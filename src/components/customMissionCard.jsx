@@ -1,12 +1,15 @@
 import { useContext, useEffect, useState } from "react";
-import { Image, Modal, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, Image, Modal, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { ThemeContext } from "../context/ThemeContext";
 import { FontAwesome5, Feather } from '@expo/vector-icons';
 import { WorkoutContext } from "../context/WorkoutContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import CustomMissionExerciseList from "./homeScreen/customMissionExerciseList";
+import { useRouter } from "expo-router";
 
 export default function CustomMissionCard({isReady}){
 
+    const router = useRouter();
     const {colorScheme} = useContext(ThemeContext);
     const {isWorkoutActive, setIsChecking} = useContext(WorkoutContext);
     const {activeProtocol} = useContext(WorkoutContext);
@@ -57,25 +60,36 @@ export default function CustomMissionCard({isReady}){
 
     const doingWorkout = ()=>{
         setIsChecking(false);
-        router.push(`/workout/${nextCustomMission.id}?type='custom`);
+        router.push(`/workout/${nextCustomMission.id}?type=custom`);
+    }
+
+    if(!nextCustomMission){
+        return(
+            <View style={[styles.cardContainer, { justifyContent: 'center', alignItems: 'center', backgroundColor: isDark ? '#141414' : '#FFF' }]}>
+                <ActivityIndicator color={'#D32F2F'} size={30}/>
+                <Text style={{color: '#D32F2F', fontSize: 18, fontWeight: 'bold', marginBottom: 10}}>LOADING DIRECTIVE...</Text>
+            </View>)
     }
     return(
         <View style={styles.cardContainer}>
             <View style={styles.imageArea}>
                 {isReady? 
                    ( <View style={styles.fallbackImageContainer}>
-                        <FontAwesome5 name="clipboard-list" size={50} color={isDark ? '#333' : '#E0E0E0'} style={styles.bgIcon} />
-                        <Text style={styles.fallbackTitle}>{nextCustomMission.title}</Text>
-                        <Text style={styles.fallbackSub}>{nextCustomMission?.exercises.length} MOVEMENTS LOADED</Text>
+                        <FontAwesome5 name="clipboard-list" size={100} color={isDark ? '#333' : '#E0E0E0'} style={styles.bgIcon} />
+                        <View style={styles.fallbackHeader}>
+                            <Text style={styles.fallbackTitle}>{nextCustomMission.title}</Text>
+                            <Text style={styles.fallbackSub}>{nextCustomMission?.exercises.length} MOVEMENTS LOADED</Text>
+                        </View>
+                        <CustomMissionExerciseList exerciseIds={nextCustomMission.exercises}/>
                     </View>)
                     :
                     (
                         <Image source={isDark? recoveryImageD: recoveryImageL} style={styles.heroImage} resizeMode="cover"/>
                     )
             }
-            <TouchableOpacity style={[styles.statusBadge,,{ borderColor: badgeColor }]} onPress={()=>setShowInfoModal(true)}>
+            <TouchableOpacity style={[styles.statusBadge,{ borderColor: badgeColor }]} onPress={()=>setShowInfoModal(true)}>
                 <Text style={styles.statusText}>{badgeText}</Text>
-                <Feather name="info" size={18} color={colorScheme === 'dark' ? 'white' : 'black'} />
+                <Feather name="info" size={15} color={colorScheme === 'dark' ? 'white' : 'black'} />
             </TouchableOpacity>
             </View>
         
@@ -129,7 +143,6 @@ function createStyles(isDark){
     return StyleSheet.create({
         cardContainer: {
             width: '92%',
-            height: 380,
             backgroundColor: isDark ? '#141414' : '#FFFFFF',
             borderRadius: 20,
             alignSelf: 'center',
@@ -143,7 +156,7 @@ function createStyles(isDark){
         },
         imageArea: {
             padding: 10,
-            flex: 3,
+           // flex: 3,
             width: '100%',
             backgroundColor: isDark ? '#111' : '#F5F5F5',
             justifyContent: 'center',
@@ -158,60 +171,69 @@ function createStyles(isDark){
         // NEW: The Tactical Data Screen styles
         fallbackImageContainer: {
             width: '100%',
-            height: '100%',
+            minHeight: 220,
             borderRadius: 20,
             backgroundColor: isDark ? '#1C1C1E' : '#E5E5EA',
-            justifyContent: 'center',
-            alignItems: 'center',
+            paddingHorizontal: 20,
+            paddingTop: 10,
+            justifyContent: 'flex-start',
+            alignItems: 'stretch',
             borderWidth: 1,
             borderColor: isDark ? '#333' : '#D1D1D6',
             overflow: 'hidden',
         },
         bgIcon: {
             position: 'absolute',
-            opacity: 0.2,
-            transform: [{ scale: 2.5 }],
+            opacity: 0.1,
+            top:'20%',
+            alignSelf:'center',
+            zIndex: 0,
         },
         fallbackTitle: {
             color: isDark ? '#FFF' : '#000',
-            fontSize: 32,
+            padding: 10,
+            fontSize: 26,
             fontWeight: '900',
             letterSpacing: 2,
             textAlign: 'center',
-            paddingHorizontal: 20,
-            zIndex: 2,
+        },
+        fallbackHeader: {
+            alignItems: 'center', // Center the title and subtitle
+            marginBottom: 10,
+            zIndex: 1, // Keep above the background icon
         },
         fallbackSub: {
             color: '#D32F2F',
-            fontSize: 12,
+            fontSize: 11,
             fontWeight: 'bold',
             letterSpacing: 1.5,
-            marginTop: 8,
-            zIndex: 2,
+           
         },
         // ... Keep the rest of your original MissionCard styles exactly as they were!
         statusBadge: {
-            position: 'absolute', 
-            top: 15, 
+            position: 'absolute',
+            right: 11, 
+            top: 12, 
             gap: 10,
             flexDirection:'row',
             justifyContent:'center',
             alignItems:'center',
-            paddingVertical: 6,
-            paddingHorizontal: 12,
+            paddingVertical: 3,
+            paddingHorizontal: 7,
             borderRadius: 6, 
             backgroundColor: 'rgba(0,0,0,0.6)',
             borderWidth: 1, 
         },
         statusText: {
             color: 'white',
-            fontSize: 10,
+            fontSize: 9,
             fontWeight: '900', 
             letterSpacing: 1.5,
         },
         actionButton: {
             flex: 1,
             margin:10,
+            padding: 15,
             flexDirection: 'column',
             alignItems: 'center',
             justifyContent: 'center',

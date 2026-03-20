@@ -7,7 +7,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons, FontAwesome5 } from '@expo/vector-icons';
 import { WorkoutContext } from "../src/context/WorkoutContext";
 import DataCalendar from "../src/components/calendar";
-import MissionCard from "../src/components/missionCard";
+
 import ProfileCard from "../src/components/profileCard";
 import FadeInView from "../src/components/FadeInView";
 import { useRouter } from "expo-router";
