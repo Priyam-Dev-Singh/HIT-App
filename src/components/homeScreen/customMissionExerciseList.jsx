@@ -1,4 +1,4 @@
-import { useContext } from "react";
+import { useContext, useMemo } from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { ThemeContext } from "../../context/ThemeContext";
 import { FontAwesome5 } from '@expo/vector-icons';
@@ -13,6 +13,13 @@ export default function CustomMissionExerciseList ({exerciseIds}){
     if(!exerciseIds || exerciseIds.length===0){
         return null;
     }
+
+   const userExercises = 
+    useMemo(()=>{
+        return exerciseIds.map((id)=> customExercises.find(ex=>ex.id===id));
+    },[exerciseIds]);
+
+
     return(
 
         <View style={styles.container}>
@@ -21,14 +28,13 @@ export default function CustomMissionExerciseList ({exerciseIds}){
                 <Text style={styles.headerText}>TARGET LOADOUT</Text>
             </View>
             <View style={styles.listContainer}>
-                {exerciseIds.map((exId,index)=>{
-                   const exercise = customExercises.find(ex=>ex.id===exId)
+                {userExercises.map((exercise,index)=>{
                    return(
                     <View key={index} style={styles.exerciseRow}>
                         <View style={styles.tacticalDotOuter}>
                             <View style={styles.tacticalDotInner}/>
                         </View>
-                        <Text style={styles.exerciseName} numberOfLines={1}>{exercise.name}</Text>
+                        <Text style={styles.exerciseName} numberOfLines={1}>{exercise?.name}</Text>
                     </View>
                    )
 })}

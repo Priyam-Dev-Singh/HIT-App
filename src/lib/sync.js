@@ -137,7 +137,13 @@ export const syncCustomRoutine = async()=>{
 
         const {data, error} = await supabase.from('profiles').select('active_protocol').eq('user_id', user.id).maybeSingle();
         if(error)console.error("error getting active_protocol");
-        const isCustomRoutineUser = data?.active_protocol === 'custom';
+
+        const currentProtocol = data?.active_protocol || 'hit';
+        await AsyncStorage.setItem('active_protocol', currentProtocol);
+        console.log('This is saved as active Protocol',currentProtocol);
+
+        const isCustomRoutineUser = currentProtocol === 'custom';
+
         if(isCustomRoutineUser){
             const {data, error} = await supabase.from('customRoutines').select('routine_data').eq('user_id', user.id).maybeSingle();
             if(error) console.error("error getting customRoutine routine");

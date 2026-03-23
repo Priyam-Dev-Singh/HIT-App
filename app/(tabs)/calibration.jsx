@@ -6,11 +6,15 @@ import { ThemeContext } from "../../src/context/ThemeContext";
 import { StyleSheet } from "react-native";
 import SleepComponent from "../../src/components/sleep";
 import { supabase } from "../../src/lib/supabase";
+import UnitSwitcher from "../../src/components/misc/unitSwitcher";
+import { WorkoutContext } from "../../src/context/WorkoutContext";
 
 export default function CalibrationLogger(){
     const [targetWeight, setTargetWeight] = useState(0);
     const [targetSleep, setTargetSleep] = useState(0);
+
     const {colorScheme} = useContext(ThemeContext);
+    const {weightUnit, changeWeightUnit} = useContext(WorkoutContext);
     const styles = createStyles(colorScheme);
     const [activeTab, setActiveTab] = useState('weight');
    useEffect(()=>{
@@ -33,9 +37,12 @@ export default function CalibrationLogger(){
   
     return(
         <SafeAreaView style={styles.container} edges={['top']}>
+            <View style={{flexDirection:'row', justifyContent:'space-between'}}>
             <View style={styles.header}>
                 <Text style={styles.headerTitle}>CALIBRATION</Text>
                 <Text style={styles.headerSubtitle}>Daily Metrics & Recovery</Text>
+            </View>
+                {activeTab==='weight' && <UnitSwitcher currentUnit={weightUnit} onToggle={(unit)=>changeWeightUnit(unit)} activeColor={'#00C851'}/>}
             </View>
             <View style={styles.tabContainer}>
                 <TouchableOpacity style={[styles.tab, activeTab==='weight' && styles.activeWeightTab]} onPress={()=>setActiveTab('weight')} activeOpacity={0.7}>

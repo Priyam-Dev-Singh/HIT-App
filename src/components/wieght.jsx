@@ -6,10 +6,11 @@ import { deleteLastWeight, saveWeight } from "../storage";
 import Octicons from '@expo/vector-icons/Octicons';
 import { LineChart } from "react-native-gifted-charts";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { WorkoutContext } from "../context/WorkoutContext";
 
 const weightStorageKey = '@weightData';
 export default function WeightComponent({targetWeight}){
-  
+    const {weightUnit} = useContext(WorkoutContext);
     const {colorScheme} = useContext(ThemeContext);
     let isDarkMode = colorScheme === 'dark';
     const styles = createStyles(colorScheme);
@@ -30,7 +31,6 @@ export default function WeightComponent({targetWeight}){
     },[])
     return(
         <View style={styles.card}>
-         
             <View style={styles.graphicContainer}>
                 <View style={styles.scaleBody}>
                     <View style={styles.ledScreen}>
@@ -43,7 +43,7 @@ export default function WeightComponent({targetWeight}){
                          onChangeText={setWeight}
                          maxLength={5}
                         />
-                        <Text style={styles.unitText}>KG</Text>
+                        <Text style={styles.unitText}>{weightUnit === 'kg' ? 'KG':'LBS'}</Text>
                     </View>
                     <View style={styles.sensorRow}>
                         <View style={styles.sensorPad} />
@@ -188,7 +188,7 @@ function createStyles(colorScheme){
     },
     unitText: {
       color: isDarkMode ? '#00FF66' : '#00FF66',
-      fontSize: 18,
+      fontSize: 16,
       fontWeight: 'bold',
       marginLeft: 5,
       marginTop: 15, // Aligns the KG closer to the baseline of the numbers

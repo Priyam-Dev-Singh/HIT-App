@@ -12,6 +12,8 @@ export const WorkoutProvider=({children})=>{
     const [fromLogin, setFromLogin] = useState(false);
     const [activeProtocol, setActiveProtocol] = useState(null);
     const [isProtocolLoading, setIsProtocolLoading] = useState(true);
+    const [weightUnit, setWeightUnit] = useState('kg');
+    const [heightUnit, setHeightUnit] = useState('cm');
 
     const startWorkout = (routineId)=>{
         setIsWorkoutActive(true);
@@ -23,10 +25,32 @@ export const WorkoutProvider=({children})=>{
         setRoutineId(null);
     }
 
-    useEffect(()=>{
-        const initializeProtocol = async()=>{
+    const changeWeightUnit = async(newUnit)=>{
+        try{
+            setWeightUnit(newUnit);
+            await AsyncStorage.setItem('weightUnit', newUnit);
+        }catch(e){console.error("error changing weight unit", e)}
+    }
+
+    const changeHeightUnit = async(newUnit)=>{
+        try{
+            setHeightUnit(newUnit);
+            await AsyncStorage.setItem("heightUnit", newUnit);
+            console.log("changed Unit: ", newUnit);
+        }catch(e){console.error("error changing height unit", e)}
+    }
+
+    const initializeProtocol = async()=>{
             try{
+                const storedUnit = await AsyncStorage.getItem('weightUnit');
+                //console.log("saved weight unit is ", storedUnit);
+                if(storedUnit) setWeightUnit(storedUnit);
+
+                const storedHeightUnit = await AsyncStorage.getItem("heightUnit");
+                //console.log('Saved unit in async storage: ', storedHeightUnit);
+                if(storedHeightUnit) setHeightUnit(storedHeightUnit);
                 const cachedProtocol = await AsyncStorage.getItem('active_protocol');
+                //console.log("Workout context here this is the cached active Protocol",cachedProtocol)
                 if(cachedProtocol){
                     setActiveProtocol(cachedProtocol);
                     setIsProtocolLoading(false);
@@ -54,13 +78,20 @@ export const WorkoutProvider=({children})=>{
                     }
                 }
                 setIsProtocolLoading(false);
+
             }catch(e){console.log("error setting up protocol",e); setIsProtocolLoading(false);}
         }
+
+    useEffect(()=>{
         initializeProtocol();
     },[])
 
     return (
-        <WorkoutContext.Provider value={{isWorkoutActive, routineId, startWorkout, endWorkout, isChecking, setIsChecking, fromLogin, setFromLogin, activeProtocol, setActiveProtocol, isProtocolLoading}}>
+        <WorkoutContext.Provider value={{isWorkoutActive, routineId, startWorkout, endWorkout, 
+                                         isChecking, setIsChecking,fromLogin, setFromLogin, 
+                                         activeProtocol, setActiveProtocol, initializeProtocol,isProtocolLoading,
+                                         weightUnit, changeWeightUnit, heightUnit, changeHeightUnit
+                                         }}>
             {children}
         </WorkoutContext.Provider>
     );

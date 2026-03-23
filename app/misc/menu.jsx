@@ -7,6 +7,7 @@ import { useRouter } from "expo-router";
 import { WorkoutContext } from "../../src/context/WorkoutContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { SafeAreaView } from "react-native-safe-area-context";
+import UnitSwitcher from "../../src/components/misc/unitSwitcher";
 
 export default function MenuScreen(){
     const router = useRouter();

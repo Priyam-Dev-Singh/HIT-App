@@ -22,7 +22,7 @@ import CustomMissionCard from '../../src/components/customMissionCard';
 
 
 export default function HomeScreen(){
-    const {fromLogin, setFromLogin, setActiveProtocol,activeProtocol, isProtocolLoading} = useContext(WorkoutContext);
+    const {fromLogin, setFromLogin, setActiveProtocol,activeProtocol, isProtocolLoading, initializeProtocol} = useContext(WorkoutContext);
    //const [markedDates, setMarkedDates] = useState({});
     const[isReady, setIsReady] = useState(true);
     const[avatarUrl, setAvatarUrl] = useState(null);
@@ -42,6 +42,7 @@ export default function HomeScreen(){
           setLoading(true);
           if(fromLogin){
             await syncAllUserData();
+            await initializeProtocol();
             setFromLogin(false);  
           }
         const data = await fetchLastGlobalWorkout();
@@ -57,6 +58,7 @@ export default function HomeScreen(){
        }
        else if(activeProtocol==='custom'){
         const jsonValue = await AsyncStorage.getItem('customRoutine');
+        
         const customRoutine = JSON.parse(jsonValue);
         const lastWorkoutId = await AsyncStorage.getItem('lastWorkoutId');
         const lastCustomWorkout = customRoutine.workouts.find(w=>w.id===lastWorkoutId);
@@ -134,8 +136,9 @@ export default function HomeScreen(){
 
     if(loading||isProtocolLoading){
       return(
-        <View style={{ flex: 1, backgroundColor: colorScheme==='dark' ? '#121212' : '#F5F5F5', justifyContent: 'center', alignItems: 'center' }}>
+        <View style={{ flex: 1,flexDirection:'column', backgroundColor: colorScheme==='dark' ? '#121212' : '#F5F5F5', justifyContent: 'center', alignItems: 'center' }}>
             <ActivityIndicator size={60} color="#D32F2F" />
+            <Text style={{alignSelf:'center', fontSize:15, color:'white'}}>Getting all your workout...</Text>
         </View>
       )
     }
@@ -181,18 +184,19 @@ export default function HomeScreen(){
             </View>}
           
             <MissionCard/>
+            <ProtocolChecklist isReady={isReady} routine={routine}/>
           </>
         ):(
           <>
-          {lastLog && 
+          {lastLog && lastCustomWorkout?.title && 
           <View style={styles.header}>
             <Text style={styles.headerText}>Last Workout {lastCustomWorkout?.title||''} : {daysAgo(lastLog.date)}</Text>
           </View>}
           <CustomMissionCard isReady={isReady}/> 
+          <ProtocolChecklist isReady={isReady} routine={routine}/>
           </>
         )}  
-        <ProtocolChecklist isReady={isReady} routine={routine}/>  
-           
+         
            
           </ScrollView>
           <StatusBar style={colorScheme==='dark'?'light':'dark'} />

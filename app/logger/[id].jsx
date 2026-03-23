@@ -12,11 +12,12 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
 import { customExercises } from "../../data/customExercises";
+import UnitSwitcher from "../../src/components/misc/unitSwitcher";
 
 export default function LoggingScreen() {
     const [isLoading, setIsLoading] = useState(false);
 
-    const { isChecking, activeProtocol } = useContext(WorkoutContext);
+    const { isChecking, activeProtocol, weightUnit, changeWeightUnit } = useContext(WorkoutContext);
     const isCustomRoutineUser = activeProtocol === 'custom';
 
     const router = useRouter();
@@ -115,6 +116,7 @@ export default function LoggingScreen() {
                    
                     <View style={styles.header}>
                         <Text style={styles.headerText}>{currentExercise.name}</Text>
+                        <UnitSwitcher currentUnit={weightUnit} onToggle={(unit)=> changeWeightUnit(unit)} activeColor={"#D32F2F"}/>
                     </View>
 
                     <View style={styles.visualContainer}>
@@ -222,7 +224,7 @@ export default function LoggingScreen() {
                            :null}
                             <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-evenly' }}>
                                 <View style={styles.logContainers}>
-                                    <Text style={styles.weightAndReps}>Weight (kg)</Text>
+                                    <Text style={styles.weightAndReps}>Weight {weightUnit==='kg'?'(KG)':'(LBS)'}</Text>
                                     <TextInput
                                         ref={weightInputRef}
                                         value={weight}
@@ -272,8 +274,8 @@ function createStyles(colorScheme) {
             backgroundColor: colorScheme === 'dark' ? '#000000' : '#F2F2F7',
         },
         header: {
-            paddingVertical: 15,
-            paddingHorizontal: 20,
+            paddingVertical: 10,
+            paddingLeft: 15,
             borderBottomWidth: 1,
             backgroundColor: colorScheme === 'dark' ? '#000000' : '#FFFFFF',
             borderBottomColor: colorScheme === 'dark' ? '#333' : '#E5E5EA',
@@ -294,7 +296,7 @@ function createStyles(colorScheme) {
             overflow: 'hidden',
             alignSelf: 'flex-start',
             marginLeft: 20,
-            marginTop: 20,
+            marginTop: 10,
             marginBottom: 5,
         },
         description: {
@@ -302,7 +304,7 @@ function createStyles(colorScheme) {
             fontSize: 13,
             lineHeight: 20,
             paddingHorizontal: 20,
-            marginBottom: 10,
+            marginBottom: 5,
         },
         logContainers: {
             width: '45%',
@@ -385,7 +387,7 @@ function createStyles(colorScheme) {
         },
         headerText: {
             color: colorScheme === 'dark' ? 'white' : 'black',
-            fontSize: 28,
+            fontSize: 23,
             fontWeight: '700',
             letterSpacing: 0.5,
         },
@@ -421,14 +423,14 @@ function createStyles(colorScheme) {
         width: '100%',
         alignItems: 'center',
         marginBottom: 10,
-        marginTop: 10,
+        marginTop: 15,
     },
     imageCard: {
-        width: '90%',       
-        height: 220,         
+        width: '88%',       
+        height: 200,         
         backgroundColor: isDark?'#333':'#FFFFFF', 
         borderRadius: 20,
-        padding: 10,
+        padding: 5,
         justifyContent: 'center',
         alignItems: 'center',
         
@@ -442,7 +444,7 @@ function createStyles(colorScheme) {
     mainImage: {
         width: '100%',
         height: '100%',
-        borderRadius: 10,
+        borderRadius: 20,
     },
     executionCard: {
             backgroundColor: 'rgba(211, 47, 47, 0.05)',
@@ -450,7 +452,7 @@ function createStyles(colorScheme) {
             borderColor: 'rgba(211, 47, 47, 0.3)',
             borderRadius: 12,
             padding: 15,
-            marginVertical: 15,
+            marginVertical: 10,
             width: '90%',
             alignSelf: 'center',
         },

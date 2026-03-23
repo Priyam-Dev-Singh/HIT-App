@@ -65,7 +65,7 @@ export default function CustomMissionCard({isReady}){
 
     if(!nextCustomMission){
         return(
-            <View style={[styles.cardContainer, { justifyContent: 'center', alignItems: 'center', backgroundColor: isDark ? '#141414' : '#FFF' }]}>
+            <View style={[styles.cardContainer, { height: 300 ,justifyContent: 'center', alignItems: 'center', backgroundColor: isDark ? '#141414' : '#FFF' }]}>
                 <ActivityIndicator color={'#D32F2F'} size={30}/>
                 <Text style={{color: '#D32F2F', fontSize: 18, fontWeight: 'bold', marginBottom: 10}}>LOADING DIRECTIVE...</Text>
             </View>)

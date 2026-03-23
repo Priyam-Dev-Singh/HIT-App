@@ -9,10 +9,15 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import LoginPage from "./auth/login";
 import  DateTimePicker from "@react-native-community/datetimepicker";
 import FadeInView from "../src/components/FadeInView";
+import UnitSwitcher from "../src/components/misc/unitSwitcher";
+import { WorkoutContext } from "../src/context/WorkoutContext";
+import HeightSwitcher from "../src/components/misc/heightSwitcher";
+import FtHeightInput from "../src/components/misc/ftHeightInput";
 
 export default function OnboardingScreen(){
     const router = useRouter();
     const {colorScheme} = useContext(ThemeContext);
+    const{weightUnit, changeWeightUnit, heightUnit, changeHeightUnit} = useContext(WorkoutContext);
     const styles = createStyles(colorScheme);
     const [loading, setLoading] = useState(false);
     const [showDatePicker, setShowDatePicker] = useState(false);
@@ -34,7 +39,7 @@ export default function OnboardingScreen(){
     const handleNext = async ()=>{
        if(step<9) setStep(step+1);
        if(step===5){await AsyncStorage.setItem('onboarding_completed', 'true');}
-      // console.log(formData);
+      //console.log(formData);
        //else{handleSubmit()};
     }
     const handleBack = ()=>{
@@ -44,6 +49,10 @@ export default function OnboardingScreen(){
     const handleDateChange = (event, selectedDate)=>{
         setShowDatePicker(false);
         if(selectedDate) updateForm('dob', selectedDate);
+    }
+
+    const handleFtHeight = (data)=>{
+        updateForm('current_weight', data);
     }
 
 
@@ -143,9 +152,6 @@ export default function OnboardingScreen(){
                 </FadeInView>
             </View>
             <FadeInView delay={2400} style={styles.bottomButtonContainer}>
-                <TouchableOpacity style={styles.primaryButton} onPress={()=> setStep(6)}>
-                    <Text style={styles.buttonText}>BEGIN CALIBRATION</Text>
-                </TouchableOpacity>
                 <TouchableOpacity onPress={async() => {await AsyncStorage.setItem('onboarding_completed', 'true'); setStep(9);}} style={{ marginTop: 20, alignItems: 'center' }}>
                 <Text style={{ color: '#888', fontSize: 14, fontWeight: 'bold' }}>
                 ALREADY A USER? <Text style={{ color: '#D32F2F' }}>LOG IN</Text>
@@ -196,7 +202,7 @@ export default function OnboardingScreen(){
                 />)
             }</FadeInView>
             <FadeInView delay={1500}>
-                <TouchableOpacity onPress={async() => {await AsyncStorage.setItem('onboarding_completed', 'true'); setStep(6);} } style={{ marginTop: 20, alignItems: 'center' }}>
+                <TouchableOpacity onPress={async() => {await AsyncStorage.setItem('onboarding_completed', 'true'); setStep(9);} } style={{ marginTop: 20, alignItems: 'center' }}>
                 <Text style={{ color: '#888', fontSize: 14, fontWeight: 'bold' }}>
                 ALREADY A USER? <Text style={{ color: '#D32F2F' }}>LOG IN</Text>
                 </Text>
@@ -210,14 +216,20 @@ export default function OnboardingScreen(){
             
             <FadeInView delay={200}>
                 <Text style={styles.stepTitle}>CALIBRATION</Text>
-                <Text style={styles.stepSubtitle}>Physical Metrics</Text>
+                <Text style={[styles.stepSubtitle, {marginBottom:10}]}>Physical Metrics</Text>
+            </FadeInView>
+            <FadeInView delay={400}>
+                <View style={{display:'flex', flexDirection:'row', alignItems:'center', gap:'25%'}}>
+                    <UnitSwitcher currentUnit={weightUnit} onToggle={(unit)=>changeWeightUnit(unit)} activeColor={'#D32F2F'}/>
+                    <HeightSwitcher currentUnit={heightUnit} onToggle={(unit)=> changeHeightUnit(unit)}/>
+                </View>
             </FadeInView>
 
             <FadeInView delay={600}>
-                <View style={styles.row}>
+                <View style={[styles.row, {flexDirection:'column'}]}>
                     
                     <View style={{flex: 1}}>
-                        <Text style={styles.label}>WEIGHT (KG)</Text>
+                        <Text style={styles.label}>WEIGHT {weightUnit==='kg'?'(KG)':'(LBS)'}</Text>
                         <TextInput
                             style={styles.input}
                             value={formData.current_weight}
@@ -231,8 +243,9 @@ export default function OnboardingScreen(){
                     <View style={{width: 15}}/>
                     
                     <View style={{flex: 1}}>
-                        <Text style={styles.label}>HEIGHT (CM)</Text>
-                        <TextInput
+                        <Text style={styles.label}>HEIGHT {heightUnit==='cm'?'(CM)':'(FT)'}</Text>
+                       {heightUnit==='cm'? 
+                           <TextInput
                             style={styles.input}
                             value={formData.height}
                             placeholder="0.0"
@@ -240,6 +253,9 @@ export default function OnboardingScreen(){
                             placeholderTextColor="#666"
                             onChangeText={(t) => updateForm('height', t)}
                         />
+                    :
+                            <FtHeightInput sendFtHeight={handleFtHeight} currentFt={0} currentInch={0}/>
+                    }
                     </View>
 
                 </View>
@@ -256,7 +272,7 @@ export default function OnboardingScreen(){
             </FadeInView>
 
             <FadeInView delay={500}>
-                <Text style={styles.label}>TARGET BODYWEIGHT (KG)</Text>
+                <Text style={styles.label}>TARGET BODYWEIGHT {weightUnit==='kg'?'(KG)':'(LBS)'}</Text>
                 <TextInput
                     value={formData.goal_weight}
                     placeholder="0.0"
