@@ -1,13 +1,15 @@
-import { useContext, useEffect, useState } from "react";
-import { Alert, Image, Linking, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { act, useContext, useEffect, useState } from "react";
+import { Alert, Image, Linking, Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { ThemeContext } from "../../src/context/ThemeContext";
 import { supabase } from "../../src/lib/supabase";
-import {Ionicons, FontAwesome5 } from '@expo/vector-icons';
+import {Ionicons, FontAwesome5, Feather } from '@expo/vector-icons';
 import { useRouter } from "expo-router";
 import { WorkoutContext } from "../../src/context/WorkoutContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { SafeAreaView } from "react-native-safe-area-context";
 import UnitSwitcher from "../../src/components/misc/unitSwitcher";
+import CustomDossier from "../../src/components/protocolDossier/customDossier";
+import IntensityDossier from "../../src/components/protocolDossier/intensityDossier";
 
 export default function MenuScreen(){
     const router = useRouter();
@@ -16,6 +18,7 @@ export default function MenuScreen(){
     let isDark = colorScheme==='dark';
     const styles = createStyles(isDark);
     const [avatar, setAvatar] = useState(null);
+    const [showSwitchProtocolModal, setShowSwitchProtocolModal] = useState(false);
 
     const privacyPolicy = "https://intensity-privacy-policy.vercel.app";
     const deleteForm = 'https://forms.gle/PPjdkMiv1xdamQh48';
@@ -37,6 +40,7 @@ export default function MenuScreen(){
                     text:'SWITCH PROTOCOL',
                     style: 'destructive',
                     onPress: async()=>{
+                        setShowSwitchProtocolModal(false);
                         const newProtocol = activeProtocol === 'custom'?'hit':'custom';
 
                         if(newProtocol==='custom'){
@@ -60,9 +64,9 @@ export default function MenuScreen(){
                             if(error) throw error;
                         }catch(e){console.error("error updating active protocol while switching");}
 
-                        
-                        Alert.alert("System updated", `Switched to ${targetName} PROTOCOL`);
                         router.replace('/');
+                        Alert.alert("System updated", `Switched to ${targetName} PROTOCOL`);
+                       
                     }
                 }
             ]
@@ -132,7 +136,7 @@ export default function MenuScreen(){
             <View style={styles.section}>
                 <Text style={styles.sectionTitle}>PROTOCOLS</Text>
                 {activeProtocol==='custom' && (<MenuItem icon='clipboard-list' label='Edit Custom Routine' onPress={()=>router.push('/routine/customBuilder')}/>)}
-                <MenuItem icon="exchange-alt" label='Switch Training Protocol' onPress={handleSwitchProtocol} isDanger={true}  />
+                <MenuItem icon="exchange-alt" label='Switch Training Protocol' onPress={()=>setShowSwitchProtocolModal(true)} isDanger={true}  />
             </View>
 
             <View style={styles.section}>
@@ -149,6 +153,19 @@ export default function MenuScreen(){
                 <MenuItem icon="skull" label="Delete Account" onPress={handleDelete} isDanger={true} />
             </View>
            </ScrollView>
+           <Modal visible={showSwitchProtocolModal} animationType="slide" transparent={true} onRequestClose={()=> setShowSwitchProtocolModal(false)}>
+              <SafeAreaView style={{flex: 1, justifyContent:'flex-end', backgroundColor: 'rgba(0,0,0,0.75)'}}>
+                 <View style={{height:'90%', backgroundColor: isDark ? '#111' : '#F9F9F9', borderTopLeftRadius:24, borderTopRightRadius: 24, overflow:'hidden', paddingTop: 10, paddingBottom:40,}}>
+                  <View style={styles.modalHeader}>
+                    <Text style={styles.modalTitle}>Switch Protocol</Text>
+                    <TouchableOpacity onPress={() => setShowSwitchProtocolModal(false)} style={styles.closeBtn}>
+                        <Feather name="x" size={24} color={isDark ? '#FFF' : '#000'} />
+                    </TouchableOpacity>
+                  </View>
+                  {activeProtocol==='custom'?(<IntensityDossier onSelect={handleSwitchProtocol} isBottomSheet={true}/>):(<CustomDossier onSelect={handleSwitchProtocol} isBottomSheet={true}/>)}
+               </View>
+              </SafeAreaView>
+           </Modal>
         </SafeAreaView>
     )
 }
@@ -262,6 +279,26 @@ container: {
         },
         dangerText: {
             color: '#D32F2F',
-        }
+        },
+        closeBtn: {
+            padding: 5,
+            backgroundColor: isDark ? '#222' : '#E0E0E0',
+            borderRadius: 20,
+        },
+         modalHeader: {
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            paddingHorizontal: 20,
+            paddingVertical: 15,
+            borderBottomWidth: 1,
+            borderBottomColor: isDark ? '#222' : '#E0E0E0',
+        },
+         modalTitle: {
+            color: isDark ? '#FFF' : '#000',
+            fontSize: 20,
+            fontWeight: '900',
+            letterSpacing: 2,
+        },
     })
 }

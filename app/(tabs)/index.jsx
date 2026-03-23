@@ -17,6 +17,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import MissionCard from '../../src/components/missionCard';
 import ProtocolChecklist from '../../src/components/protocolChecklist';
 import CustomMissionCard from '../../src/components/customMissionCard';
+import IntensityDossier from '../../src/components/protocolDossier/intensityDossier';
+import CustomDossier from '../../src/components/protocolDossier/customDossier';
 
 
 
@@ -155,26 +157,16 @@ export default function HomeScreen(){
            
         {activeProtocol === null ?
         (
-          <View style={styles.uncalibratedContainer}>
-            <FontAwesome5 name="dumbbell" size={40} color="#EF6C00" style={{marginBottom: 15}}/>
-            <Text style={styles.uncalibratedTitle}>SYSTEM UNCALIBRATED</Text>
-            <Text style={styles.uncalibratedSubtitle}>Select your training routine to initialize the console.</Text>
+          <View style={{flex:1, backgroundColor: '#000', justifyContent: 'center'}}>
+            <Text style={{color: '#FFF', textAlign: 'center', marginBottom: 20, fontSize: 18, fontWeight: 'bold'}}>SELECT YOUR PROTOCOL</Text>
 
-            <TouchableOpacity style={[styles.directiveBtn, styles.primaryDirective]} onPress={setHIT}>
-              <Text style={styles.directiveBtnTitle}>THE INTENSITY PROTOCOL</Text>
-              <Text style={styles.directiveBtnSub}>Pre-calibrated 3-day HIT split. Optimal growth.(recommended for intermediate lifters)</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity style={[styles.directiveBtn, styles.secondaryDirective]} onPress={()=>router.push('/routine/customBuilder')}>
-              <Text style={styles.directiveBtnTitle}>CREATE YOUR OWN ROUTINE</Text>
-              <Text style={styles.directiveBtnSub}>Create your own workout routine. Top-set tracking only.</Text>
-            </TouchableOpacity>
-
-            <View style={{flexDirection:'row', gap:5,}}>
-              <AntDesign name="info-circle" size={14} color="white" />
-              <Text style={styles.directiveBtnSub}>You can always switch routines in the future</Text>
-            </View>
-          </View>)
+            <ScrollView horizontal pagingEnabled showsHorizontalScrollIndicator={false} contentContainerStyle={{alignItems:'center'}}>
+              <IntensityDossier onSelect={setHIT}/>
+              <CustomDossier onSelect={()=>router.push('/routine/customBuilder')}/>
+            </ScrollView>
+          </View>
+         
+          )
         : activeProtocol === 'hit'?
         (<>
            {lastLog==null?<View></View>:
@@ -427,3 +419,23 @@ function createStyles (colorScheme){
     
   })
 }
+ {/*<View style={styles.uncalibratedContainer}>
+            <FontAwesome5 name="dumbbell" size={40} color="#EF6C00" style={{marginBottom: 15}}/>
+            <Text style={styles.uncalibratedTitle}>SYSTEM UNCALIBRATED</Text>
+            <Text style={styles.uncalibratedSubtitle}>Select your training routine to initialize the console.</Text>
+
+            <TouchableOpacity style={[styles.directiveBtn, styles.primaryDirective]} onPress={setHIT}>
+              <Text style={styles.directiveBtnTitle}>THE INTENSITY PROTOCOL</Text>
+              <Text style={styles.directiveBtnSub}>Pre-calibrated 3-day HIT split. Optimal growth.(recommended for intermediate lifters)</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity style={[styles.directiveBtn, styles.secondaryDirective]} onPress={()=>router.push('/routine/customBuilder')}>
+              <Text style={styles.directiveBtnTitle}>CREATE YOUR OWN ROUTINE</Text>
+              <Text style={styles.directiveBtnSub}>Create your own workout routine. Top-set tracking only.</Text>
+            </TouchableOpacity>
+
+            <View style={{flexDirection:'row', gap:5,}}>
+              <AntDesign name="info-circle" size={14} color="white" />
+              <Text style={styles.directiveBtnSub}>You can always switch routines in the future</Text>
+            </View>
+          </View>*/}
