@@ -132,7 +132,6 @@ export default function LoggingScreen() {
                         <Text style={styles.description}>Description: {currentExercise.description}</Text>
                     </View>
                     <View style={styles.executionCard}>
-                        <Text style={styles.executionTitle}>EXECUTION PROTOCOL</Text>
                         <View style={styles.executionRow}>
                             <FontAwesome5 name="stopwatch" size={14} color="#D32F2F" />
                             <Text style={styles.executionText}>TEMPO: 3 Sec Negative, 2 Sec Positive.</Text>
@@ -142,6 +141,7 @@ export default function LoggingScreen() {
                             <Text style={styles.executionText}>FAILURE: Push until the weight absolutely cannot be moved.</Text>
                         </View>
                     </View>
+                  
                     <View style={styles.chartCard}>
                         <View style={styles.chartHeaderComp}>
                             <Text style={styles.chartHeader}>Strength Curve (1RM)</Text>
@@ -399,7 +399,7 @@ function createStyles(colorScheme) {
             letterSpacing: 1.2,
         },
         chartCard: {
-            marginTop: 20,
+            marginTop: 5,
             marginHorizontal: 15,
             padding: 15,
             borderRadius: 16,
@@ -452,7 +452,7 @@ function createStyles(colorScheme) {
             borderColor: 'rgba(211, 47, 47, 0.3)',
             borderRadius: 12,
             padding: 15,
-            marginVertical: 10,
+            marginVertical: 5,
             width: '90%',
             alignSelf: 'center',
         },
@@ -476,4 +476,15 @@ function createStyles(colorScheme) {
             flex: 1,
         },
     })
+}
+
+{/*
+      {lastLog && lastLog.weight ? (
+                        <View style={[styles.lastSet, {borderColor:'#D32F2F', borderWidth:1,}]}>
+                            <View style={{ alignItems: "center", flexDirection: 'row' }}>
+                                <Text style={styles.lastSetContent}>Today's Target</Text>
+                                <Text style={styles.lastSetContent}>{lastLog.weight} kgs / {lastLog.reps} reps</Text>
+                            </View>
+                        </View>
+                    ) : null}*/
 }

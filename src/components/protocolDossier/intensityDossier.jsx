@@ -58,6 +58,40 @@ export default function IntensityDossier({ onSelect, isBottomSheet = false }) {
                         One set to absolute failure. Maximum mechanical tension. Zero junk volume.
                     </Text>
                 </View>
+                {/* THE PROTOCOL ADVANTAGES */}
+                <View style={styles.advantagesGrid}>
+                    <View style={styles.advantageItem}>
+                        <FontAwesome5 name="dumbbell" size={16} color="#D32F2F" />
+                        <View style={styles.advantageTextWrap}>
+                            <Text style={styles.advantageTitle}>HYPERTROPHY</Text>
+                            <Text style={styles.advantageDesc}>100% of energy deployed only on the muscle-building reps.</Text>
+                        </View>
+                    </View>
+
+                    <View style={styles.advantageItem}>
+                        <FontAwesome5 name="shield-alt" size={16} color="#D32F2F" />
+                        <View style={styles.advantageTextWrap}>
+                            <Text style={styles.advantageTitle}>JOINT ARMOR</Text>
+                            <Text style={styles.advantageDesc}>Fewer sets mean drastically less wear-and-tear on your joints.</Text>
+                        </View>
+                    </View>
+
+                    <View style={styles.advantageItem}>
+                        <FontAwesome5 name="chart-line" size={16} color="#D32F2F" />
+                        <View style={styles.advantageTextWrap}>
+                            <Text style={styles.advantageTitle}>PURE DATA</Text>
+                            <Text style={styles.advantageDesc}>Low volume makes tracking progressive overload mathematically flawless.</Text>
+                        </View>
+                    </View>
+
+                    <View style={styles.advantageItem}>
+                        <FontAwesome5 name="clock" size={16} color="#D32F2F" />
+                        <View style={styles.advantageTextWrap}>
+                            <Text style={styles.advantageTitle}>TIME LETHALITY</Text>
+                            <Text style={styles.advantageDesc}>In and out in 45 minutes. Maximum stimulus, zero wasted time.</Text>
+                        </View>
+                    </View>
+                </View>
 
                 {/* THE WORKOUT SPLIT (ACCORDIONS) */}
                 <View style={styles.splitContainer}>
@@ -291,6 +325,39 @@ function createStyles(isDark, isBottomSheet) {
             fontSize: 16,
             fontWeight: '900',
             letterSpacing: 2,
+        },
+        // --- ADVANTAGES GRID STYLES ---
+        advantagesGrid: {
+            flexDirection: 'row',
+            flexWrap: 'wrap',
+            justifyContent: 'space-between',
+            marginTop: 20,
+            marginBottom: 25,
+            paddingTop: 20,
+            borderTopWidth: 1,
+            borderTopColor: isDark ? '#222' : '#EAEAEA',
+        },
+        advantageItem: {
+            width: '47%', // Creates a perfect 2x2 grid
+            flexDirection: 'column',
+            alignItems: 'flex-start',
+            marginBottom: 20,
+            gap: 8,
+        },
+        advantageTextWrap: {
+            flex: 1,
+        },
+        advantageTitle: {
+            color: isDark ? '#FFF' : '#000',
+            fontSize: 11,
+            fontWeight: '900',
+            letterSpacing: 1,
+            marginBottom: 4,
+        },
+        advantageDesc: {
+            color: isDark ? '#888' : '#666',
+            fontSize: 11,
+            lineHeight: 16,
         },
     });
 }

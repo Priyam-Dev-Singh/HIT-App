@@ -19,6 +19,8 @@ import ProtocolChecklist from '../../src/components/protocolChecklist';
 import CustomMissionCard from '../../src/components/customMissionCard';
 import IntensityDossier from '../../src/components/protocolDossier/intensityDossier';
 import CustomDossier from '../../src/components/protocolDossier/customDossier';
+import WhatsNewModal from '../../src/components/misc/whatsNew';
+import Constants from 'expo-constants';
 
 
 
@@ -27,13 +29,15 @@ export default function HomeScreen(){
     const {fromLogin, setFromLogin, setActiveProtocol,activeProtocol, isProtocolLoading, initializeProtocol} = useContext(WorkoutContext);
    //const [markedDates, setMarkedDates] = useState({});
     const[isReady, setIsReady] = useState(true);
-    const[avatarUrl, setAvatarUrl] = useState(null);
     const [routine, setRoutine] = useState({});
     const [lastLog, setLastLog] = useState({});
-    const {colorScheme, toggleTheme} = useContext(ThemeContext);
+    const {colorScheme} = useContext(ThemeContext);
     const styles = createStyles(colorScheme);
     const router = useRouter();
     const [loading, setLoading] = useState(false);
+    const [showUpdateModal, setShowUpdateModal] = useState(false);
+
+    const currentAppVersion = Constants.expoConfig?.version;
 
     const [lastCustomWorkout, setLastCustomWorkout] = useState(null);
     let isDark = colorScheme === 'dark'; 
@@ -42,11 +46,17 @@ export default function HomeScreen(){
        useCallback( ()=>{
         const initializeDashboard = async ()=>{
           setLoading(true);
+
+          const lastSeenVersion = await AsyncStorage.getItem('lastVersionSeen');
+          if(lastSeenVersion !== currentAppVersion) setShowUpdateModal(true);
+
+
           if(fromLogin){
             await syncAllUserData();
             await initializeProtocol();
             setFromLogin(false);  
           }
+
         const data = await fetchLastGlobalWorkout();
         setLastLog(data);
         //console.log(data);
@@ -65,7 +75,6 @@ export default function HomeScreen(){
         const lastWorkoutId = await AsyncStorage.getItem('lastWorkoutId');
         const lastCustomWorkout = customRoutine.workouts.find(w=>w.id===lastWorkoutId);
         setLastCustomWorkout(lastCustomWorkout);
-        
        }
        
         setLoading(false);
@@ -136,6 +145,13 @@ export default function HomeScreen(){
       }catch(e){console.log("error setting active protocol",e)}
     }
 
+    const handleCloseUpdateModal = async()=>{
+      try{
+        await AsyncStorage.setItem("lastVersionSeen", currentAppVersion);
+        setShowUpdateModal(false);
+      }catch(e){console.error("error saving last version"); setShowUpdateModal(false);}
+    }
+
     if(loading||isProtocolLoading){
       return(
         <View style={{ flex: 1,flexDirection:'column', backgroundColor: colorScheme==='dark' ? '#121212' : '#F5F5F5', justifyContent: 'center', alignItems: 'center' }}>
@@ -192,6 +208,7 @@ export default function HomeScreen(){
            
           </ScrollView>
           <StatusBar style={colorScheme==='dark'?'light':'dark'} />
+          <WhatsNewModal visible={showUpdateModal} onClose={handleCloseUpdateModal} version={currentAppVersion} />
         </SafeAreaView>
        
     );
