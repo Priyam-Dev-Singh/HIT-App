@@ -3,7 +3,7 @@ import { Alert, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, To
 import { exercises } from "../../data/exercises";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useContext, useEffect, useState, useRef } from "react";
-import { saveSet, getLastLog, deleteLastLog, getProgressData } from "../../src/storage";
+import { saveSet, getLastLog, deleteLastLog, getProgressData, targetSet } from "../../src/storage";
 import Octicons from '@expo/vector-icons/Octicons';
 import { ThemeContext } from "../../src/context/ThemeContext";
 import { LineChart } from "react-native-gifted-charts";
@@ -104,6 +104,8 @@ export default function LoggingScreen() {
         fetchChartData();
     }, [currentExercise.id]);
 
+    const {targetWeight, targetReps} = targetSet(currentExercise.type, lastLog.weight, lastLog.reps, weightUnit);
+
     return (
         <SafeAreaView style={styles.container} >
             <KeyboardAvoidingView
@@ -141,6 +143,14 @@ export default function LoggingScreen() {
                             <Text style={styles.executionText}>FAILURE: Push until the weight absolutely cannot be moved.</Text>
                         </View>
                     </View>
+                     {lastLog && lastLog.weight ? (
+                        <View style={[styles.lastSet, {borderColor:'#D32F2F', borderWidth:1,}]}>
+                            <View style={{ alignItems: "center", flexDirection: 'row' }}>
+                                <Text style={styles.lastSetContent}>Today's Target</Text>
+                                <Text style={styles.lastSetContent}>{targetWeight} kgs / {targetReps} reps</Text>
+                            </View>
+                        </View>
+                    ) : null}
                   
                     <View style={styles.chartCard}>
                         <View style={styles.chartHeaderComp}>

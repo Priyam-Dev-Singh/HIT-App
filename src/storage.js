@@ -586,3 +586,52 @@ export const deleteLastSleep = async()=>{
         }catch(e){console.error("error deleting last sleep log from supabase", e);}
     }catch(e){console.error("error deleting last sleep");}
 }
+
+//-----------------------------------------target set logic
+
+export const targetSet = (exType, lastWeight, lastReps, weightUnit)=>{
+    let targetReps = lastReps;
+    let targetWeight = lastWeight;
+    const thresholdWeight = weightUnit === 'kg'?90:215;
+    if(exType==='compound'){
+       if(lastWeight>thresholdWeight){
+
+        if(lastReps<12){
+            targetWeight = lastWeight;
+            targetReps = lastReps+1;
+            //return{ targetReps,targetWeight};
+        }
+        else{
+            targetWeight = weightUnit === 'kg'? lastWeight + 5: lastWeight + 15;
+            targetReps = 7;
+            //return {targetReps, targetWeight};
+        }
+       }
+       else{
+         if(lastReps<12){
+            targetWeight = lastWeight;
+            targetReps = lastReps + 1;
+           // return {targetReps,targetWeight};
+        }
+        else{
+            targetWeight = weightUnit === 'kg'? lastWeight + 5: lastWeight + 10;
+            targetReps = 8;
+           // return {targetReps, targetWeight};
+        }
+       }
+    }
+    else{
+    
+        if(lastReps<15){
+            targetWeight = lastWeight;
+            targetReps = lastReps + 2;
+           // return {targetReps,targetWeight};
+        }
+        else{
+            targetWeight = weightUnit === 'kg'? lastWeight+2.5: lastWeight+5;
+            targetReps = 8;
+           // return { targetReps,targetWeight};
+        }
+    }
+    return {targetWeight, targetReps};
+}
