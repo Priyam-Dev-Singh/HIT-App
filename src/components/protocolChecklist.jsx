@@ -7,6 +7,7 @@ import FadeInView from "./FadeInView";
 import { FontAwesome5, MaterialCommunityIcons, Ionicons } from '@expo/vector-icons';
 import { WorkoutContext } from "../context/WorkoutContext";
 import { ThemeContext } from "../context/ThemeContext";
+import { getWorkoutHistory } from "../storage";
 
 export default function ProtocolChecklist({isReady, routine}){
     
@@ -29,6 +30,13 @@ export default function ProtocolChecklist({isReady, routine}){
         return logDate.toDateString()===today.toDateString();
 
     }
+    const getTodayString = () => {
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, '0');
+    const day = String(today.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+};
     useFocusEffect(
         useCallback(()=>{
             const checkDailyLogs = async()=>{
@@ -37,6 +45,7 @@ export default function ProtocolChecklist({isReady, routine}){
                     const sleepJson = await AsyncStorage.getItem('@sleepData');
                     const macrosJson = await AsyncStorage.getItem('@macrosLogs');
                     const liftJson = await AsyncStorage.getItem('@workoutLogs');
+                    const markedDates = await getWorkoutHistory();
 
                     let weightLogged = false;
                     let sleepLogged = false;
@@ -44,10 +53,10 @@ export default function ProtocolChecklist({isReady, routine}){
                     let workoutCompleted = false;
 
                     if(weightJson){
-                        const weightLogs = JSON.parse(weightJson);
-                        if(weightLogs.length>0){
-                            weightLogged = isToday(weightLogs[weightLogs.length-1].createdAt);
-                        }
+                       const weightData = JSON.parse(weightJson);
+                       if(weightData.length>0){
+                        weightLogged = isToday(weightData[weightData.length-1].createdAt);
+                       }
                     }
                     if(sleepJson){
                         const sleepLogs = JSON.parse(sleepJson);
@@ -61,14 +70,16 @@ export default function ProtocolChecklist({isReady, routine}){
                             macrosLogged = isToday(macrosLogs[macrosLogs.length-1].date);
                         }
                     }
-                    if(liftJson){
-                        const liftLogs = JSON.parse(liftJson);
-                        if(liftLogs.length>0){
-                            workoutCompleted = isToday(liftLogs[liftLogs.length-1].date);
+                    if(markedDates){
+                        //console.log(calendarData);
+                        const todayStr = getTodayString();
+                        
+                        if(markedDates[todayStr]){
+                           weightLogged = true;
                         }
                     }
                     setTasks({weight: weightLogged, sleep: sleepLogged, macros: macrosLogged, workout: workoutCompleted});
-                }catch(e){console.error("error checking completed or not");}
+                }catch(e){console.error("error checking completed or not",e);}
             }
             checkDailyLogs();
         },[])

@@ -1,4 +1,4 @@
-import { FlatList, Pressable, View, Text, StyleSheet, Appearance, Image } from "react-native";
+import { FlatList, Pressable, View, Text, StyleSheet, Appearance, Image, TouchableOpacity } from "react-native";
 import {SafeAreaView} from 'react-native-safe-area-context'
 import { exercises } from "../../data/exercises";
 import { routines } from "../../data/routines";
@@ -8,15 +8,17 @@ import { ThemeContext } from "../../src/context/ThemeContext";
 import Octicons from '@expo/vector-icons/Octicons';
 import { WorkoutContext } from "../../src/context/WorkoutContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import PerformanceLog from "../../src/components/performanceLog";
 
 export default function WorkoutSelectionScreen (){
 
     const router = useRouter();
-    const {colorScheme, toggleTheme} = useContext(ThemeContext);
+    const {colorScheme} = useContext(ThemeContext);
     const {setIsChecking, activeProtocol} = useContext(WorkoutContext);
     const isCustomRoutineUser = activeProtocol === 'custom';
     const [customRoutine, setCustomRoutine] = useState(null);
     const styles = createStyles(colorScheme);
+    const [activeTab, setActiveTab] = useState('performance');
     const selectWorkout = (id)=>{
         console.log(id);
         router.push(`/workout/${id}`);
@@ -58,7 +60,21 @@ export default function WorkoutSelectionScreen (){
     )
    
     return(
-       <SafeAreaView style={styles.container}>
+       <SafeAreaView style={styles.container} edges={['top']}>
+        <View style={styles.tabContainer}>
+            <TouchableOpacity style={[styles.tab, activeTab==='performance' && styles.activePerTab]} onPress={()=> setActiveTab('performance')} activeOpacity={0.7}>
+                <Text style={[styles.tabText, activeTab==='performance' && styles.activePerText]}>PERFORMANCE</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity style={[styles.tab, activeTab==='progress' && styles.activeProTab]} onPress={()=> setActiveTab('progress')} activeOpacity={0.7}>
+                <Text style={[styles.tabText, activeTab==='progress' && styles.activeProText]}>PROGRESS</Text>
+            </TouchableOpacity>
+        </View>
+
+        {activeTab === 'performance' ? 
+        (<PerformanceLog routine={isCustomRoutineUser? customRoutine: routines} activeProtocol={activeProtocol}/>):
+        (
+        <>
         <View style={styles.header}> 
             <Text style = {styles.headerText}>Select a Workout</Text>
         </View>
@@ -67,13 +83,21 @@ export default function WorkoutSelectionScreen (){
         keyExtractor={item => item.id}
         renderItem={renderItem}
         style={styles.list}
-        
         />
+        </>
+        )}
+        
+        
        </SafeAreaView>
     )
 }
 
 function createStyles(colorScheme){
+    const isDark = colorScheme === 'dark';
+    const weightAccent = isDark ? '#00FF66' : '#00C851'; // Neon Green
+    const sleepAccent =  '#D32F2F'  // Restorative Blue
+    const inactiveText = isDark ? '#666666' : '#A0A0A0';
+    const inactiveBorder = isDark ? '#222222' : '#E0E0E0';
     return StyleSheet.create({
     container:{
         flex: 1,
@@ -163,5 +187,37 @@ function createStyles(colorScheme){
         width: '100%',
         height: '100%',
     },
+     tabContainer: {
+            flexDirection: 'row',
+            borderBottomWidth: 1,
+            borderBottomColor: inactiveBorder,
+            marginBottom: 10,
+        },
+        tab: {
+            flex: 1,
+            alignItems: 'center',
+            paddingVertical: 16,
+            borderBottomWidth: 3,
+            borderBottomColor: 'transparent', // Invisible by default
+        },
+        tabText: {
+            fontSize: 15,
+            fontWeight: '800',
+            letterSpacing: 1,
+            color: inactiveText,
+        },
+        // Active Tab Dynamic Styles
+        activePerTab: {
+            borderBottomColor: weightAccent,
+        },
+        activePerText: {
+            color: weightAccent,
+        },
+        activeProTab: {
+            borderBottomColor: sleepAccent,
+        },
+        activeProText: {
+            color: sleepAccent,
+        },
     
 })}

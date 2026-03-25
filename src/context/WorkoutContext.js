@@ -87,7 +87,7 @@ export const WorkoutProvider=({children})=>{
     },[])
 
     return (
-        <WorkoutContext.Provider value={{isWorkoutActive, routineId, startWorkout, endWorkout, 
+        <WorkoutContext.Provider value={{isWorkoutActive,setIsWorkoutActive, routineId, startWorkout, endWorkout, 
                                          isChecking, setIsChecking,fromLogin, setFromLogin, 
                                          activeProtocol, setActiveProtocol, initializeProtocol,isProtocolLoading,
                                          weightUnit, changeWeightUnit, heightUnit, changeHeightUnit

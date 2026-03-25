@@ -11,7 +11,7 @@ export default function CustomMissionCard({isReady}){
 
     const router = useRouter();
     const {colorScheme} = useContext(ThemeContext);
-    const {isWorkoutActive, setIsChecking} = useContext(WorkoutContext);
+    const {isWorkoutActive, setIsChecking, startWorkout, setIsWorkoutActive} = useContext(WorkoutContext);
     const {activeProtocol} = useContext(WorkoutContext);
     const isDark = colorScheme==='dark';
     const styles = createStyles(isDark); 
@@ -60,6 +60,7 @@ export default function CustomMissionCard({isReady}){
 
     const doingWorkout = ()=>{
         setIsChecking(false);
+        startWorkout(nextCustomMission.id);
         router.push(`/workout/${nextCustomMission.id}?type=custom`);
     }
 
@@ -70,10 +71,11 @@ export default function CustomMissionCard({isReady}){
                 <Text style={{color: '#D32F2F', fontSize: 18, fontWeight: 'bold', marginBottom: 10}}>LOADING DIRECTIVE...</Text>
             </View>)
     }
+    //console.log(isWorkoutActive);
     return(
-        <View style={styles.cardContainer}>
-            <View style={styles.imageArea}>
-                {isReady? 
+        <View style={[styles.cardContainer, (!isReady && !isWorkoutActive) && {height: 380}]}>
+            <View style={[styles.imageArea, (!isReady && !isWorkoutActive) && {flex:3}]}>
+                {isReady || isWorkoutActive ? 
                    ( <View style={styles.fallbackImageContainer}>
                         <FontAwesome5 name="clipboard-list" size={100} color={isDark ? '#333' : '#E0E0E0'} style={styles.bgIcon} />
                         <View style={styles.fallbackHeader}>
@@ -95,9 +97,11 @@ export default function CustomMissionCard({isReady}){
         
             {isWorkoutActive?(
                 <TouchableOpacity style={[styles.actionButton, { backgroundColor: '#D32F2F' }]} onPress={doingWorkout}>
-                    <Text style={styles.mission}>MISSION IN PROGRESS</Text>
-                    <Text style={styles.nextWorkout}>RESUME</Text>
-                    <FontAwesome5 name="play" size={24} color={colorScheme === 'dark' ? 'white' : 'black'} />
+                   <View style={{width: '100%',flexDirection: 'row', alignItems: 'center', justifyContent: 'space-evenly', paddingVertical:10, }}>
+                     <Text style={styles.mission}>MISSION IN PROGRESS</Text>
+                     <Text style={styles.nextWorkout}>RESUME</Text>
+                     <FontAwesome5 name="play" size={24} color={colorScheme === 'dark' ? 'white' : 'black'} />
+                   </View>
                 </TouchableOpacity>
             ): isReady ? (
                 <TouchableOpacity style={[styles.actionButton, { backgroundColor: '#D32F2F' }]} onPress={doingWorkout}>

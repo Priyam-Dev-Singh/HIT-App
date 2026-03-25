@@ -14,7 +14,8 @@ export default function DataCalendar(){
         setMarkedDates(history);
        }
        loadCalendar();
-    },[])
+    },[]);
+   // console.log(markedDates);
     return(
         <View style={{width:'100%', borderRadius:15, overflow:'hidden'}}>
               <Calendar
