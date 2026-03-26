@@ -25,6 +25,9 @@ export default function LoggingScreen() {
     const [reps, setReps] = useState('');
     const [lastLog, setLastLog] = useState({});
     const [chartData, setChartData] = useState([]);
+
+    const [targetWeight, setTargetWeight] = useState(0);
+    const [targetReps, setTargetReps] = useState(0);
     
     // Inputs
     const weightInputRef = useRef(null);
@@ -66,6 +69,12 @@ export default function LoggingScreen() {
     const fetchLastLog = async () => {
         const data = await getLastLog(currentExercise.id);
         setLastLog(data);
+        if(data && data.length !==0){
+            const {targetWeight, targetReps} = targetSet(currentExercise.type, data.weight, data.reps, weightUnit);
+            setTargetWeight(targetWeight);
+            setTargetReps(targetReps);
+        }
+        
     };
 
     const performDelete = async () => {
@@ -104,8 +113,7 @@ export default function LoggingScreen() {
         fetchChartData();
     }, [currentExercise.id]);
 
-    const {targetWeight, targetReps} = targetSet(currentExercise.type, lastLog.weight, lastLog.reps, weightUnit);
-
+   
     return (
         <SafeAreaView style={styles.container} >
             <KeyboardAvoidingView
@@ -143,11 +151,11 @@ export default function LoggingScreen() {
                             <Text style={styles.executionText}>FAILURE: Push until the weight absolutely cannot be moved.</Text>
                         </View>
                     </View>
-                     {lastLog && lastLog.weight ? (
+                     {lastLog && lastLog.weight && !isChecking ? (
                         <View style={[styles.lastSet, {borderColor:'#D32F2F', borderWidth:1,}]}>
                             <View style={{ alignItems: "center", flexDirection: 'row' }}>
                                 <Text style={styles.lastSetContent}>Today's Target</Text>
-                                <Text style={styles.lastSetContent}>{targetWeight} kgs / {targetReps} reps</Text>
+                                <Text style={styles.lastSetContent}>{targetWeight.toString()} kgs / {targetReps.toString()} reps</Text>
                             </View>
                         </View>
                     ) : null}
@@ -397,7 +405,7 @@ function createStyles(colorScheme) {
         },
         headerText: {
             color: colorScheme === 'dark' ? 'white' : 'black',
-            fontSize: 23,
+            fontSize: 18,
             fontWeight: '700',
             letterSpacing: 0.5,
         },

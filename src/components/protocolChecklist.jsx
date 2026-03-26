@@ -75,7 +75,7 @@ export default function ProtocolChecklist({isReady, routine}){
                         const todayStr = getTodayString();
                         
                         if(markedDates[todayStr]){
-                           weightLogged = true;
+                           workoutCompleted = true;
                         }
                     }
                     setTasks({weight: weightLogged, sleep: sleepLogged, macros: macrosLogged, workout: workoutCompleted});

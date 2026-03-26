@@ -14,15 +14,15 @@ const updates = [
         desc: 'Users can now forge custom training splits from our 190+ exercise database. Go to Menu -> Switch Protocol'
     },
     {
+        icon: 'chart-bar',
+        title: 'PERFORMANCE ANALYSIS',
+        desc: 'App can now analyse lifts and give analysis. Also detects plateaus. Go to Progress Tab-> Performance'
+    },
+    {
         icon: 'tachometer-alt',
         title: 'EDIT PROFILE',
         desc: 'User can now edit their Profile Data based on their goals'
     },
-    {
-        icon: 'bolt',
-        title: 'SYSTEM OPTIMIZATION',
-        desc: 'Bug fixes and major interface improvements'
-    }
 ];
 
 export default function WhatsNewModal({ visible, onClose, version = "1.1.0" }) {
@@ -75,7 +75,7 @@ export default function WhatsNewModal({ visible, onClose, version = "1.1.0" }) {
                     {/* ACTION BUTTON */}
                     <TouchableOpacity 
                         style={styles.actionButton} 
-                        onPress={onClose} // <-- You will run your AsyncStorage logic inside the parent component when this fires
+                        onPress={onClose} 
                         activeOpacity={0.8}
                     >
                         <Text style={styles.actionButtonText}>UNDERSTOOD</Text>

@@ -236,7 +236,7 @@ function createStyles (colorScheme){
       alignItems: 'center',
       justifyContent: 'flex-start',
       paddingHorizontal: 20,     
-      paddingVertical: 15,      
+      paddingVertical: 10,      
       backgroundColor: 'transparent',
       gap:'22%',
     },
