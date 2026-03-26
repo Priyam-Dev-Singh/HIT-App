@@ -58,7 +58,13 @@ export default function WorkoutSelectionScreen (){
             />
         </Pressable>
     )
-   
+   if(!activeProtocol){
+     return(
+        <View style={{flex: 1, alignItems: 'center', justifyContent:'center', backgroundColor: colorScheme==='dark'?'black':'white'}}>
+            <Text style={{color:colorScheme==='dark'?'white':'black', fontSize: 20,}}>Select a Routine first</Text>
+        </View>
+     )
+   }
     return(
        <SafeAreaView style={styles.container} edges={['top']}>
         <View style={styles.tabContainer}>

@@ -6,6 +6,7 @@ import { WorkoutContext } from "../context/WorkoutContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import CustomMissionExerciseList from "./homeScreen/customMissionExerciseList";
 import { useRouter } from "expo-router";
+import { getTodayStringAdv, getWorkoutHistory } from "../storage";
 
 export default function CustomMissionCard({isReady}){
 
@@ -17,6 +18,8 @@ export default function CustomMissionCard({isReady}){
     const styles = createStyles(isDark); 
     const [showInfoModal, setShowInfoModal] = useState(false);
     const [nextCustomMission, setNextCustomMission] = useState(null);
+    const [showNextWorkoutModal, setShowNextWorkoutModal] = useState(false);
+    //const [isReady, setIsReady] = useState(false);
 
     const recoveryImageD = require('./recoveryD.jpg');
     const recoveryImageL = require('./recoveryL.jpg');
@@ -25,6 +28,7 @@ export default function CustomMissionCard({isReady}){
 
     useEffect(()=>{
         const initializeCard = async()=>{
+            
             const storedRoutine = await AsyncStorage.getItem("customRoutine");
          // console.log(storedRoutine);
           const lastWorkoutId = await AsyncStorage.getItem("lastWorkoutId");
@@ -94,6 +98,10 @@ export default function CustomMissionCard({isReady}){
                 <Text style={styles.statusText}>{badgeText}</Text>
                 <Feather name="info" size={15} color={colorScheme === 'dark' ? 'white' : 'black'} />
             </TouchableOpacity>
+            {!isReady && <TouchableOpacity style={[styles.nextBadge,{ borderColor: '#D32F2F',}]} onPress={()=> setShowNextWorkoutModal(true)}>
+                <Feather name="chevrons-right" size={15} color={colorScheme === 'dark' ? 'white' : 'black'} />
+                <Text style={[styles.statusText,{textAlign:'center', fontSize: 15, padding: 2}]}>{nextCustomMission?.title}</Text>
+            </TouchableOpacity>}
             </View>
         
             {isWorkoutActive?(
@@ -139,6 +147,18 @@ export default function CustomMissionCard({isReady}){
             </View>
         </Modal>
 
+        <Modal animationType="fade" transparent={true} visible={showNextWorkoutModal} onRequestClose={()=> setShowNextWorkoutModal(false)}>
+             <View style={styles.modalOverlay}>
+                <View style={styles.modalContent}>
+                    <Text style={styles.modalTitle}>Next Workout: {nextCustomMission.title}</Text>
+                    <CustomMissionExerciseList exerciseIds={nextCustomMission.exercises}/>
+                    <TouchableOpacity style={styles.modalCloseBtn} onPress={()=> setShowNextWorkoutModal(false)}>
+                        <Text style={styles.modalCloseText}>Close</Text>
+                    </TouchableOpacity>
+                    
+                </View>
+            </View> 
+        </Modal>
         </View>
     )
 }
@@ -219,6 +239,19 @@ function createStyles(isDark){
             position: 'absolute',
             right: 11, 
             top: 12, 
+            gap: 10,
+            flexDirection:'row',
+            justifyContent:'center',
+            alignItems:'center',
+            paddingVertical: 3,
+            paddingHorizontal: 7,
+            borderRadius: 6, 
+            backgroundColor: 'rgba(0,0,0,0.6)',
+            borderWidth: 1, 
+        },
+        nextBadge: {
+            position: 'absolute',
+            bottom: 10, 
             gap: 10,
             flexDirection:'row',
             justifyContent:'center',

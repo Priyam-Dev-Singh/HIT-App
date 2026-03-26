@@ -1,34 +1,33 @@
 import { useContext, useEffect, useState } from "react";
-import { Image, Modal, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Image, Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { WorkoutContext } from "../context/WorkoutContext";
 import { FontAwesome5, Feather } from '@expo/vector-icons';
-import { fetchLastGlobalWorkout, getCurrentRoutine } from "../storage";
+import { fetchLastGlobalWorkout, getCurrentRoutine, getTodayStringAdv, getWorkoutHistory } from "../storage";
 import { HitRoutine, routines } from "../../data/routines";
 import { useRouter } from "expo-router";
 import { ThemeContext } from "../context/ThemeContext";
+import { exercises } from "../../data/exercises";
 
 export default function MissionCard(){
     const router = useRouter();
     const {colorScheme} = useContext(ThemeContext);
     const {setIsChecking, startWorkout, isWorkoutActive,} = useContext(WorkoutContext);
-    const [lastLog, setLastLog] = useState({});
     const [routine, setRoutine] = useState({});
     const[isReady, setIsReady] = useState(true);
     const [restTime, setrestTime] = useState('');
     const[showInfoModal, setShowInfoModal] = useState(false);
+
+    const [exerciseList, setExerciseList] = useState([]);
+    const [showNextWorkoutModal, setShowNextWorkoutModal] = useState(false);
+
     const styles = createStyles(colorScheme);
     const recoveryImageD = require('./recoveryD.jpg');
     const recoveryImageL = require('./recoveryL.jpg');
 
     useEffect(()=>{
         const getCardData = async()=>{
-            const data = await fetchLastGlobalWorkout();
-            setLastLog(data);
-                //console.log(data);
-            if(data && data.date){
-                const ready = hoursAgo(data.date);
-                setIsReady(ready);
-            }
+           
+            await checkHitReadiness();
             const currentRoutine = await findCurrentRoutine();
             setRoutine(currentRoutine);
         }
@@ -42,23 +41,56 @@ export default function MissionCard(){
           const currentRoutineId = HitRoutine[currentIndex];
           //console.log(currentRoutineId);
           const currentRoutine = routines.find(rt=> rt.id === currentRoutineId);
+
+          const listOfEx = currentRoutine.exerciseIds.map(id=>exercises.find(ex=>ex.id===id));
+          setExerciseList(listOfEx);
           //console.log(currentRoutine);
           return currentRoutine;
         }
     
-    const hoursAgo =(dateString)=>{
-      const past = new Date (dateString);
-      const now = new Date();
-      const diffTime = Math.abs(now-past);
-      const diffMin = Math.floor(diffTime/(1000*60));
-      const diffHrs = Math.floor(diffMin/60);
-      const hrs = 47-diffHrs;
-    
-      const minutes = 60 - diffMin%60;
-      setrestTime(`${hrs}h ${minutes}m`);
-      if(diffHrs>48){return true;}
-      else {return false;}
+    const checkHitReadiness = async()=>{
+        try{
+            const markedDates = await getWorkoutHistory();
+            if(!markedDates){
+                setIsReady(true);
+                return;
+            }
+            const markedDatesArray = Object.keys(markedDates);
+            if(markedDatesArray.length===0){
+                setIsReady(true);
+                return;
+            }
+            markedDatesArray.sort((a,b)=> new Date(b)- new Date(a));
+            const lastWorkoutDateStr = markedDatesArray[0];
+
+            const [lastYear, lastMonth, lastDay] = lastWorkoutDateStr.split('-');
+            const lastWorkoutMidnight = new Date(lastYear, lastMonth-1, lastDay);
+            const lastWorkoutObj = new Date(lastYear, lastMonth-1, lastDay);
+            
+            lastWorkoutObj.setDate(lastWorkoutObj.getDate()+2);
+            const nextYear = lastWorkoutObj.getFullYear();
+            const nextMonth = String(lastWorkoutObj.getMonth()+1).padStart(2, '0');
+            const nextDay = String(lastWorkoutObj.getDate()).padStart(2,'0');
+
+            const nextWorkoutDate = `${nextDay}-${nextMonth}-${nextYear}`;
+
+            setrestTime(nextWorkoutDate);
+
+            const today = new Date();
+            const todayMidnight = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+
+            const diffInMilliSec = todayMidnight - lastWorkoutMidnight;
+            const diffInDays = diffInMilliSec/(24*60*60*1000);
+
+            if(diffInDays>=3){
+                setIsReady(true);
+            }else{
+                setIsReady(false);
+            }
+
+        }catch(e){console.error('Error checking hit readiness',e); setIsReady(true);}
     }
+
     const badgeColor = isWorkoutActive ? '#FF4444' : (isReady ? '#00FF66' : '#0088FF');
     const badgeText = isWorkoutActive ? "IN PROGRESS" : (isReady ? 'SYSTEM READY' : 'RECOVERING');
        
@@ -70,6 +102,12 @@ export default function MissionCard(){
                     <Text style={styles.statusText}>{badgeText}</Text>
                     <Feather name="info" size={18} color={colorScheme==='dark'?'white':'black'} />
                 </TouchableOpacity>
+
+                {!isReady && 
+                <TouchableOpacity style={[styles.nextBadge, {borderColor: '#D32F2F'}]} onPress={()=> setShowNextWorkoutModal(true)} >
+                    <Feather name="chevrons-right" size={18} color={colorScheme==='dark'?'white':'black'} />
+                    <Text style={styles.statusText}>{routine?.name}</Text>  
+                </TouchableOpacity>}
             </View>
             {isWorkoutActive?
                        <TouchableOpacity style={[styles.actionButton, { backgroundColor: '#D32F2F' }]} onPress={()=>{
@@ -100,7 +138,7 @@ export default function MissionCard(){
                             <Text style= {styles.recoveryText}>Recovery Mode</Text>
                             <Feather name="battery-charging" size={30} color="white" />
                         </View>
-                         <Text style= {styles.timerText}>Next session unlocks in: {restTime}</Text>
+                         <Text style= {styles.timerText}>Next session on: {restTime}{'\n'}{'Take 8 hrs of sleep'}</Text>
                        </View>
                         )}
             
@@ -116,6 +154,32 @@ export default function MissionCard(){
                         <TouchableOpacity style={styles.modalCloseBtn} onPress={()=> setShowInfoModal(false)}>
                             <Text style={styles.modalCloseText}>UNDERSTOOD</Text>
                         </TouchableOpacity>
+                    </View>
+                </View>
+            </Modal>
+             
+            <Modal animationType="fade" transparent={true} visible={showNextWorkoutModal} onRequestClose={()=>setShowNextWorkoutModal(false)}>
+                <View style={styles.modalOverlay}>
+                   
+                    <View style={[styles.modalContent,{padding: 15,}]}>
+                        <View style={styles.modalHeader}>
+                            <Text style={[styles.modalTitle,{fontSize: 20, marginBottom:0, textAlign:'center'}]} numberOfLines={2}>NEXT WORKOUT{'\n'} {routine.name}</Text>
+                            <TouchableOpacity onPress={()=> setShowNextWorkoutModal(false)}>
+                                <Feather name="x" size={25} color={'#D32F2F'} />
+                            </TouchableOpacity>
+                        </View>
+                        <ScrollView contentContainerStyle={{flexGrow: 1, paddingBottom: 20}} showsVerticalScrollIndicator={false} >
+                            {exerciseList.map((exercise, index)=>{
+                            return(
+                                <View key={index} style={styles.exerciseRow}>
+                                    <View style={styles.tacticalDotOuter}>
+                                        <View style={styles.tacticalDotInner}/>
+                                    </View>
+                                    <Text style={styles.exerciseName}>{exercise.name}</Text>
+                                </View>
+                            )
+                        })} 
+                        </ScrollView>
                     </View>
                 </View>
             </Modal>
@@ -213,6 +277,20 @@ function createStyles (colorScheme){
             borderWidth: 1, 
             borderColor: 'rgba(255,255,255,0.2)',
         },
+        nextBadge: {
+            position: 'absolute', 
+            bottom: 10, 
+            gap: 10,
+            flexDirection:'row',
+            justifyContent:'center',
+            alignItems:'center',
+            paddingVertical: 6,
+            paddingHorizontal: 12,
+            borderRadius: 6, 
+            backgroundColor: 'rgba(0,0,0,0.6)',
+            borderWidth: 1, 
+            borderColor: 'rgba(255,255,255,0.2)',
+        },
         statusText: {
             color: 'white',
             fontSize: 10,
@@ -241,13 +319,15 @@ function createStyles (colorScheme){
             fontWeight: 'bold',
             marginTop: 4,
             letterSpacing: 1,
+            textAlign: 'center',
         },
         modalTitle: {
             color: isDark ? '#FFF' : '#000',
             fontSize: 20,
             fontWeight: '900',
             letterSpacing: 1,
-            marginBottom: 10,
+            flex:1,
+            marginBottom: 20,
             textTransform: 'uppercase',
         },
         modalText: {
@@ -274,11 +354,56 @@ function createStyles (colorScheme){
         },
         modalContent: {
             backgroundColor: isDark ? '#1C1C1E' : '#FFFFFF',
+            maxHeight: '45%',
             width: '85%',
-            padding: 25,
             borderRadius: 15,
             borderWidth: 1,
             borderColor: isDark ? '#333' : '#E5E5EA',
         },
+        exerciseRow: {
+            flexDirection: 'row',
+            alignItems: 'center',
+            paddingVertical: 12,
+            borderBottomWidth: 1,
+            borderBottomColor: isDark ? '#2A2A2C' : '#EAEAEA',
+        },
+        tacticalDotOuter: {
+            width: 14,
+            height: 14,
+            borderRadius: 7,
+            backgroundColor: isDark ? 'rgba(211, 47, 47, 0.25)' : 'rgba(211, 47, 47, 0.15)', // Translucent Halo
+            justifyContent: 'center',
+            alignItems: 'center',
+            marginRight: 15,
+            marginLeft: 5, // Slight indent to align nicely
+        },
+        tacticalDotInner: {
+            width: 6,
+            height: 6,
+            borderRadius: 3,
+            backgroundColor: '#D32F2F', // Solid Hero Red Core
+            
+            // Subtle Glow Effect
+            shadowColor: '#D32F2F',
+            shadowOffset: { width: 0, height: 0 },
+            shadowOpacity: 0.8,
+            shadowRadius: 4,
+            elevation: 3,
+        },
+        exerciseName: {
+            color: isDark ? '#E0E0E0' : '#222',
+            fontSize: 12,
+            fontWeight: '600',
+            flex: 1,
+        },
+        modalHeader: {
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            marginBottom: 20, // Space between header and the scrollable list
+            borderBottomWidth: 1, // Optional: Adds a subtle line under the header
+            borderBottomColor: isDark ? '#333' : '#E5E5EA',
+            paddingBottom: 15,
+            flexDirection: 'row',
+},
     })
 }

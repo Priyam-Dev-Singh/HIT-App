@@ -4,7 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import { useCallback, useContext, useEffect, useState } from 'react';
 import { ThemeContext } from '../../src/context/ThemeContext';
-import { fetchLastGlobalWorkout, getCurrentRoutine, getWorkoutHistory, logOut } from '../../src/storage';
+import { fetchLastGlobalWorkout, getCurrentRoutine, getTodayStringAdv, getWorkoutHistory, logOut } from '../../src/storage';
 import { HitRoutine, routines } from '../../data/routines';
 import Octicons from '@expo/vector-icons/Octicons';
 import {Ionicons, FontAwesome5 } from '@expo/vector-icons';
@@ -56,19 +56,14 @@ export default function HomeScreen(){
             await initializeProtocol();
             setFromLogin(false);  
           }
+        
+        await checkReadiness();
 
         const data = await fetchLastGlobalWorkout();
         setLastLog(data);
         //console.log(data);
-        if(data && data.date){
-          const ready = hoursAgo(data.date);
-          setIsReady(ready);
-        }
-       if(activeProtocol==='hit'){
-         const currentRoutine = await findCurrentRoutine();
-         setRoutine(currentRoutine);
-       }
-       else if(activeProtocol==='custom'){
+      
+       if(activeProtocol==='custom'){
         const jsonValue = await AsyncStorage.getItem('customRoutine');
         
         const customRoutine = JSON.parse(jsonValue);
@@ -86,7 +81,14 @@ export default function HomeScreen(){
     },[fromLogin, activeProtocol])
       );
     
-    
+      const checkReadiness = async()=>{
+        const markedDates = await getWorkoutHistory();
+        const todayStr = getTodayStringAdv();
+        if(markedDates){
+          if(markedDates[todayStr]) setIsReady(false);
+          else setIsReady(true);
+        }else setIsReady(true);
+      }
 
     const getRoutine = ()=>{
      if(routines[0].exerciseIds.includes(lastLog.exerciseId)){
@@ -105,35 +107,6 @@ export default function HomeScreen(){
       if (diffDays === 0) return "Today";
       if (diffDays === 1) return "Yesterday";
       return `${diffDays} days ago`
-    }
-    
-    const hoursAgo =(dateString)=>{
-      const past = new Date (dateString);
-      const now = new Date();
-      const diffTime = Math.abs(now-past);
-      const diffHrs = Math.floor(diffTime/(1000*60*60));
-      if(activeProtocol === 'hit'){
-        if(diffHrs>48){
-          return true;
-        }
-        else {return false;}
-      }
-      else{
-        if(diffHrs>12) return true;
-        else false;
-      }
-    }
-
-    const findCurrentRoutine = async ()=>{
-      const index = await getCurrentRoutine();
-      const currentIndex = index+1 < HitRoutine.length ? index+1 : 0; 
-      //console.log(currentIndex);
-      const currentRoutineId = HitRoutine[currentIndex];
-      //console.log(currentRoutineId);
-      const currentRoutine = routines.find(rt=> rt.id === currentRoutineId);
-      //console.log(currentRoutine);
-      return currentRoutine;
-
     }
 
     const setHIT = async()=>{
@@ -200,7 +173,7 @@ export default function HomeScreen(){
           <View style={styles.header}>
             <Text style={styles.headerText}>Last Workout {lastCustomWorkout?.title||''} : {daysAgo(lastLog.date)}</Text>
           </View>}
-          <CustomMissionCard isReady={isReady}/> 
+          <CustomMissionCard isReady={isReady} /> 
           <ProtocolChecklist isReady={isReady} routine={routine}/>
           </>
         )}  

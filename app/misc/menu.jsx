@@ -54,7 +54,7 @@ export default function MenuScreen(){
                             }
                         }
 
-                        await AsyncStorage.setItem('activeProtocol', newProtocol);
+                        await AsyncStorage.setItem('active_protocol', newProtocol);
                         setActiveProtocol(newProtocol);
                         try{
                             const {data:{user}} = await supabase.auth.getUser();
