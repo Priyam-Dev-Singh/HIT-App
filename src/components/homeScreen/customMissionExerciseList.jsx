@@ -4,7 +4,7 @@ import { ThemeContext } from "../../context/ThemeContext";
 import { FontAwesome5 } from '@expo/vector-icons';
 import { customExercises } from "../../../data/customExercises";
 
-export default function CustomMissionExerciseList ({exerciseIds}){
+export default function CustomMissionExerciseList ({exerciseIds, isModal = false}){
 
     const {colorScheme} = useContext(ThemeContext);
     const isDark = colorScheme==='dark';
@@ -27,7 +27,7 @@ export default function CustomMissionExerciseList ({exerciseIds}){
                 <FontAwesome5 name="crosshairs" size={14} color="#D32F2F" />
                 <Text style={styles.headerText}>TARGET LOADOUT</Text>
             </View>
-            <ScrollView style={styles.listContainer} contentContainerStyle={{flexGrow:1,paddingBottom: 20,}}>
+            <View style={styles.listContainer} contentContainerStyle={{flexGrow:1,paddingBottom: 20,}}>
                 {userExercises.map((exercise,index)=>{
                    return(
                     <View key={index} style={styles.exerciseRow}>
@@ -38,7 +38,7 @@ export default function CustomMissionExerciseList ({exerciseIds}){
                     </View>
                    )
 })}
-            </ScrollView>
+            </View>
         </View>
     )
 }
@@ -48,7 +48,7 @@ function createStyles(isDark){
     return StyleSheet.create({
         container: {
             width: '92%',
-            maxHeight: 200,
+           // maxHeight: 200,
             alignSelf: 'center',
             marginTop: 5,
             marginBottom: 20, // Gives breathing room at the bottom of the scroll

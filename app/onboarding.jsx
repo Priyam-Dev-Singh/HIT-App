@@ -131,14 +131,15 @@ export default function OnboardingScreen(){
                 <Text style={styles.introSubtitle}>SYSTEM CAPABILITIES</Text>
             </FadeInView>
             <View style={styles.featureList}>
-                <FadeInView delay={600} style={styles.featureItem}>
-                    <FontAwesome5 name="check-circle" size={24} color= '#EF6C00'/>
-                    <Text style={styles.featureText}>Follow optimal routines for your exact goals.</Text>
-                </FadeInView>
-                
-                <FadeInView delay={1000} style={styles.featureItem}>
+
+                 <FadeInView delay={600} style={styles.featureItem}>
                     <FontAwesome5 name="fire-alt" size={24} color='#D32F2F'/>
-                    <Text style={styles.featureText}>Track top sets with high-intensity execution.</Text>
+                    <Text style={styles.featureText}>Track whole workout in 20 sec. Top Set tracking.</Text>
+                </FadeInView>
+
+                <FadeInView delay={1000} style={styles.featureItem}>
+                    <FontAwesome5 name="check-circle" size={24} color= '#EF6C00'/>
+                    <Text style={styles.featureText}>Follow the optimal routine for size & strength.</Text>
                 </FadeInView>
                 
                 <FadeInView delay={1400} style={styles.featureItem}>

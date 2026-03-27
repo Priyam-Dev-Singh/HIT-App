@@ -149,7 +149,7 @@ export default function CustomRoutineBuilderScreen(){
     },[draftExercises, isDark, toggleExercise])
     
     return(
-        <SafeAreaView style={styles.container} edges={["top",'left','right']}>
+        <SafeAreaView style={styles.container}>
             <StatusBar style={isDark ? 'light':'dark'}/>
             <View style={styles.header}>
                 <TouchableOpacity onPress={()=>router.back()}>
@@ -222,13 +222,12 @@ export default function CustomRoutineBuilderScreen(){
                 <Feather name="plus-circle" size={20} color={isDark ? '#FFF' : '#000'} />
                 <Text style={styles.addBtnText}>ADD WORKOUT TO THE ROUTINE</Text>
             </TouchableOpacity>
-            
-            <TouchableOpacity style={styles.saveBtn} onPress={saveRoutine}>
+           
+             </ScrollView>
+             <TouchableOpacity style={styles.saveBtn} onPress={saveRoutine}>
               <Text style={styles.saveBtnText}>{isSaving? 'INITIALIZING...':'INITIALIZE SYSTEM'}</Text>
                 <Ionicons name="shield-checkmark" size={20} color="#FFF" />
             </TouchableOpacity>
-           
-             </ScrollView>
         </KeyboardAvoidingView>
 
             <Modal animationType='slide' transparent={true} visible={isModalVisible} onRequestClose={()=>setIsModalVisible(false)}>

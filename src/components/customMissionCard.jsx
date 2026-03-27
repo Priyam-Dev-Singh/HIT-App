@@ -76,7 +76,7 @@ export default function CustomMissionCard({isReady}){
             </View>)
     }
     //console.log(isWorkoutActive);
-    console.log("is ready :",isReady);
+    //console.log("is ready :",isReady);
     return(
         <View style={[styles.cardContainer, (!isReady && !isWorkoutActive) && {height: 380}]}>
             <View style={[styles.imageArea, (!isReady && !isWorkoutActive) && {flex:3}]}>

@@ -150,6 +150,10 @@ export default function LoggingScreen() {
                             <FontAwesome5 name="skull" size={14} color="#D32F2F" />
                             <Text style={styles.executionText}>FAILURE: Push until the weight absolutely cannot be moved.</Text>
                         </View>
+                        <View style={styles.executionRow}>
+                            <MaterialCommunityIcons name="dumbbell" size={18} color="#D32F2F" />
+                            <Text style={styles.executionText}>TRACK: Log your top set only.</Text>
+                        </View>
                     </View>
                      {lastLog && lastLog.weight && !isChecking ? (
                         <View style={[styles.lastSet, {borderColor:'#D32F2F', borderWidth:1,}]}>
@@ -234,12 +238,12 @@ export default function LoggingScreen() {
                     {/* Inputs */}
                     {!isChecking ? (
                         <>  
-                           {['ex_09','ex_14'].includes(currentExercise.id)?
+                        
                            <View style={{flexDirection:'row', alignItems:'center', marginHorizontal:20}}>
-                            <AntDesign name="info-circle" size={15} color={colorScheme==='dark'?'white':'black'} />
-                            <Text style={[styles.description, {marginTop:10}]}>If doing with no weight mark weight as 1</Text>
+                            <AntDesign name="info-circle" size={14} color={colorScheme==='dark'?'white':'black'} />
+                            <Text style={[styles.description, {marginTop:10}]}>For bodyweight movements mark weight as 1</Text>
                            </View>
-                           :null}
+                           
                             <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-evenly' }}>
                                 <View style={styles.logContainers}>
                                     <Text style={styles.weightAndReps}>Weight {weightUnit==='kg'?'(KG)':'(LBS)'}</Text>
