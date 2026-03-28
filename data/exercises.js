@@ -1,34 +1,34 @@
 export const exercises = [
     {
-        'id' : 'ex_01',
-        'name' : 'Chest Flyes',
+        'id' : 'ex_14',
+        'name' : 'Incline Chest Flyes',
         'type' : 'isolation',
         'muscleGroup' : 'Chest',
-        'description': 'Chest Flyes either with Dumbbell or on a machine',
+        'description': 'Chest Flyes either with Dumbbell on a incline bench',
         'imageD': require('../assets/exercisesImages/chestFlyesD.jpg'),
         'imageL': require('../assets/exercisesImages/chestFlyesL.jpg'),
         
     },
     {
-        'id': 'ex_02',
-        'name': 'Incline Press',
+        'id': 'ex_07',
+        'name': 'Incline Dumbbell Press',
         'type': 'compound',
         'muscleGroup' : 'Chest (Upper Chest)',
-        'description': 'Incline Chest Press either free weights or a machine',
+        'description': 'Incline Chest Press with dumbbell',
         'imageD': require('../assets/exercisesImages/inclinePressD.jpg'),  
         'imageL': require('../assets/exercisesImages/inclinePressL.jpg'),  
     },
     {
-        'id':'ex_03',
+        'id':'ex_62',
         'name':'Straight Arm PullDowns',
         'type' : 'isolation',
         'muscleGroup':'Back (Lats)',
-        'description':'Straight arm Lat Pulldowns on a Lat pulldown machine',
+        'description':'Straight arm Lat Pulldowns on the cables with a rope',
         'imageD': require('../assets/exercisesImages/straightArmLatPulldownD.jpg'),
         'imageL': require('../assets/exercisesImages/straightArmLatPulldownL.jpg'),
     },
     {
-        'id':'ex_04',
+        'id':'ex_40',
         'name':'Palms-up Pulldown',
         'type': 'compound',
         'muscleGroup':'Back and Biceps',
@@ -37,7 +37,7 @@ export const exercises = [
         'imageL': require('../assets/exercisesImages/palmsUpPulldownsL.jpg'),
     },
     {
-        'id':'ex_05',
+        'id':'ex_53',
         'name':'Deadlift',
         'type': 'compound',
         'muscleGroup':'Back',
@@ -46,7 +46,7 @@ export const exercises = [
         'imageL': require('../assets/exercisesImages/deadliftL.jpg'),
     },
     {
-        'id':'ex_06',
+        'id':'ex_90',
         'name':'Leg Extensions',
         'type' : 'isolation',
         'muscleGroup':'Quads',
@@ -55,7 +55,7 @@ export const exercises = [
         'imageL': require('../assets/exercisesImages/legExtensionsL.jpg'),
     },
     {
-        'id':'ex_07',
+        'id':'ex_74',
         'name':'Leg Press',
         'type': 'compound',
         'muscleGroup':'Legs',
@@ -64,8 +64,8 @@ export const exercises = [
         'imageL': require('../assets/exercisesImages/legPressL.jpg'),
     },
     {
-        'id':'ex_08',
-        'name':'Calf Raises',
+        'id':'ex_95',
+        'name':'Standing Calf Raises',
         'type' : 'isolation',
         'muscleGroup':'Calves',
         'description': 'Standing Calf raises preferably on a machine',
@@ -73,7 +73,7 @@ export const exercises = [
         'imageL': require('../assets/exercisesImages/calfRaisesL.jpg'),
     },
     {
-        'id':'ex_09',
+        'id':'ex_166',
         'name':'Sit ups',
         'type' : 'isolation',
         'muscleGroup':'Abdominals',
@@ -82,7 +82,7 @@ export const exercises = [
         'imageL': require('../assets/exercisesImages/crunchesL.jpg'),
     },
     {
-        'id':'ex_10',
+        'id':'ex_111',
         'name':'Lateral Raises',
         'type' : 'isolation',
         'muscleGroup':'Lateral Delts',
@@ -91,7 +91,7 @@ export const exercises = [
         'imageL': require('../assets/exercisesImages/lateralRaisesL.jpg'),
     },
     {
-        'id':'ex_11',
+        'id':'ex_122',
         'name':'Rear Delt Fly',
         'type' : 'isolation',
         'muscleGroup':'Rear Delts',
@@ -100,7 +100,7 @@ export const exercises = [
         'imageL': require('../assets/exercisesImages/rearDeltFlyL.jpg'),
     },
     {
-        'id':'ex_12',
+        'id':'ex_191',
         'name':'Close Grip Pulldown',
         'type': 'compound',
         'muscleGroup':'Biceps and Back',
@@ -109,17 +109,17 @@ export const exercises = [
         'imageL': require('../assets/exercisesImages/palmsUpPulldownsL.jpg'),
     },
     {
-        'id':'ex_13',
+        'id':'ex_147',
         'name':'Tricep Pressdown',
         'type' : 'isolation',
         'muscleGroup':'Triceps',
-        'description': 'Tricep press downs on a machine',
+        'description': 'Tricep press downs on a machine with a flat bar',
         'imageD': require('../assets/exercisesImages/tricepPushdownsD.jpg'),
         'imageL': require('../assets/exercisesImages/tricepPushdownsL.jpg'),
     },
     
     {
-        'id':'ex_14',
+        'id':'ex_26',
         'name':'Dips',
         'type': 'compound',
         'muscleGroup':'Chest',

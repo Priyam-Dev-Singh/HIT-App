@@ -8,7 +8,8 @@ export const PerformanceAnalysis = async (routine, activeProtocol)=>{
     const jsonValue = await AsyncStorage.getItem('@workoutLogs');
     const storedLogs = jsonValue != null ? JSON.parse(jsonValue):[];
     let allExercises = [];
-    routine.forEach((w)=> {
+    if(isCustomUser){
+        routine.forEach((w)=> {
         if(w.exercises){
             w.exercises.forEach(exId=>{
                 if(!allExercises.includes(exId)){
@@ -17,6 +18,17 @@ export const PerformanceAnalysis = async (routine, activeProtocol)=>{
             })
         }
     } );
+    }else{
+        routine.forEach((w)=>{
+            w.exerciseIds.forEach(exId=>{
+                if(!allExercises.includes(exId)){
+                    allExercises.push(exId);
+                }
+            })
+        })
+
+    }
+    console.log(routine);
    const performanceData = allExercises.map((exId)=>analyseLast3Lifts(exId,storedLogs));
    //console.log(performanceData);
    return performanceData;
