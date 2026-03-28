@@ -31,7 +31,7 @@ export const saveSet = async (exerciseId, weight, reps)=>{
 
         //updating
         const updatedLogs = [...currentLogs,newLog];
-        console.log(JSON.stringify(updatedLogs));
+        //console.log(JSON.stringify(updatedLogs));
 
         //saving to storage
         await AsyncStorage.setItem(workoutStorageKey,JSON.stringify(updatedLogs));
@@ -111,7 +111,7 @@ export const deleteLastLog = async (exerciseId) => {
         if(error){console.error("Error deleting from cloud", error);
             return false;
         }
-        console.log('Last set was deleted');
+        console.log('Last set was deleted from cloud');
 
     }catch(error){console.error("Error deleting workout from DB", error)}
 
