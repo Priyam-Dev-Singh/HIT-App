@@ -66,7 +66,7 @@ export default function ExerciseSelectionScreen(){
     else{
         currentRoutine = routines.find((routine)=> routine.id===id);
         const currentExerciseIds = [...currentRoutine.exerciseIds];
-        currentExercises = currentExerciseIds.map(id => exercises.find(obj => obj.id === id));
+        currentExercises = currentExerciseIds.map(id => customExercises.find(obj => obj.id === id));
     }
 
 

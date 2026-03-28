@@ -294,6 +294,7 @@ function createStyles(isDark){
         philosophySubtitle: {
             color: 'rgba(255,255,255,0.6)',
             fontSize: 10,
+            textAlign:'center',
             fontStyle: 'italic',
             marginTop: 2,
         },

@@ -7,14 +7,13 @@ import { HitRoutine, routines } from "../../data/routines";
 import { useRouter } from "expo-router";
 import { ThemeContext } from "../context/ThemeContext";
 import { exercises } from "../../data/exercises";
+import { customExercises } from "../../data/customExercises";
 
-export default function MissionCard(){
+export default function MissionCard({isReady, restTime}){
     const router = useRouter();
     const {colorScheme} = useContext(ThemeContext);
     const {setIsChecking, startWorkout, isWorkoutActive,} = useContext(WorkoutContext);
     const [routine, setRoutine] = useState({});
-    const[isReady, setIsReady] = useState(true);
-    const [restTime, setrestTime] = useState('');
     const[showInfoModal, setShowInfoModal] = useState(false);
 
     const [exerciseList, setExerciseList] = useState([]);
@@ -26,8 +25,7 @@ export default function MissionCard(){
 
     useEffect(()=>{
         const getCardData = async()=>{
-           
-            await checkHitReadiness();
+        
             const currentRoutine = await findCurrentRoutine();
             setRoutine(currentRoutine);
         }
@@ -42,58 +40,18 @@ export default function MissionCard(){
           //console.log(currentRoutineId);
           const currentRoutine = routines.find(rt=> rt.id === currentRoutineId);
 
-          const listOfEx = currentRoutine.exerciseIds.map(id=>exercises.find(ex=>ex.id===id));
+          const listOfEx = currentRoutine.exerciseIds.map(id=>customExercises.find(ex=>ex.id===id));
           setExerciseList(listOfEx);
           //console.log(currentRoutine);
           return currentRoutine;
         }
-    
-    const checkHitReadiness = async()=>{
-        try{
-            const markedDates = await getWorkoutHistory();
-            if(!markedDates){
-                setIsReady(true);
-                return;
-            }
-            const markedDatesArray = Object.keys(markedDates);
-            if(markedDatesArray.length===0){
-                setIsReady(true);
-                return;
-            }
-            markedDatesArray.sort((a,b)=> new Date(b)- new Date(a));
-            const lastWorkoutDateStr = markedDatesArray[0];
 
-            const [lastYear, lastMonth, lastDay] = lastWorkoutDateStr.split('-');
-            const lastWorkoutMidnight = new Date(lastYear, lastMonth-1, lastDay);
-            const lastWorkoutObj = new Date(lastYear, lastMonth-1, lastDay);
-            
-            lastWorkoutObj.setDate(lastWorkoutObj.getDate()+2);
-            const nextYear = lastWorkoutObj.getFullYear();
-            const nextMonth = String(lastWorkoutObj.getMonth()+1).padStart(2, '0');
-            const nextDay = String(lastWorkoutObj.getDate()).padStart(2,'0');
+         
 
-            const nextWorkoutDate = `${nextDay}-${nextMonth}-${nextYear}`;
-
-            setrestTime(nextWorkoutDate);
-
-            const today = new Date();
-            const todayMidnight = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-
-            const diffInMilliSec = todayMidnight - lastWorkoutMidnight;
-            const diffInDays = diffInMilliSec/(24*60*60*1000);
-
-            if(diffInDays>=3){
-                setIsReady(true);
-            }else{
-                setIsReady(false);
-            }
-
-        }catch(e){console.error('Error checking hit readiness',e); setIsReady(true);}
-    }
 
     const badgeColor = isWorkoutActive ? '#FF4444' : (isReady ? '#00FF66' : '#0088FF');
     const badgeText = isWorkoutActive ? "IN PROGRESS" : (isReady ? 'SYSTEM READY' : 'RECOVERING');
-       
+       //console.log(isReady);
     return(
         <View style={styles.cardContainer}>
             <View style={styles.imageArea}>
@@ -273,7 +231,7 @@ function createStyles (colorScheme){
             paddingVertical: 6,
             paddingHorizontal: 12,
             borderRadius: 6, 
-            backgroundColor: 'rgba(0,0,0,0.6)',
+            backgroundColor: isDark?'rgba(0,0,0,0.6)':'rgba(255, 255, 255, 0.8)',
             borderWidth: 1, 
             borderColor: 'rgba(255,255,255,0.2)',
         },
@@ -287,12 +245,12 @@ function createStyles (colorScheme){
             paddingVertical: 6,
             paddingHorizontal: 12,
             borderRadius: 6, 
-            backgroundColor: 'rgba(0,0,0,0.6)',
+            backgroundColor: isDark?'rgba(0,0,0,0.6)':'rgba(255, 255, 255, 0.8)',
             borderWidth: 1, 
             borderColor: 'rgba(255,255,255,0.2)',
         },
         statusText: {
-            color: 'white',
+            color: isDark?'white':'black',
             fontSize: 10,
             fontWeight: '900', 
             letterSpacing: 1.5,
@@ -300,7 +258,7 @@ function createStyles (colorScheme){
         actionButton: {
             flex: 1, // Takes up 1/4 of the card
             margin:10,
-            flexDirection: 'column',
+            flexDirection: 'row',
             alignItems: 'center',
             justifyContent: 'center',
             borderRadius:15,
@@ -311,6 +269,7 @@ function createStyles (colorScheme){
             color: 'rgba(255,255,255,0.6)',
             fontSize: 10,
             fontStyle: 'italic',
+            textAlign:'center',
             marginTop: 2,
         },
         timerText: {

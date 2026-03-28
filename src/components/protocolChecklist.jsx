@@ -101,6 +101,8 @@ export default function ProtocolChecklist({isReady, routine}){
             </TouchableOpacity>
         </FadeInView>
     );
+   // console.log("tasks.workout is",tasks.workout);
+    //console.log("is ready is ", isReady);
 
     return(
         <View style={styles.container}>
@@ -108,11 +110,11 @@ export default function ProtocolChecklist({isReady, routine}){
                 <Text style={styles.headerTitle}>DAILY PROTOCOL</Text>
                {(isReady||tasks.workout)? <Text style={[styles.headerSubtitle, completedCount===4 && {color: isDark ? '#00FF66' : '#00C851'}]}>{completedCount}/4 CLEARED</Text>:<Text style={[styles.headerSubtitle, completedCount===3 && {color: isDark ? '#00FF66' : '#00C851'}]}>{completedCount}/3 CLEARED</Text>}
             </View>
-            {(isReady || tasks.workout )&& <TaskItem
+            {(isReady || tasks.workout ) && <TaskItem
             label={`TRAIN TODAY`}
             isCompleted={tasks.workout}
             delay={100}
-            route= {`/workout/${routine.id}`}
+            route= {`/`}
             icon='dumbbell'
             /> }
             <TaskItem

@@ -29,6 +29,8 @@ export default function HomeScreen(){
     const {fromLogin, setFromLogin, setActiveProtocol,activeProtocol, isProtocolLoading, initializeProtocol} = useContext(WorkoutContext);
    //const [markedDates, setMarkedDates] = useState({});
     const[isReady, setIsReady] = useState(true);
+  const [hitRestTime, setHitRestTime] = useState('');
+
     const [routine, setRoutine] = useState({});
     const [lastLog, setLastLog] = useState({});
     const {colorScheme} = useContext(ThemeContext);
@@ -57,19 +59,21 @@ export default function HomeScreen(){
             setFromLogin(false);  
           }
         
-        await checkReadiness();
+       
 
         const data = await fetchLastGlobalWorkout();
         setLastLog(data);
         //console.log(data);
       
        if(activeProtocol==='custom'){
+        await checkCustomReadiness();
         const jsonValue = await AsyncStorage.getItem('customRoutine');
-        
         const customRoutine = JSON.parse(jsonValue);
         const lastWorkoutId = await AsyncStorage.getItem('lastWorkoutId');
         const lastCustomWorkout = customRoutine.workouts.find(w=>w.id===lastWorkoutId);
         setLastCustomWorkout(lastCustomWorkout);
+       } else if(activeProtocol==='hit'){
+        await checkHitReadiness();
        }
        
         setLoading(false);
@@ -81,7 +85,7 @@ export default function HomeScreen(){
     },[fromLogin, activeProtocol])
       );
     
-      const checkReadiness = async()=>{
+      const checkCustomReadiness = async()=>{
         const markedDates = await getWorkoutHistory();
         const todayStr = getTodayStringAdv();
         if(markedDates){
@@ -89,6 +93,50 @@ export default function HomeScreen(){
           else setIsReady(true);
         }else setIsReady(true);
       }
+
+      async function checkHitReadiness(){
+        try{
+            const markedDates = await getWorkoutHistory();
+            if(!markedDates){
+                setIsReady(true);
+                return;
+            }
+            const markedDatesArray = Object.keys(markedDates);
+            if(markedDatesArray.length===0){
+                setIsReady(true);
+                return;
+            }
+            markedDatesArray.sort((a,b)=> new Date(b)- new Date(a));
+            const lastWorkoutDateStr = markedDatesArray[0];
+
+            const [lastYear, lastMonth, lastDay] = lastWorkoutDateStr.split('-');
+            const lastWorkoutMidnight = new Date(lastYear, lastMonth-1, lastDay);
+            const lastWorkoutObj = new Date(lastYear, lastMonth-1, lastDay);
+            
+            lastWorkoutObj.setDate(lastWorkoutObj.getDate()+2);
+            const nextYear = lastWorkoutObj.getFullYear();
+            const nextMonth = String(lastWorkoutObj.getMonth()+1).padStart(2, '0');
+            const nextDay = String(lastWorkoutObj.getDate()).padStart(2,'0');
+
+            const nextWorkoutDate = `${nextDay}-${nextMonth}-${nextYear}`;
+
+            setHitRestTime(nextWorkoutDate);
+
+            const today = new Date();
+            const todayMidnight = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+
+            const diffInMilliSec = todayMidnight - lastWorkoutMidnight;
+            const diffInDays = diffInMilliSec/(24*60*60*1000);
+
+            if(diffInDays>=3){
+                setIsReady(true);
+            }else{
+                setIsReady(false);
+            }
+
+        }catch(e){console.error('Error checking hit readiness',e); setIsReady(true);}
+    }
+
 
     const getRoutine = ()=>{
      if(routines[0].exerciseIds.includes(lastLog.exerciseId)){
@@ -164,7 +212,7 @@ export default function HomeScreen(){
             <Text style={styles.lastWorkout}>{daysAgo(lastLog.date)}</Text>
             </View>}
           
-            <MissionCard/>
+            <MissionCard isReady={isReady} restTime={hitRestTime}/>
             <ProtocolChecklist isReady={isReady} routine={routine}/>
           </>
         ):(

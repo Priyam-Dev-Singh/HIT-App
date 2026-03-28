@@ -1,7 +1,10 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { customExercises } from "../data/customExercises";
 
+
+
 export const PerformanceAnalysis = async (routine, activeProtocol)=>{
+   
     const isCustomUser = activeProtocol === 'custom';
 
    try{
@@ -19,6 +22,7 @@ export const PerformanceAnalysis = async (routine, activeProtocol)=>{
         }
     } );
     }else{
+       // console.log("inside hit routine");
         routine.forEach((w)=>{
             w.exerciseIds.forEach(exId=>{
                 if(!allExercises.includes(exId)){
@@ -28,7 +32,7 @@ export const PerformanceAnalysis = async (routine, activeProtocol)=>{
         })
 
     }
-    console.log(routine);
+    //console.log(routine);
    const performanceData = allExercises.map((exId)=>analyseLast3Lifts(exId,storedLogs));
    //console.log(performanceData);
    return performanceData;
