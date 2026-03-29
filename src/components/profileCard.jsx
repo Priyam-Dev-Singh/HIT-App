@@ -490,7 +490,7 @@ function createStyles(isDark){
             borderColor: border 
         },
         activeChoice: { backgroundColor: primary, borderColor: primary },
-        choiceText: { fontSize: 14, fontWeight: '600', color: '#888' },
+        choiceText: { fontSize: 13, fontWeight: '600', color: '#888' },
         activeChoiceText: { color: '#FFF' },
          dateBtn: {
             backgroundColor: cardBg,

@@ -258,7 +258,7 @@ function createStyles (colorScheme){
         actionButton: {
             flex: 1, // Takes up 1/4 of the card
             margin:10,
-            flexDirection: 'row',
+            flexDirection: 'column',
             alignItems: 'center',
             justifyContent: 'center',
             borderRadius:15,
